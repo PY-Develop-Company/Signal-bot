@@ -54,8 +54,21 @@ def scalp_pro(close_price, fast_line=8, slow_line=10, smoothness=8):
     return sm.buy_signal if macd[0] > smooth3[0] else sm.sell_signal
 
 
-def volume():
-    pass
+def volume(open, close, bars_count=3):
+    buy_signal_count = 0
+    sell_signal_count = 0
+    for i in range(bars_count):
+        if open[i] <= close[i]:
+            buy_signal_count += 1
+        else:
+            sell_signal_count += 1
+
+    if buy_signal_count == bars_count:
+        return sm.buy_signal
+    elif sell_signal_count == bars_count:
+        return sm.sell_signal
+    else:
+        return sm.neutral_signal
 
 
 #barindex[0] or barindex[-1]
@@ -309,4 +322,4 @@ def nadaraya_watson_envelope(close_price, h=8.0, mult=3.0):
 
 
 if __name__ == '__main__':
-    print(nadaraya_watson_envelope(priceData.close))
+    print(volume(priceData.open, priceData.close))
