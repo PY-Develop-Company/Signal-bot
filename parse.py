@@ -4,13 +4,11 @@ import math
 import signal_maker as sm
 from datetime import timedelta
 
-import plotly.graph_objects as go
-
-symbol='NIFTY'
-exchange='NSE'
 
 def clamp(value, min_value, max_value):
     return max(min(value, max_value), min_value)
+
+
 def get_datetime(interval):
     if interval == Interval.in_3_minute:
         return timedelta(minutes=3)
@@ -80,15 +78,9 @@ def volume(open, close, bars_count=3):
         return sm.neutral_signal
 
 
-#barindex[0] or barindex[-1]
-def super_order_block(src, open, close, high, low, interval, pivotLookup=1, obBullColor=(0, 255, 0), obBearColor=(255, 0, 0), obMaxBoxSet=10, mitOBColor=(100, 100, 100),
-                      plotFVG=True, plotStructureBreakingFVG=True, fvgBullColor=(255,255,255), fvgBearColor=(255,255,255),
-                      fvgStructBreakingColor=(0, 0, 255), fvgMaxBoxSet=10, mitFVGColor=(100,100,100)):
-    pass
-
-    # pivotLookup = clamp(pivotLookup, 1, 5)
-    # obMaxBoxSet = clamp(obMaxBoxSet, 1, 100)
-    # fvgMaxBoxSet = clamp(fvgMaxBoxSet, 1, 100)
+def super_order_block(src, open, close, high, low, interval, obMaxBoxSet=10, fvgMaxBoxSet=10):
+    obMaxBoxSet = clamp(obMaxBoxSet, 1, 100)
+    fvgMaxBoxSet = clamp(fvgMaxBoxSet, 1, 100)
 
     # Box Arrays
     _bearBoxesOB = []
@@ -144,52 +136,17 @@ def super_order_block(src, open, close, high, low, interval, pivotLookup=1, obBu
                 nearest_low_price = price[i]
             lows.update({i: nearest_low_price})
         return lows
+
     def controlBox(boxes, high, low, box_index):
         for i in range(len(boxes)-1, 0, -1):
             is_price_in_box = (high > boxes[i].bottom and low < boxes[i].bottom) or (high > boxes[i].top and low < boxes[i].top)
             if src.datetime[box_index] == boxes[i].right and not is_price_in_box:
                 boxes[i].right = src.datetime[box_index] + get_datetime(interval)
-    #
-    # # # # # # # # # # # Pivots # # # # # # # # # #
-    # def pivot_high(source, leftbars, rightbars):
-    #     pivot_highs = []
-    #     for i in range(len(source)):
-    #          if i+rightbars >= len(source) or i-leftbars < 0:
-    #              continue
-    #          if (source[i] > source[i+rightbars]) and (source[i] > source[i-leftbars]):
-    #              pivot_highs.append(source[i])
-    #     return pivot_highs
-    # def pivot_low(source, leftbars, rightbars):
-    #     pivot_lows = []
-    #     for i in range(len(source)):
-    #         if i + rightbars >= len(source) or i - leftbars < 0:
-    #             continue
-    #         if (source[i] < source[i+rightbars]) and (source[i] < source[i-leftbars]):
-    #             pivot_lows.append(source[i])
-    #     return pivot_lows
-    #
-    # def value_when(condition, source):
-    #     result = []
-    #     y = len(condition)-1
-    #     for i in range(len(source), 0, -1):
-    #         if condition[y] == source[i-1]:
-    #             result.append(source[i-1])
-    #             y = clamp(y-1, 0, y)
-    #         elif len(result) == 0:
-    #             result.append(0)
-    #         else:
-    #             result.append(result[-1])
-    #     return result
-    #
-    #
-    # def del_box(boxes, box):
-    #     boxes.remove(box)
 
     top = pivot_high(high, src.datetime)
     bottom = pivot_low(low, src.datetime)
 
     # # # # # # # # # # # Order Block # # # # # # # # #
-    # OB Boxes
     for i in range(100, 0, -1):
         if is_ob_box_up(i+1):
             _bullboxOB = Box(left=src.datetime[i] - get_datetime(interval)*2, top=high[i+2], right=src.datetime[i], bottom=min(low[i+2], low[i+1]), signal_type=sm.buy_signal)
@@ -229,47 +186,8 @@ def super_order_block(src, open, close, high, low, interval, pivotLookup=1, obBu
                 _bearBoxesFVG.remove(_bearBoxesFVG[0])
             _bearBoxesFVG.append(_bearboxFVG)
 
-        if plotFVG or plotStructureBreakingFVG:
-            controlBox(_bearBoxesFVG, high[i], low[i], i)
-            controlBox(_bullBoxesFVG, high[i], low[i], i)
-
-    # scatters = []
-    # for box in _bearBoxesFVG:
-    #     scatters.append(go.Scatter(x=[box.left, box.left, box.right, box.right, box.left],
-    #                y=[box.bottom, box.top, box.top, box.bottom, box.bottom],
-    #                fill="toself", fillcolor='#42f542'))
-    # scatters.append(go.Scatter(x=[src.datetime[x] for x in range(0, 100)], y=[top.get(x) for x in range(0, 100)]))
-    # fig = go.Figure(
-    #     data=[
-    #         go.Candlestick(
-    #             x=src["datetime"],
-    #             open=src["open"],
-    #             high=src["high"],
-    #             low=src["low"],
-    #             close=src["close"]
-    #         ),
-    #         scatters[-1],
-    #         scatters[-2],
-    #         scatters[-3]
-    #
-    #         # go.Scatter(
-    #         #     x=src["datetime"],
-    #         #     y=avg_red,
-    #         #     mode='lines',
-    #         #     name='red_signal',
-    #         #     line={'color': '#eb3434'}
-    #         # )
-    #     ]
-    # )
-    # fig.update_layout(
-    #     title=f'The Candlestick graph for {symbol}',
-    #     xaxis_title='Date',
-    #     yaxis_title=f'Price ({exchange})',
-    #     xaxis_rangeslider_visible=False,
-    #     xaxis=dict(type="category")
-    # )
-    #
-    # fig.show()
+        controlBox(_bearBoxesFVG, high[i], low[i], i)
+        controlBox(_bullBoxesFVG, high[i], low[i], i)
 
     for box in _bullBoxesOB:
         signal = box.check_signal(low[0], high[0], src.datetime[0])
@@ -291,72 +209,16 @@ def super_order_block(src, open, close, high, low, interval, pivotLookup=1, obBu
 
 
 def ultimate_moving_average(close_price, rolling=20, smoothe=2):
-    # def sma(x, y):
-    #     sum = 0.0
-    #     for i in range(0, y):
-    #         sum += x[i] / y
-    #
-    #     return sum
-    #
-    # def ema(src, length):
-    #     alpha = 2 / (length + 1)
-    #     sum = sma(src, length) if (sum[1] == None) else alpha * src[0] + (1 - alpha) * sum[1]
-    #     return sum
-
     avg = close_price.rolling(window=rolling).mean()
     avg = avg.shift(periods=-rolling)
 
-    # avg_red = []
-    # avg_green = []
     signals = []
     for i in range(len(avg)):
         if np.isnan(avg[i]) or np.isnan(avg[i+smoothe]):
             continue
 
         ma_up = avg[i] >= avg[i+smoothe]
-        # ma_down = avg[i] < avg[i+smoothe]
-
         signals.append(sm.buy_signal if ma_up else sm.sell_signal)
-        # if ma_up:
-        #     avg_red.append((avg.index, 0))
-        #     avg_green.append((avg.index, avg[i]))
-        # if ma_down:
-        #     avg_red.append((avg.index, avg[i]))
-        #     avg_green.append((avg.index, 0))
-
-    # z_avg_red = list(zip(*avg_red))
-    # avg_red = pd.Series(z_avg_red[1], index=z_avg_red[0])
-    # z_avg_green = list(zip(*avg_green))
-    # avg_green = pd.Series(z_avg_green[1], index=z_avg_green[0])
-    #
-    # fig = go.Figure(
-    #     data=[
-    #         go.Candlestick(
-    #             x=src["datetime"],
-    #             open=src["open"],
-    #             high=src["high"],
-    #             low=src["low"],
-    #             close=src["close"]
-    #         ),
-    #
-    #         go.Scatter(
-    #             x=src["datetime"],
-    #             y=avg_red,
-    #             mode='lines',
-    #             name='red_signal',
-    #             line={'color': '#eb3434'}
-    #         )
-    #     ]
-    # )
-    # fig.update_layout(
-    #     title=f'The Candlestick graph for {symbol}',
-    #     xaxis_title='Date',
-    #     yaxis_title=f'Price ({exchange})',
-    #     xaxis_rangeslider_visible=False,
-    #     xaxis=dict(type="category")
-    # )
-    #
-    # fig.show()
 
     return signals[0]
 
@@ -390,5 +252,13 @@ def nadaraya_watson_envelope(close_price, h=8.0, mult=3.0):
 
 
 if __name__ == '__main__':
-    df = get_price_data()
-    print(super_order_block(df, df.open, df.close, df.high, df.low, Interval.in_5_minute))
+    username = 't4331662@gmail.com'
+    password = 'Pxp626AmH7_'
+    # tv = TvDatafeed()
+    # tv = TvDatafeed(username=username, password=password)
+    # data = tv.search_symbol("EURUSD")[0]
+    # print(data)
+    # get_price_data(symbol=data["symbol"], exchange=data["exchange"])
+    get_price_data()
+
+

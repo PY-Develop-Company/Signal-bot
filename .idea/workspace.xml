@@ -41,7 +41,7 @@
     &quot;settings.editor.selected.configurable&quot;: &quot;configurable.group.project&quot;
   }
 }</component>
-  <component name="RunManager" selected="Python.signal_maker">
+  <component name="RunManager" selected="Python.parse">
     <configuration name="main" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
       <module name="Signal-bot" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -107,8 +107,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.signal_maker" />
         <item itemvalue="Python.parse" />
+        <item itemvalue="Python.signal_maker" />
       </list>
     </recent_temporary>
   </component>
