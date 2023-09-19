@@ -1,5 +1,6 @@
 import parse
 from pandas import DataFrame
+import time
 from tvDatafeed import TvDatafeed, Interval
 
 username = 't4331662@gmail.com'
@@ -7,9 +8,17 @@ password = 'Pxp626AmH7_'
 symbol = 'NIFTY'
 exchange = 'NSE'
 
-buy_signal = "Buy"
-sell_signal = "Sell"
+buy_signal = "Лонг"
+sell_signal = "Шорт"
 neutral_signal = "Neutral"
+
+
+def get_signal_message(signal, symbol, interval):
+    return signal + " на " + symbol + " " + str(interval)
+
+
+def close_position(interval):
+    time.sleep()
 
 
 def check_signal(price_data: DataFrame, successful_indicators_count=4):
@@ -23,9 +32,9 @@ def check_signal(price_data: DataFrame, successful_indicators_count=4):
 
     main_signal = max(signal_counts)
     if main_signal[0] >= successful_indicators_count:
-        return main_signal[1], main_signal[0]
+        return (True, get_signal_message(main_signal[1], symbol, price_data.datetime[0]-price_data.datetime[1]))
 
-    return neutral_signal, 0
+    return False, "None"
 
 
 if __name__ == "__main__":
