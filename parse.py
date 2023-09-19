@@ -30,7 +30,7 @@ def scalp_pro(close_price, fast_line=8, slow_line=10, smoothness=8):
         c2 = 2 * a * math.cos(f)
         c1 = 1 - c2 - c3
 
-        for i in range(len(p)):
+        for i in range(1, len(p)):
             ssm1 = 0
             ssm2 = 0
             if i > 2:
