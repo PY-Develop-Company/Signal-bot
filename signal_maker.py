@@ -8,7 +8,7 @@ exchange = 'NSE'
 
 buy_signal = "Buy"
 sell_signal = "Sell"
-neutral_signal = "Wait"
+neutral_signal = "Neutral"
 
 def check_signal(successful_indicators_count=2, interval=Interval.in_5_minute):
     tv = TvDatafeed()
