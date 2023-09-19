@@ -1,12 +1,7 @@
 import numpy as np
-from plotly.graph_objs.layout import xaxis
 from tvDatafeed import TvDatafeed, Interval
 import math
-import matplotlib.pyplot as plt
-import plotly.graph_objects as go
-import pandas as pd
 import signal_maker as sm
-# from torch import clamp
 
 def clamp(value, min_value, max_value):
     return max(min(value, max_value), min_value)
