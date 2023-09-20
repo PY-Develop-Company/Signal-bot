@@ -35,6 +35,16 @@ none_status = "none"
 wait_status = 'Очікуємо перевірки'
 
 
+async def get_chat_id(user_id):
+    try:
+        chat_member = await bot.get_chat(user_id)
+        chat_id = chat_member.id
+        return chat_id
+    except Exception as e:
+        print(f"Error: {e}")
+        return None
+
+
 def get_vip_users_ids():
     data = read_file(db_path)
     vip_users = []
@@ -221,6 +231,8 @@ def open_signal_check_thread(interval):
                 open_signal = signal_maker.check_signal(data, successful_indicators_count=4)
                 if open_signal[0]:
                     for user_id in vip_users_ids:
+                        if await get_chat_id(user_id) is None:
+                            continue
                         message = await bot.send_message(
                             user_id,
                             signal_maker.get_open_position_signal_message(open_signal[1], symbol, timedelta_interval),
@@ -252,6 +264,17 @@ def close_signal_check_thread(vip_users_ids, open_signal, symbol, interval):
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
     loop.run_until_complete(close_signal_check(vip_users_ids, open_signal, symbol, interval))
+
+
+def test_thr():
+    async def test():
+        vips = get_vip_users_ids()
+        for i in vips:
+            print(await get_chat_id(i), i)
+
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    loop.run_until_complete(test())
 
 
 if __name__ == '__main__':
