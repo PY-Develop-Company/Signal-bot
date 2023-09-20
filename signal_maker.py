@@ -2,30 +2,48 @@ import indicators_reader
 import price_parser
 from pandas import DataFrame
 import time
-
+from pandas import Timedelta
+from datetime import timedelta
 import signal_maker
 
 username = 't4331662@gmail.com'
 password = 'Pxp626AmH7_'
 
-buy_signal = "Лонг"
-sell_signal = "Шорт"
+buy_signal = "<b>Лонг</b>⬆️"
+sell_signal = "<b>Шорт</b>⬇️"
 neutral_signal = "Neutral"
 
 
-def get_signal_message(signal, symbol, interval, indicators=""):
-    message = signal + " на " + symbol + " " + str(interval)
-    if not indicators == "":
-        message.join(indicators)
+def timedelta_to_string(interval):
+    delay_days = interval / Timedelta(days=1)
+    delay_hours = interval / Timedelta(hours=1)
+    delay_minutes = interval / Timedelta(minutes=1)
+    if delay_days > 0:
+        str(int(delay_days)) + "D"
+    elif delay_hours > 0:
+        return str(int(delay_hours)) + "h"
 
+    return str(int(delay_minutes)) + "m"
+
+
+def get_open_position_signal_message(signal, symbol, interval, indicators=""):
+    message = "🟢" + signal + "\n        " + symbol + " на " + timedelta_to_string(interval)
     return message
 
 
-def close_position(interval):
-    time.sleep()
+def get_close_position_signal_message(signal, symbol, interval):
+    message = "🔴Закриваємо позицію: " + signal + "\n        " + symbol + " на " + timedelta_to_string(interval)
+    return message
 
 
-def check_signal(prices: DataFrame, symbol, successful_indicators_count=4):
+async def close_position(signal, symbol, interval: timedelta, bars_count=3):
+    delay_minutes = interval / Timedelta(minutes=1)
+    time.sleep(delay_minutes * bars_count * 60)
+    return get_close_position_signal_message(signal, symbol, interval)
+
+
+
+def check_signal(prices: DataFrame, successful_indicators_count=4):
     indicators_signals = [indicators_reader.volume(prices.open, prices.close),
                           indicators_reader.ultimate_moving_average(prices.close),
                           indicators_reader.nadaraya_watson_envelope(prices.close),
@@ -34,7 +52,7 @@ def check_signal(prices: DataFrame, symbol, successful_indicators_count=4):
                                                               prices.low, prices.datetime[0] - prices.datetime[1])]
 
     signal_counts = {buy_signal: [0, []], sell_signal: [0, []]}
-    print(indicators_signals)
+    print(prices.symbol[0], prices.datetime[0]-prices.datetime[1], indicators_signals)
     for signal in indicators_signals:
         if not signal[0] == neutral_signal:
             signal_counts.get(signal[0])[0] += 1
@@ -46,9 +64,8 @@ def check_signal(prices: DataFrame, symbol, successful_indicators_count=4):
             main_signal = signal_count
 
     if main_signal[1][0] >= successful_indicators_count:
-        return (True, get_signal_message(main_signal[0], symbol, prices.datetime[0] - prices.datetime[1], main_signal[1][1]))
-
-    return False, "None"
+        return (True, main_signal[0])
+    return False, neutral_signal
 
 
 if __name__ == "__main__":

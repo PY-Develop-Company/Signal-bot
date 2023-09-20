@@ -9,6 +9,7 @@ import signal_maker
 from pandas import Timedelta
 from tvDatafeed import Interval
 import asyncio
+import multiprocessing
 
 BANAN_API_TOKEN = "6037306867:AAE7op0UnUoe4nzZGPFLUGLPOikMpoI4ADc"
 API_TOKEN = "6538527964:AAHUUHZHYVnNFbYAPoMn4bRUMASKR0h9qfA"
@@ -207,45 +208,60 @@ async def handle_media(message: types.Message):
         else:
             await not_vip_main_menu(message)
 
-    # vip_users_ids = get_vip_users_ids()
-    # for currency in price_parser.get_currencies():
-    #     data = price_parser.get_price_data(symbol=currency[0], exchange=currency[1], interval=Interval.in_1_minute)
-    #
-    #     symbol = data.symbol[0].split(":")[1]
-    #     signal = signal_maker.check_signal(data, symbol, successful_indicators_count=3)
-    #     print(signal)
-    #
-    #     delay_minutes = (data.datetime[0]-data.datetime[1]) / Timedelta(minutes=1)
-    #     time.sleep(delay_minutes*60)
+
+def open_signal_check_thread(interval):
+    async def open_signal_check(interval):
+        while True:
+            vip_users_ids = get_vip_users_ids()
+            for currency in price_parser.get_currencies():
+                data = price_parser.get_price_data(symbol=currency[0], exchange=currency[1], interval=interval)
+
+                timedelta_interval = data.datetime[0] - data.datetime[1]
+                symbol = data.symbol[0].split(":")[1]
+                open_signal = signal_maker.check_signal(data, successful_indicators_count=4)
+                if open_signal[0]:
+                    for user_id in vip_users_ids:
+                        message = await bot.send_message(
+                            user_id,
+                            signal_maker.get_open_position_signal_message(open_signal[1], symbol, timedelta_interval),
+                            disable_notification=False,
+                            parse_mode="HTML"
+                        )
+                    p = multiprocessing.Process(target=close_signal_check_thread,
+                                                args=(vip_users_ids, open_signal[1], symbol, timedelta_interval))
+                    p.start()
+            delay_minutes = (data.datetime[0] - data.datetime[1]) / Timedelta(minutes=1)
+            time.sleep(delay_minutes * 60)
+
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    loop.run_until_complete(open_signal_check(interval))
 
 
-async def signal_check(interval):
-    while True:
-        vip_users_ids = get_vip_users_ids()
-        for currency in price_parser.get_currencies():
-            data = price_parser.get_price_data(symbol=currency[0], exchange=currency[1], interval=interval)
+def close_signal_check_thread(vip_users_ids, open_signal, symbol, interval):
+    async def close_signal_check(vip_users_ids, open_signal, symbol, interval):
+        close_signal = await signal_maker.close_position(open_signal, symbol, interval)
+        for user_id in vip_users_ids:
+            await bot.send_message(
+                user_id,
+                close_signal,
+                disable_notification=False,
+                parse_mode="HTML"
+            )
 
-            symbol = data.symbol[0].split(":")[1]
-            signal = signal_maker.check_signal(data, symbol, successful_indicators_count=2)
-            if signal[0]:
-                for user_id in vip_users_ids:
-                    await bot.send_message(
-                        user_id,
-                        signal[1],
-                        disable_notification=False
-                    )
-        delay_minutes = (data.datetime[0]-data.datetime[1]) / Timedelta(minutes=1)
-        time.sleep(delay_minutes*60)
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    loop.run_until_complete(close_signal_check(vip_users_ids, open_signal, symbol, interval))
 
 
 if __name__ == '__main__':
     from aiogram import executor
+    p1 = multiprocessing.Process(target=open_signal_check_thread, args=(Interval.in_1_minute,))
+    p2 = multiprocessing.Process(target=open_signal_check_thread, args=(Interval.in_15_minute,))
+    p3 = multiprocessing.Process(target=open_signal_check_thread, args=(Interval.in_5_minute,))
 
-    main_loop = asyncio.get_event_loop()
+    p1.start()
+    p2.start()
+    p3.start()
 
-    main_loop.run_until_complete(signal_check(Interval.in_1_minute))
-
-    # loop = asyncio.get_event_loop()
-    # t1 = threading.Thread(target=signal_check_loop, args=(loop,))
-    # t1.start()
     executor.start_polling(dp, skip_updates=True)
