@@ -4,6 +4,7 @@ import plotly.graph_objects as go
 import math
 import signal_maker as sm
 from datetime import timedelta
+from pandas import DataFrame, Series
 
 
 def clamp(value, min_value, max_value):
@@ -27,33 +28,150 @@ def get_datetime(interval):
         return timedelta(days=1)
 
 
-def scalp_pro(close_price, fast_line=8, slow_line=10, smoothness=8):
-    def smooth(par, p):
-        res = np.empty(close_price.shape, dtype=float)
+def scalp_pro(src, close_price, fast_line=8, slow_line=10, smoothness=8):
+    def smooth(par, p: Series):
+        res = np.empty(len(close_price), dtype=float)
 
-        f = (1.414 * math.pi) / par
+        f = (1.414 * math.pi) / float(par)
         a = math.exp(-f)
         c3 = -a * a
         c2 = 2 * a * math.cos(f)
         c1 = 1 - c2 - c3
 
-        for i in range(1, len(p)):
+        for i in range(len(p)-2, -1, -1):
+
             ssm1 = 0
             ssm2 = 0
-            if i > 2:
-                ssm1 = 0 if np.isnan(res[i-1]) else res[i-1]
-                ssm2 = 0 if np.isnan(res[i-2]) else res[i-2]
+            if not (i+1 >= len(p) or np.isnan(res[i+1])):
+                ssm1 = res[i+1]
+            if not (i+2 >= len(p) or np.isnan(res[i+2])):
+                ssm2 = res[i+2]
 
-            res[i] = c1 * (p[i] + p[i-1]) * 0.5 + c2 * ssm1 + c3 * ssm2
+            res[i] += c1 * (p[i] + p[i + 1]) + c2 * ssm1 + c3 * ssm2
         return res
 
     smooth1 = smooth(fast_line, close_price)
     smooth2 = smooth(slow_line, close_price)
 
-    macd = (smooth1 - smooth2) * 10000000
-    smooth3 = smooth(smoothness, macd)
 
+    macd = (smooth1 - smooth2) * 100
+    smooth3 = smooth(smoothness, macd)
+    # fig = go.Figure(
+    #     data=[
+    #         go.Candlestick(
+    #             x=src["datetime"],
+    #             open=src["open"],
+    #             high=src["high"],
+    #             low=src["low"],
+    #             close=src["close"]
+    #         ),
+    #
+    #         go.Scatter(
+    #             x=src["datetime"],
+    #             y=smooth1,
+    #             mode='lines',
+    #             name='green_sig',
+    #             line={'color': '#eb3434'}
+    #         ),
+    #         go.Scatter(
+    #             x=src["datetime"],
+    #             y=smooth2,
+    #             mode='lines',
+    #             name='red_signal',
+    #             line={'color': '#890089'}
+    #         ),
+    #         go.Scatter(
+    #             x=src["datetime"],
+    #             y=macd,
+    #             mode='lines',
+    #             name='macd',
+    #             line={'color': '#888888'}
+    #         ),
+    #         go.Scatter(
+    #             x=src["datetime"],
+    #             y=smooth3,
+    #             mode='lines',
+    #             name='sm3',
+    #             line={'color': '#AAAAAA'}
+    #         )
+    #     ]
+    # )
+    # fig.update_layout(
+    #     title=f'The Candlestick graph for ',
+    #     xaxis_title='Date',
+    #     yaxis_title=f'Price ()',
+    #     xaxis_rangeslider_visible=False,
+    #     xaxis=dict(type="category")
+    # )
+    # fig.show()
     return (sm.buy_signal if macd[0] > smooth3[0] else sm.sell_signal, "scalp_pro")
+# def scalp_pro(src, close_price, fast_line=8, slow_line=10, smoothness=8):
+#     return (sm.neutral_signal, "scalp_pro")
+    # def smooth(par, p):
+    #     f = (np.sqrt(2) * np.pi) / par
+    #     a = np.exp(-f)
+    #     print(np.cos(f))
+    #     c2 = 2 * a * np.cos(f)
+    #     c3 = -a * a
+    #     c1 = 1 - c2 - c3
+    #     print(c1,c2, c3)
+    #
+    #     res = np.empty(len(close_price), dtype=float)
+    #     for i in range(len(p)):
+    #         if i == 0:
+    #             res[i] = c1 * (p[i] + p[i + 1]) * 0.5
+    #         else:
+    #             res[i] = c1 * (p[i] + p[i - 1]) * 0.5
+    #
+    #     for i in range(1, len(p)):
+    #         res[i] += c2 * res[i - 1]
+    #
+    #     for i in range(2, len(p)):
+    #         res[i] += c3 * res[i - 2]
+    #     return res
+    #
+    # smooth1 = close_price.rolling(window=fast_line).mean()#smooth(fast_line, close_price) #
+    # smooth2 = close_price.rolling(window=slow_line).mean()#smooth(slow_line, close_price) #
+    #
+    # macd = (smooth1 - smooth2)
+    # smooth3 = macd.rolling(window=smoothness).mean()
+    #
+    # fig = go.Figure(
+    #     data=[
+    #         go.Candlestick(
+    #             x=src["datetime"],
+    #             open=src["open"],
+    #             high=src["high"],
+    #             low=src["low"],
+    #             close=src["close"]
+    #         ),
+    #
+    #         go.Scatter(
+    #             x=src["datetime"],
+    #             y=smooth1,
+    #             mode='lines',
+    #             name='green_sig',
+    #             line={'color': '#eb3434'}
+    #         ),
+    #         go.Scatter(
+    #             x=src["datetime"],
+    #             y=smooth2,
+    #             mode='lines',
+    #             name='red_signal',
+    #             line={'color': '#890089'}
+    #         )
+    #     ]
+    # )
+    # fig.update_layout(
+    #     title=f'The Candlestick graph for ',
+    #     xaxis_title='Date',
+    #     yaxis_title=f'Price ()',
+    #     xaxis_rangeslider_visible=False,
+    #     xaxis=dict(type="category")
+    # )
+    # fig.show()
+    # return (sm.buy_signal if macd[0] > smooth3[0] else sm.sell_signal, "scalp_pro")
+
 
 
 def volume(open, close, bars_count=3):
@@ -179,92 +297,6 @@ def super_order_block(src, open, close, high, low, interval: timedelta, obMaxBox
 
         control_box(_bearBoxesFVG, high[i], low[i], i)
         control_box(_bullBoxesFVG, high[i], low[i], i)
-
-    # scatters1 = []
-    # scatters2 = []
-    # scatters3 = []
-    # scatters4 = []
-    # for box in _bullBoxesOB:
-    #     scatters1.append(go.Scatter(x=[box.left, box.left, box.right, box.right, box.left],
-    #                y=[box.bottom, box.top, box.top, box.bottom, box.bottom],
-    #                fill="toself", fillcolor='#42f542'))
-    # for box in _bearBoxesOB:
-    #     scatters2.append(go.Scatter(x=[box.left, box.left, box.right, box.right, box.left],
-    #                                y=[box.bottom, box.top, box.top, box.bottom, box.bottom],
-    #                                fill="toself", fillcolor='#E01400'))
-    # for box in _bullBoxesFVG:
-    #     scatters3.append(go.Scatter(x=[box.left, box.left, box.right, box.right, box.left],
-    #                                y=[box.bottom, box.top, box.top, box.bottom, box.bottom],
-    #                                fill="toself", fillcolor='#00CCCC'))
-    # for box in _bearBoxesFVG:
-    #     scatters4.append(go.Scatter(x=[box.left, box.left, box.right, box.right, box.left],
-    #                                y=[box.bottom, box.top, box.top, box.bottom, box.bottom],
-    #                                fill="toself", fillcolor='#9200E0'))
-    #
-    # # scatters.append(go.Scatter(x=[src.datetime[x] for x in range(0, 100)], y=[top.get(x) for x in range(0, 100)]))
-    # fig = go.Figure(
-    #     data=[
-    #         go.Candlestick(
-    #             x=src["datetime"],
-    #             open=src["open"],
-    #             high=src["high"],
-    #             low=src["low"],
-    #             close=src["close"]
-    #         ),
-    #         scatters1[-1],
-    #         scatters1[-2],
-    #         scatters1[-3],
-    #         scatters1[-4],
-    #         scatters1[-5],
-    #         scatters2[-1],
-    #         scatters2[-2],
-    #         scatters2[-3],
-    #         scatters2[-4],
-    #         scatters2[-5],
-    #         scatters3[-1],
-    #         scatters3[-2],
-    #         scatters3[-3],
-    #         scatters3[-4],
-    #         scatters3[-5],
-    #         scatters4[-1],
-    #         scatters4[-2],
-    #         scatters4[-3],
-    #         scatters4[-4],
-    #         scatters4[-5]
-    #         # go.Scatter(
-    #         #     x=src["datetime"],
-    #         #     y=avg_red,
-    #         #     mode='lines',
-    #         #     name='red_signal',
-    #         #     line={'color': '#eb3434'}
-    #         # )
-    #     ]
-    # )
-    # fig.update_layout(
-    #     title=f'The Candlestick graph for ',
-    #     xaxis_title='Date',
-    #     yaxis_title=f'Price ()',
-    #     xaxis_rangeslider_visible=False,
-    #     xaxis=dict(type="category")
-    # )
-    # fig.show()
-
-    # for box in _bullBoxesOB:
-    #     signal = box.check_signal(low[0], high[0], src.datetime[0])
-    #     if not signal == sm.neutral_signal:
-    #         return signal
-    # for box in _bearBoxesOB:
-    #     signal = box.check_signal(low[0], high[0], src.datetime[0])
-    #     if not signal == sm.neutral_signal:
-    #         return signal
-    # for box in _bullBoxesFVG:
-    #     signal = box.check_signal(low[0], high[0], src.datetime[0])
-    #     if not signal == sm.neutral_signal:
-    #         return signal
-    # for box in _bearBoxesFVG:
-    #     signal = box.check_signal(low[0], high[0], src.datetime[0])
-    #     if not signal == sm.neutral_signal:
-    #         return signal
 
     boxes = _bullBoxesOB + _bearBoxesOB + _bullBoxesFVG + _bearBoxesFVG
     return_signal = sm.neutral_signal

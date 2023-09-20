@@ -38,5 +38,5 @@ if __name__ == '__main__':
     tv = TvDatafeed()
     # tv = TvDatafeed(username=username, password=password)
     cur = get_currencies()[0]
-    df = get_price_data(symbol=cur[0], exchange=cur[1], interval=Interval.in_5_minute)
-    indicators_reader.super_order_block(df, df.open, df.close, df.high, df.low, interval=Interval.in_5_minute)
+    df = get_price_data(symbol="AUDCAD", exchange="OANDA", interval=Interval.in_5_minute, bars_count=100)
+    print(indicators_reader.scalp_pro(df, df.close))
