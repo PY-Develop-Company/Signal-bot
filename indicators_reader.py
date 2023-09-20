@@ -1,5 +1,5 @@
 import numpy as np
-from tvDatafeed import TvDatafeed, Interval
+from tvDatafeed import Interval
 import math
 import signal_maker as sm
 from datetime import timedelta
@@ -18,18 +18,6 @@ def get_datetime(interval):
         return timedelta(minutes=15)
     else:
         return timedelta(days=1)
-
-
-def get_price_data(symbol='NIFTY', exchange='NSE', interval=Interval.in_5_minute, username='t4331662@gmail.com', password='Pxp626AmH7_'):
-    tv = TvDatafeed()
-    # tv = TvDatafeed(username=username, password=password)
-
-    priceData = tv.get_hist(symbol=symbol, exchange=exchange, interval=interval, n_bars=1000)
-    priceData = priceData.reindex(index=priceData.index[::-1]).reset_index()
-    # priceData = priceData.set_index("datetime")
-    # print(priceData.head())
-    # priceData.info()
-    return priceData
 
 
 def scalp_pro(close_price, fast_line=8, slow_line=10, smoothness=8):
@@ -58,7 +46,7 @@ def scalp_pro(close_price, fast_line=8, slow_line=10, smoothness=8):
     macd = (smooth1 - smooth2) * 10000000
     smooth3 = smooth(smoothness, macd)
 
-    return sm.buy_signal if macd[0] > smooth3[0] else sm.sell_signal
+    return (sm.buy_signal if macd[0] > smooth3[0] else sm.sell_signal, "scalp_pro")
 
 
 def volume(open, close, bars_count=3):
@@ -70,24 +58,16 @@ def volume(open, close, bars_count=3):
         else:
             sell_signal_count += 1
 
+    signal = sm.neutral_signal
     if buy_signal_count == bars_count:
-        return sm.buy_signal
+        signal = sm.buy_signal
     elif sell_signal_count == bars_count:
-        return sm.sell_signal
-    else:
-        return sm.neutral_signal
+        signal = sm.sell_signal
+
+    return (signal, "volume")
 
 
-def super_order_block(src, open, close, high, low, interval, obMaxBoxSet=10, fvgMaxBoxSet=10):
-    obMaxBoxSet = clamp(obMaxBoxSet, 1, 100)
-    fvgMaxBoxSet = clamp(fvgMaxBoxSet, 1, 100)
-
-    # Box Arrays
-    _bearBoxesOB = []
-    _bullBoxesOB = []
-    _bearBoxesFVG = []
-    _bullBoxesFVG = []
-
+def super_order_block(src, open, close, high, low, interval: timedelta, obMaxBoxSet=10, fvgMaxBoxSet=10):
     class Box:
         def __init__(self, left=0, top=0, right=0, bottom=0, signal_type="box"):
             self.left = left
@@ -101,76 +81,76 @@ def super_order_block(src, open, close, high, low, interval, obMaxBoxSet=10, fvg
             is_date_range_in_box = self.left <= bar_date <= self.right
             return self.signal_type if is_price_in_box and is_date_range_in_box else sm.neutral_signal
 
-    def is_up_bar(index):
-        return close[index] > open[index]
+    is_up_bar = lambda index: close[index] > open[index]
+    is_down_bar = lambda index: close[index] < open[index]
+    is_ob_box_up = lambda index: is_down_bar(index + 1) and is_up_bar(index) and close[index] > high[index + 1]
+    is_ob_box_down = lambda index: is_up_bar(index + 1) and is_down_bar(index) and close[index] < low[index + 1]
+    is_fvg_box_up = lambda index: low[index] > high[index + 2]
+    is_fvg_box_down = lambda index: high[index] < low[index + 2]
 
-    def is_down_bar(index):
-        return close[index] < open[index]
-
-    def is_ob_box_up(index):
-        return is_down_bar(index + 1) and is_up_bar(index) and close[index] > high[index + 1]
-
-    def is_ob_box_down(index):
-        return is_up_bar(index + 1) and is_down_bar(index) and close[index] < low[index + 1]
-
-    def is_fvg_box_up(index):
-        return low[index] > high[index + 2]
-
-    def is_fvg_box_down(index):
-        return high[index] < low[index + 2]
-
-    def pivot_high(price, date):
+    def pivot_high(price):
         highs = {}
-        nearest_high_price = price[100]
-        for i in range(100, 0, -1):
-            if i-1 > 0 and price[i-1] < price[i] > price[i+1]:
+        prices_count = len(price)
+        nearest_high_price = price[prices_count-1]
+        for i in range(prices_count-2, 1, -1):
+            if price[i-1] < price[i] > price[i+1]:
                 nearest_high_price = price[i]
             highs.update({i: nearest_high_price})
         return highs
 
-    def pivot_low(price, date):
+    def pivot_low(price):
         lows = {}
-        nearest_low_price = price[100]
-        for i in range(100, 0, -1):
-            if i-1 > 0 and price[i-1] > price[i] < price[i+1]:
+        prices_count = len(price)
+        nearest_low_price = price[prices_count-1]
+        for i in range(prices_count-2, 1, -1):
+            if price[i-1] > price[i] < price[i+1]:
                 nearest_low_price = price[i]
             lows.update({i: nearest_low_price})
         return lows
 
-    def controlBox(boxes, high, low, box_index):
+    def control_box(boxes, high, low, box_index):
         for i in range(len(boxes)-1, 0, -1):
             is_price_in_box = (high > boxes[i].bottom and low < boxes[i].bottom) or (high > boxes[i].top and low < boxes[i].top)
             if src.datetime[box_index] == boxes[i].right and not is_price_in_box:
                 boxes[i].right = src.datetime[box_index] + get_datetime(interval)
 
-    top = pivot_high(high, src.datetime)
-    bottom = pivot_low(low, src.datetime)
+    obMaxBoxSet = clamp(obMaxBoxSet, 1, 100)
+    fvgMaxBoxSet = clamp(fvgMaxBoxSet, 1, 100)
 
+    _bearBoxesOB = []
+    _bullBoxesOB = []
+    _bearBoxesFVG = []
+    _bullBoxesFVG = []
+
+    top = pivot_high(high)
+    bottom = pivot_low(low)
+
+    prices_count = len(src)
     # # # # # # # # # # # Order Block # # # # # # # # #
-    for i in range(100, 0, -1):
+    for i in range(prices_count-3, 1, -1):
         if is_ob_box_up(i+1):
-            _bullboxOB = Box(left=src.datetime[i] - get_datetime(interval)*2, top=high[i+2], right=src.datetime[i], bottom=min(low[i+2], low[i+1]), signal_type=sm.buy_signal)
+            _bullboxOB = Box(left=src.datetime[i] - interval*2, top=high[i+2], right=src.datetime[i], bottom=min(low[i+2], low[i+1]), signal_type=sm.buy_signal)
             if len(_bullBoxesOB) > obMaxBoxSet:
                 _bullBoxesOB.remove(_bullBoxesOB[0])
             _bullBoxesOB.append(_bullboxOB)
 
         if is_ob_box_down(i+1):
-            _bearboxOB = Box(left=src.datetime[i] - get_datetime(interval)*2, top=max(high[i+2], high[i+1]), right=src.datetime[i], bottom=low[i+2], signal_type=sm.sell_signal)
+            _bearboxOB = Box(left=src.datetime[i] - interval*2, top=max(high[i+2], high[i+1]), right=src.datetime[i], bottom=low[i+2], signal_type=sm.sell_signal)
             if len(_bearBoxesOB) > obMaxBoxSet:
                 _bearBoxesOB.remove(_bearBoxesOB[0])
             _bearBoxesOB.append(_bearboxOB)
 
-        controlBox(_bearBoxesOB, high[i], low[i], i)
-        controlBox(_bullBoxesOB, high[i], low[i], i)
+        control_box(_bearBoxesOB, high[i], low[i], i)
+        control_box(_bullBoxesOB, high[i], low[i], i)
 
     # # # # # # # # # # Fair Value Gap # # # # # # # # #
-    for i in range(100, 0, -1):
+    for i in range(prices_count-3, 1, -1):
         if is_fvg_box_up(i):
             _bullboxFVG = None
             if (close[i+1] > top[i]) and (low[i+1] < top[i]) and (high[i+2] < top[i]) and (low[i] > top[i]):
-                _bullboxFVG = Box(left=src.datetime[i] - get_datetime(interval)*2, top=low[i], right=src.datetime[i], bottom=high[i+2], signal_type=sm.buy_signal)
+                _bullboxFVG = Box(left=src.datetime[i] - interval*2, top=low[i], right=src.datetime[i], bottom=high[i+2], signal_type=sm.buy_signal)
             else:
-                _bullboxFVG = Box(left=src.datetime[i] - get_datetime(interval)*2, top=low[i], right=src.datetime[i], bottom=high[i+2], signal_type=sm.buy_signal)
+                _bullboxFVG = Box(left=src.datetime[i] - interval*2, top=low[i], right=src.datetime[i], bottom=high[i+2], signal_type=sm.buy_signal)
 
             if len(_bullBoxesFVG) > fvgMaxBoxSet:
                 _bullBoxesFVG.remove(_bullBoxesFVG[0])
@@ -186,26 +166,16 @@ def super_order_block(src, open, close, high, low, interval, obMaxBoxSet=10, fvg
                 _bearBoxesFVG.remove(_bearBoxesFVG[0])
             _bearBoxesFVG.append(_bearboxFVG)
 
-        controlBox(_bearBoxesFVG, high[i], low[i], i)
-        controlBox(_bullBoxesFVG, high[i], low[i], i)
+        control_box(_bearBoxesFVG, high[i], low[i], i)
+        control_box(_bullBoxesFVG, high[i], low[i], i)
 
-    for box in _bullBoxesOB:
+    boxes = _bullBoxesOB + _bearBoxesOB + _bullBoxesFVG + _bearBoxesFVG
+    return_signal = sm.neutral_signal
+    for box in boxes:
         signal = box.check_signal(low[0], high[0], src.datetime[0])
         if not signal == sm.neutral_signal:
-            return signal
-    for box in _bearBoxesOB:
-        signal = box.check_signal(low[0], high[0], src.datetime[0])
-        if not signal == sm.neutral_signal:
-            return signal
-    for box in _bullBoxesFVG:
-        signal = box.check_signal(low[0], high[0], src.datetime[0])
-        if not signal == sm.neutral_signal:
-            return signal
-    for box in _bearBoxesFVG:
-        signal = box.check_signal(low[0], high[0], src.datetime[0])
-        if not signal == sm.neutral_signal:
-            return signal
-    return sm.neutral_signal
+            return_signal = signal
+    return (return_signal, "super order block")
 
 
 def ultimate_moving_average(close_price, rolling=20, smoothe=2):
@@ -220,19 +190,20 @@ def ultimate_moving_average(close_price, rolling=20, smoothe=2):
         ma_up = avg[i] >= avg[i+smoothe]
         signals.append(sm.buy_signal if ma_up else sm.sell_signal)
 
-    return signals[0]
+    return (signals[0], "ultimate moving average")
 
 
 def nadaraya_watson_envelope(close_price, h=8.0, mult=3.0):
     gauss = lambda x, h: math.exp(-(math.pow(x, 2) / (h * h * 2)))
 
+    price_count = len(close_price)
     nwe = []
     sae = 0
-    for i in range(0, 500):
+    for i in range(0, price_count-2):
         sum = 0.0
         sumw = 0.0
 
-        for j in range(0, 500):
+        for j in range(0, price_count-2):
             w = gauss(i - j, h)
             sum += close_price[j] * w
             sumw += w
@@ -241,24 +212,13 @@ def nadaraya_watson_envelope(close_price, h=8.0, mult=3.0):
         sae += abs(close_price[i] - y2)
         nwe.append(y2)
 
-    sae = sae/500 * mult
+    sae = sae/(price_count-2) * mult
     signals = []
-    for i in range(0, 500):
+    for i in range(0, price_count-2):
         if close_price[i] > (nwe[i] + sae) and close_price[i + 1] < (nwe[i] + sae):
             signals.append((i, sm.sell_signal))
         elif close_price[i] < (nwe[i] - sae) and close_price[i + 1] > (nwe[i] - sae):
             signals.append((i, sm.buy_signal))
-    return signals[0][1]
-
-
-if __name__ == '__main__':
-    username = 't4331662@gmail.com'
-    password = 'Pxp626AmH7_'
-    # tv = TvDatafeed()
-    # tv = TvDatafeed(username=username, password=password)
-    # data = tv.search_symbol("EURUSD")[0]
-    # print(data)
-    # get_price_data(symbol=data["symbol"], exchange=data["exchange"])
-    get_price_data()
+    return (signals[0][1], "Nadaraya Watson envelope")
 
 

@@ -1,22 +1,24 @@
 import os
 import time
 import threading
-from aiogram import Bot, Dispatcher, types
+from aiogram import Bot, Dispatcher, types, exceptions
 import logging
 import json
-import parse
+import price_parser
 import signal_maker
 from pandas import Timedelta
+from tvDatafeed import Interval
+import asyncio
 
-
-API_TOKEN = "6037306867:AAE7op0UnUoe4nzZGPFLUGLPOikMpoI4ADc"
+BANAN_API_TOKEN = "6037306867:AAE7op0UnUoe4nzZGPFLUGLPOikMpoI4ADc"
+API_TOKEN = "6538527964:AAHUUHZHYVnNFbYAPoMn4bRUMASKR0h9qfA"
 logging.basicConfig(level=logging.INFO)
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot)
 
 db_path = "users/db.txt"
 
-manager_username ="@test_nano"
+manager_username = "@test_nano"
 managers_id = [5359645780]
 manager_url = f"https://t.me/{manager_username[1:]}"
 
@@ -24,15 +26,24 @@ start_search_manager = "VIP ?"
 check_text = "Який видати статус користувачу"
 
 for_vip_text = "Для отримання VIP..."
-you_have_vip_text ="У вас вже активний vip"
+you_have_vip_text = "У вас вже активний vip"
 
-vip_status ="vip"
+vip_status = "vip"
 nf_vip_status = "nf"
 none_status = "none"
-wait_status='Очікуємо перевірки'
+wait_status = 'Очікуємо перевірки'
 
 
-def update_status(message,status):
+def get_vip_users_ids():
+    data = read_file(db_path)
+    vip_users = []
+    for user in data:
+        if has_user_status(user['id'], vip_status):
+            vip_users.append(user['id'])
+    return vip_users
+
+
+def update_status(message, status):
     url = f"users/{message.from_user.id}.txt"
     data ={"id":message.from_user.id,"status":status}
     write_file(url,data)
@@ -78,7 +89,7 @@ async def update_status_user(id, status):
             user['status'] = status
             break
         else: ...
-    write_file(db_path,data)
+    write_file(db_path, data)
 
 
 async def search_no_vip(message):
@@ -88,7 +99,7 @@ async def search_no_vip(message):
         user_status = user['status'] == wait_status
         if user_status:
             user_id = user['id']
-            await update_manager_status(message,user_id)
+            await update_manager_status(message, user_id)
             return user_id
         else:
             ...
@@ -196,26 +207,45 @@ async def handle_media(message: types.Message):
         else:
             await not_vip_main_menu(message)
 
+    # vip_users_ids = get_vip_users_ids()
+    # for currency in price_parser.get_currencies():
+    #     data = price_parser.get_price_data(symbol=currency[0], exchange=currency[1], interval=Interval.in_1_minute)
+    #
+    #     symbol = data.symbol[0].split(":")[1]
+    #     signal = signal_maker.check_signal(data, symbol, successful_indicators_count=3)
+    #     print(signal)
+    #
+    #     delay_minutes = (data.datetime[0]-data.datetime[1]) / Timedelta(minutes=1)
+    #     time.sleep(delay_minutes*60)
 
-def signal_check():
+
+async def signal_check(interval):
     while True:
-        pd = parse.get_price_data()
-        signal = signal_maker.check_signal(pd, successful_indicators_count=2)
-        if signal[0]:
-            print(signal[1])
+        vip_users_ids = get_vip_users_ids()
+        for currency in price_parser.get_currencies():
+            data = price_parser.get_price_data(symbol=currency[0], exchange=currency[1], interval=interval)
 
-        delay_minutes = (pd.datetime[0]-pd.datetime[1]) / Timedelta(minutes=1)
-        print("delay_minutes ", delay_minutes)
+            symbol = data.symbol[0].split(":")[1]
+            signal = signal_maker.check_signal(data, symbol, successful_indicators_count=2)
+            if signal[0]:
+                for user_id in vip_users_ids:
+                    await bot.send_message(
+                        user_id,
+                        signal[1],
+                        disable_notification=False
+                    )
+        delay_minutes = (data.datetime[0]-data.datetime[1]) / Timedelta(minutes=1)
         time.sleep(delay_minutes*60)
 
 
 if __name__ == '__main__':
     from aiogram import executor
-    t1 = threading.Thread(target=signal_check, daemon=False)
-    t1.start()
 
-    print(threading.active_count())
-    print(threading.enumerate())
+    main_loop = asyncio.get_event_loop()
+
+    main_loop.run_until_complete(signal_check(Interval.in_1_minute))
+
+    # loop = asyncio.get_event_loop()
+    # t1 = threading.Thread(target=signal_check_loop, args=(loop,))
+    # t1.start()
     executor.start_polling(dp, skip_updates=True)
-
-

@@ -5,16 +5,17 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c8e52443-fb39-41fa-9e09-4877251a22f1" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/users/db.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/price_parser.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/users/currencies.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/Signal-bot.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Signal-bot.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-    </list>
-    <list id="cbe571c8-b52a-4250-a9e3-ad1313cd5330" name="Changes by Alex" comment="">
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/parse.py" beforeDir="false" afterPath="$PROJECT_DIR$/indicators_reader.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/signal_maker.py" beforeDir="false" afterPath="$PROJECT_DIR$/signal_maker.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/users/db.txt" beforeDir="false" afterPath="$PROJECT_DIR$/users/db.txt" afterDir="false" />
     </list>
+    <list id="cbe571c8-b52a-4250-a9e3-ad1313cd5330" name="Changes by Alex" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -30,23 +31,6 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="LineStatusTrackerManager">
-    <file path="$PROJECT_DIR$/main.py">
-      <ranges>
-        <range start1="0" end1="1" start2="0" end2="4" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
-        <range start1="2" end1="3" start2="5" end2="21" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
-        <range start1="4" end1="9" start2="22" end2="24" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
-        <range start1="10" end1="12" start2="25" end2="27" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
-        <range start1="13" end1="13" start2="28" end2="32" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
-        <range start1="14" end1="17" start2="33" end2="33" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
-        <range start1="18" end1="18" start2="34" end2="38" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
-        <range start1="19" end1="25" start2="39" end2="112" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
-        <range start1="26" end1="26" start2="113" end2="121" changelist="cbe571c8-b52a-4250-a9e3-ad1313cd5330" />
-        <range start1="27" end1="30" start2="122" end2="130" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
-        <range start1="31" end1="34" start2="131" end2="221" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
-      </ranges>
-    </file>
-  </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: -1
 }</component>
@@ -58,17 +42,38 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "codeWithMe.voiceChat.enabledByDefault": "false",
-    "git-widget-placeholder": "main",
-    "last_opened_file_path": "C:/Users/Alex/Projects/Programming/Vilors/Signal-bot",
-    "settings.editor.selected.configurable": "configurable.group.project"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/Alex/Projects/Programming/Vilors/Signal-bot&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;configurable.group.project&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager" selected="Python.main">
+    <configuration name="indicators_reader" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="Signal-bot" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="C:\Users\Alex\Projects\Programming\Vilors\Signal-bot\indicators_reader.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="main" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
       <module name="Signal-bot" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -90,7 +95,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="parse" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+    <configuration name="price_parser" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="Signal-bot" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -102,7 +107,7 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/parse.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/price_parser.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -134,7 +139,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.parse" />
+        <item itemvalue="Python.price_parser" />
+        <item itemvalue="Python.indicators_reader" />
         <item itemvalue="Python.signal_maker" />
       </list>
     </recent_temporary>
@@ -149,5 +155,16 @@
       <updated>1694867479647</updated>
     </task>
     <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
 </project>
