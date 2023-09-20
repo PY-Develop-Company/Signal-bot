@@ -1,10 +1,9 @@
 import numpy as np
 from tvDatafeed import Interval
-import plotly.graph_objects as go
 import math
 import signal_maker as sm
 from datetime import timedelta
-from pandas import DataFrame, Series
+from pandas import Series
 
 
 def clamp(value, min_value, max_value):

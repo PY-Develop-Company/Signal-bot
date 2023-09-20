@@ -1,8 +1,6 @@
 from tvDatafeed import TvDatafeed, Interval
 import json
-
 import indicators_reader
-import signal_maker
 
 currencies_path = "users/currencies.txt"
 
@@ -36,7 +34,7 @@ if __name__ == '__main__':
     password = 'Pxp626AmH7_'
 
     tv = TvDatafeed()
-    # tv = TvDatafeed(username=username, password=password)
+
     cur = get_currencies()[0]
     df = get_price_data(symbol="AUDCAD", exchange="OANDA", interval=Interval.in_5_minute, bars_count=100)
     print(indicators_reader.scalp_pro(df, df.close))
