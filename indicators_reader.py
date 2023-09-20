@@ -1,5 +1,6 @@
 import numpy as np
 from tvDatafeed import Interval
+import plotly.graph_objects as go
 import math
 import signal_maker as sm
 from datetime import timedelta
@@ -10,12 +11,18 @@ def clamp(value, min_value, max_value):
 
 
 def get_datetime(interval):
-    if interval == Interval.in_3_minute:
+    if interval == Interval.in_1_minute:
+        return timedelta(minutes=1)
+    elif interval == Interval.in_3_minute:
         return timedelta(minutes=3)
     elif interval == Interval.in_5_minute:
         return timedelta(minutes=5)
     elif interval == Interval.in_15_minute:
         return timedelta(minutes=15)
+    elif interval == Interval.in_30_minute:
+        return timedelta(minutes=30)
+    elif interval == Interval.in_45_minute:
+        return timedelta(minutes=45)
     else:
         return timedelta(days=1)
 
@@ -92,27 +99,29 @@ def super_order_block(src, open, close, high, low, interval: timedelta, obMaxBox
         highs = {}
         prices_count = len(price)
         nearest_high_price = price[prices_count-1]
-        for i in range(prices_count-2, 1, -1):
+        for i in range(prices_count-2, 0, -1):
             if price[i-1] < price[i] > price[i+1]:
                 nearest_high_price = price[i]
             highs.update({i: nearest_high_price})
+        highs.update({0: nearest_high_price})
         return highs
 
     def pivot_low(price):
         lows = {}
         prices_count = len(price)
-        nearest_low_price = price[prices_count-1]
-        for i in range(prices_count-2, 1, -1):
-            if price[i-1] > price[i] < price[i+1]:
+        nearest_low_price = price[prices_count - 1]
+        for i in range(prices_count - 2, 0, -1):
+            if price[i - 1] > price[i] < price[i + 1]:
                 nearest_low_price = price[i]
             lows.update({i: nearest_low_price})
+        lows.update({0: nearest_low_price})
         return lows
 
     def control_box(boxes, high, low, box_index):
         for i in range(len(boxes)-1, 0, -1):
             is_price_in_box = (high > boxes[i].bottom and low < boxes[i].bottom) or (high > boxes[i].top and low < boxes[i].top)
             if src.datetime[box_index] == boxes[i].right and not is_price_in_box:
-                boxes[i].right = src.datetime[box_index] + get_datetime(interval)
+                boxes[i].right = src.datetime[box_index] + interval
 
     obMaxBoxSet = clamp(obMaxBoxSet, 1, 100)
     fvgMaxBoxSet = clamp(fvgMaxBoxSet, 1, 100)
@@ -127,7 +136,8 @@ def super_order_block(src, open, close, high, low, interval: timedelta, obMaxBox
 
     prices_count = len(src)
     # # # # # # # # # # # Order Block # # # # # # # # #
-    for i in range(prices_count-3, 1, -1):
+    interval = get_datetime(Interval.in_5_minute)
+    for i in range(prices_count-3, 0, -1):
         if is_ob_box_up(i+1):
             _bullboxOB = Box(left=src.datetime[i] - interval*2, top=high[i+2], right=src.datetime[i], bottom=min(low[i+2], low[i+1]), signal_type=sm.buy_signal)
             if len(_bullBoxesOB) > obMaxBoxSet:
@@ -143,8 +153,8 @@ def super_order_block(src, open, close, high, low, interval: timedelta, obMaxBox
         control_box(_bearBoxesOB, high[i], low[i], i)
         control_box(_bullBoxesOB, high[i], low[i], i)
 
-    # # # # # # # # # # Fair Value Gap # # # # # # # # #
-    for i in range(prices_count-3, 1, -1):
+    # # # # # # # # # Fair Value Gap # # # # # # # # #
+    for i in range(prices_count-3, 0, -1):
         if is_fvg_box_up(i):
             _bullboxFVG = None
             if (close[i+1] > top[i]) and (low[i+1] < top[i]) and (high[i+2] < top[i]) and (low[i] > top[i]):
@@ -159,9 +169,10 @@ def super_order_block(src, open, close, high, low, interval: timedelta, obMaxBox
         if is_fvg_box_down(i):
             _bearboxFVG = None
             if (close[i+1] < bottom[i]) and (high[i+1] > bottom[i]) and (low[i+2] > bottom[i]) and (high[i] < bottom[i]):
-                _bearboxFVG = Box(left=src.datetime[i] - get_datetime(interval)*2, top=low[i+2], right=src.datetime[i], bottom=high[i], signal_type=sm.sell_signal)
+                _bearboxFVG = Box(left=src.datetime[i] - interval*2, top=low[i+2], right=src.datetime[i], bottom=high[i], signal_type=sm.sell_signal)
             else:
-                _bearboxFVG = Box(left=src.datetime[i] - get_datetime(interval)*2, top=low[i+2], right=src.datetime[i], bottom=high[i], signal_type=sm.sell_signal)
+                _bearboxFVG = Box(left=src.datetime[i] - interval*2, top=low[i+2], right=src.datetime[i], bottom=high[i], signal_type=sm.sell_signal)
+
             if len(_bearBoxesFVG) > fvgMaxBoxSet:
                 _bearBoxesFVG.remove(_bearBoxesFVG[0])
             _bearBoxesFVG.append(_bearboxFVG)
@@ -169,12 +180,106 @@ def super_order_block(src, open, close, high, low, interval: timedelta, obMaxBox
         control_box(_bearBoxesFVG, high[i], low[i], i)
         control_box(_bullBoxesFVG, high[i], low[i], i)
 
+    # scatters1 = []
+    # scatters2 = []
+    # scatters3 = []
+    # scatters4 = []
+    # for box in _bullBoxesOB:
+    #     scatters1.append(go.Scatter(x=[box.left, box.left, box.right, box.right, box.left],
+    #                y=[box.bottom, box.top, box.top, box.bottom, box.bottom],
+    #                fill="toself", fillcolor='#42f542'))
+    # for box in _bearBoxesOB:
+    #     scatters2.append(go.Scatter(x=[box.left, box.left, box.right, box.right, box.left],
+    #                                y=[box.bottom, box.top, box.top, box.bottom, box.bottom],
+    #                                fill="toself", fillcolor='#E01400'))
+    # for box in _bullBoxesFVG:
+    #     scatters3.append(go.Scatter(x=[box.left, box.left, box.right, box.right, box.left],
+    #                                y=[box.bottom, box.top, box.top, box.bottom, box.bottom],
+    #                                fill="toself", fillcolor='#00CCCC'))
+    # for box in _bearBoxesFVG:
+    #     scatters4.append(go.Scatter(x=[box.left, box.left, box.right, box.right, box.left],
+    #                                y=[box.bottom, box.top, box.top, box.bottom, box.bottom],
+    #                                fill="toself", fillcolor='#9200E0'))
+    #
+    # # scatters.append(go.Scatter(x=[src.datetime[x] for x in range(0, 100)], y=[top.get(x) for x in range(0, 100)]))
+    # fig = go.Figure(
+    #     data=[
+    #         go.Candlestick(
+    #             x=src["datetime"],
+    #             open=src["open"],
+    #             high=src["high"],
+    #             low=src["low"],
+    #             close=src["close"]
+    #         ),
+    #         scatters1[-1],
+    #         scatters1[-2],
+    #         scatters1[-3],
+    #         scatters1[-4],
+    #         scatters1[-5],
+    #         scatters2[-1],
+    #         scatters2[-2],
+    #         scatters2[-3],
+    #         scatters2[-4],
+    #         scatters2[-5],
+    #         scatters3[-1],
+    #         scatters3[-2],
+    #         scatters3[-3],
+    #         scatters3[-4],
+    #         scatters3[-5],
+    #         scatters4[-1],
+    #         scatters4[-2],
+    #         scatters4[-3],
+    #         scatters4[-4],
+    #         scatters4[-5]
+    #         # go.Scatter(
+    #         #     x=src["datetime"],
+    #         #     y=avg_red,
+    #         #     mode='lines',
+    #         #     name='red_signal',
+    #         #     line={'color': '#eb3434'}
+    #         # )
+    #     ]
+    # )
+    # fig.update_layout(
+    #     title=f'The Candlestick graph for ',
+    #     xaxis_title='Date',
+    #     yaxis_title=f'Price ()',
+    #     xaxis_rangeslider_visible=False,
+    #     xaxis=dict(type="category")
+    # )
+    # fig.show()
+
+    # for box in _bullBoxesOB:
+    #     signal = box.check_signal(low[0], high[0], src.datetime[0])
+    #     if not signal == sm.neutral_signal:
+    #         return signal
+    # for box in _bearBoxesOB:
+    #     signal = box.check_signal(low[0], high[0], src.datetime[0])
+    #     if not signal == sm.neutral_signal:
+    #         return signal
+    # for box in _bullBoxesFVG:
+    #     signal = box.check_signal(low[0], high[0], src.datetime[0])
+    #     if not signal == sm.neutral_signal:
+    #         return signal
+    # for box in _bearBoxesFVG:
+    #     signal = box.check_signal(low[0], high[0], src.datetime[0])
+    #     if not signal == sm.neutral_signal:
+    #         return signal
+
     boxes = _bullBoxesOB + _bearBoxesOB + _bullBoxesFVG + _bearBoxesFVG
     return_signal = sm.neutral_signal
+    signal_boxes = []
     for box in boxes:
         signal = box.check_signal(low[0], high[0], src.datetime[0])
         if not signal == sm.neutral_signal:
-            return_signal = signal
+            signal_boxes.append(box)
+
+    biggest_box_height = 0
+    for b in signal_boxes:
+        res = b.top-b.bottom
+        if res > biggest_box_height:
+            biggest_box_height = res
+            return_signal = b.signal_type
     return (return_signal, "super order block")
 
 
@@ -220,5 +325,3 @@ def nadaraya_watson_envelope(close_price, h=8.0, mult=3.0):
         elif close_price[i] < (nwe[i] - sae) and close_price[i + 1] > (nwe[i] - sae):
             signals.append((i, sm.buy_signal))
     return (signals[0][1], "Nadaraya Watson envelope")
-
-

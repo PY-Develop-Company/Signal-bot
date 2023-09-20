@@ -228,7 +228,7 @@ def open_signal_check_thread(interval):
 
                 timedelta_interval = data.datetime[0] - data.datetime[1]
                 symbol = data.symbol[0].split(":")[1]
-                open_signal = signal_maker.check_signal(data, successful_indicators_count=4)
+                open_signal = signal_maker.check_signal(data, interval, successful_indicators_count=4)
                 if open_signal[0]:
                     for user_id in vip_users_ids:
                         if await get_chat_id(user_id) is None:

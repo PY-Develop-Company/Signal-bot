@@ -1,6 +1,7 @@
 from tvDatafeed import TvDatafeed, Interval
 import json
 
+import indicators_reader
 import signal_maker
 
 currencies_path = "users/currencies.txt"
@@ -36,9 +37,6 @@ if __name__ == '__main__':
 
     tv = TvDatafeed()
     # tv = TvDatafeed(username=username, password=password)
-    for currency in get_currencies():
-        data = get_price_data(symbol=currency[0], exchange=currency[1])
-
-        symbol = data.symbol[0].split(":")[1]
-        print(signal_maker.check_signal(data, symbol, successful_indicators_count=2))
-        print(data.sample())
+    cur = get_currencies()[0]
+    df = get_price_data(symbol=cur[0], exchange=cur[1], interval=Interval.in_5_minute)
+    indicators_reader.super_order_block(df, df.open, df.close, df.high, df.low, interval=Interval.in_5_minute)
