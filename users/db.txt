@@ -1,1 +1,1 @@
-[{"id": 741867026, "name": "Sasha Kovalchuk", "status": "Надати VIP статус"}]
+[{"id": 741867026, "name": "Sasha Kovalchuk", "status": "Предоставить VIP статус"}, {"id": 2091413236, "name": "Mana None", "status": "none"}]

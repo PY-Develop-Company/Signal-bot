@@ -11,36 +11,35 @@ from tvDatafeed import Interval
 import asyncio
 import multiprocessing
 
-BANAN_API_TOKEN = "6037306867:AAE7op0UnUoe4nzZGPFLUGLPOikMpoI4ADc"
-API_TOKEN = "6538527964:AAHUUHZHYVnNFbYAPoMn4bRUMASKR0h9qfA"
+API_TOKEN = "6340912636:AAHACm2V2hDJUDXng0y0uhBRVRFJgqrok48"
 logging.basicConfig(level=logging.INFO)
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot)
 
 db_path = "users/db.txt"
 
-manager_username = "@justsashakovalchuk"
-managers_id = [5359645780]
+manager_username = "@indddij"
+managers_id = [2091413236]
 manager_url = f"https://t.me/{manager_username[1:]}"
 
-start_search_manager = "Підтвердження VIP-акаунтів"
-check_text = "Який видати статус користувачу"
+start_search_manager = "Подтверждение VIP-аккаунтов"
+check_text = "Какой выдать статус пользователю"
 
-for_vip_text = "Для отримання VIP виконайте наступні умови:"
-you_have_vip_text = "У вас вже активний VIP статус"
-get_vip_text = """Вітаю, вашу заявку прийнято, вам надано VIP-статус 
-для початку роботи натисніть: /check """
-reject_vip_text = "На жаль вашу заявку не прийнято"
+for_vip_text = "Для получения VIP выполните следующие условия:"
+you_have_vip_text = "У вас уже активный VIP статус"
+get_vip_text = """Поздравляю, ваша заявка принята, вам предоставлен VIP-статус 
+для начала работы нажмите: /check """
+reject_vip_text = "К сожалению, ваша заявка не принята"
 
-vip_status = "Надати VIP статус"
-none_status = "Відмовити у VIP статусі"
-wait_status = 'Ожидания проверки статуса'
+vip_status = "Предоставить VIP статус"
+none_status = "Отказать в VIP статусе"
+wait_status = 'Ожидание проверки статуса'
 
-contact_manager = "СВЯЗАТЬСЯ С МЕНЕДЖЕРОМ"
+contact_manager = "ПОДДЕРЖКА"
 contact_manager_text="Данные менеджера :"
 apply_for_vip_status = "ПРОВЕРИТЬ ID"
 vip_status_info = "ДОСТУП К СИГНАЛАМ"
-no_VIP_requests_text = "Всі заявки у vip оброблені"
+no_VIP_requests_text = "Все заявки в VIP обработаны"
 
 wait_comand_text = "Ожидание команды:"
 
@@ -260,7 +259,7 @@ def open_signal_check_thread(interval):
 
                 timedelta_interval = data.datetime[0] - data.datetime[1]
                 symbol = data.symbol[0].split(":")[1]
-                open_signal = signal_maker.check_signal(data, interval, successful_indicators_count=2)
+                open_signal = signal_maker.check_signal(data, interval, successful_indicators_count=4)
                 if open_signal[0]:
                     for user_id in vip_users_ids:
                         if await get_chat_id(user_id) is None:
@@ -284,7 +283,7 @@ def open_signal_check_thread(interval):
 
 def close_signal_check_thread(open_position_price, close_prices, vip_users_ids, open_signal, symbol, interval):
     async def close_signal_check(open_position_price, close_prices, vip_users_ids, open_signal, symbol, interval):
-        close_signal = await signal_maker.close_position(open_position_price, close_prices, open_signal, symbol, interval, bars_count=1)
+        close_signal = await signal_maker.close_position(open_position_price, close_prices, open_signal, symbol, interval, bars_count=3)
         for user_id in vip_users_ids:
             await bot.send_message(
                 user_id,
@@ -305,7 +304,7 @@ if __name__ == '__main__':
     p3 = multiprocessing.Process(target=open_signal_check_thread, args=(Interval.in_5_minute,))
 
     p1.start()
-    # p2.start()
-    # p3.start()
+    p2.start()
+    p3.start()
 
     executor.start_polling(dp, skip_updates=True)

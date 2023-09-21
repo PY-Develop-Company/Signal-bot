@@ -9,16 +9,9 @@
       <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/users/5359645780.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/users/741867026.txt" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/users/db.txt" beforeDir="false" afterPath="$PROJECT_DIR$/users/db.txt" afterDir="false" />
     </list>
-    <list id="cbe571c8-b52a-4250-a9e3-ad1313cd5330" name="Changes by Alex" comment="">
-      <change beforePath="$PROJECT_DIR$/indicators_reader.py" beforeDir="false" afterPath="$PROJECT_DIR$/indicators_reader.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/price_parser.py" beforeDir="false" afterPath="$PROJECT_DIR$/price_parser.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/signal_maker.py" beforeDir="false" afterPath="$PROJECT_DIR$/signal_maker.py" afterDir="false" />
-    </list>
+    <list id="cbe571c8-b52a-4250-a9e3-ad1313cd5330" name="Changes by Alex" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -34,46 +27,14 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="LineStatusTrackerManager">
-    <file path="$PROJECT_DIR$/main.py">
-      <ranges>
-        <range start1="22" end1="23" start2="22" end2="23" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
-        <range start1="28" end1="30" start2="28" end2="33" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
-        <range start1="32" end1="35" start2="35" end2="45" changelist="cbe571c8-b52a-4250-a9e3-ad1313cd5330" />
-        <range start1="76" end1="78" start2="86" end2="88" changelist="cbe571c8-b52a-4250-a9e3-ad1313cd5330" />
-        <range start1="93" end1="93" start2="103" end2="110" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
-        <range start1="100" end1="100" start2="117" end2="121" changelist="cbe571c8-b52a-4250-a9e3-ad1313cd5330" />
-        <range start1="101" end1="102" start2="122" end2="124" changelist="cbe571c8-b52a-4250-a9e3-ad1313cd5330" />
-        <range start1="107" end1="108" start2="129" end2="129" changelist="cbe571c8-b52a-4250-a9e3-ad1313cd5330" />
-        <range start1="116" end1="117" start2="137" end2="145" changelist="cbe571c8-b52a-4250-a9e3-ad1313cd5330" />
-        <range start1="120" end1="134" start2="148" end2="157" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
-        <range start1="138" end1="139" start2="161" end2="162" changelist="cbe571c8-b52a-4250-a9e3-ad1313cd5330" />
-        <range start1="140" end1="141" start2="163" end2="164" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
-        <range start1="146" end1="149" start2="169" end2="172" changelist="cbe571c8-b52a-4250-a9e3-ad1313cd5330" />
-        <range start1="150" end1="151" start2="173" end2="174" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
-        <range start1="157" end1="158" start2="180" end2="181" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
-        <range start1="183" end1="183" start2="206" end2="214" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
-        <range start1="188" end1="188" start2="219" end2="220" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
-        <range start1="189" end1="191" start2="221" end2="222" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
-        <range start1="192" end1="201" start2="223" end2="231" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
-        <range start1="206" end1="207" start2="236" end2="237" changelist="cbe571c8-b52a-4250-a9e3-ad1313cd5330" />
-        <range start1="213" end1="215" start2="243" end2="245" changelist="cbe571c8-b52a-4250-a9e3-ad1313cd5330" />
-        <range start1="232" end1="233" start2="262" end2="263" changelist="cbe571c8-b52a-4250-a9e3-ad1313cd5330" />
-        <range start1="244" end1="245" start2="274" end2="275" changelist="cbe571c8-b52a-4250-a9e3-ad1313cd5330" />
-        <range start1="254" end1="257" start2="284" end2="287" changelist="cbe571c8-b52a-4250-a9e3-ad1313cd5330" />
-        <range start1="267" end1="279" start2="297" end2="298" changelist="cbe571c8-b52a-4250-a9e3-ad1313cd5330" />
-        <range start1="288" end1="290" start2="307" end2="309" changelist="cbe571c8-b52a-4250-a9e3-ad1313cd5330" />
-      </ranges>
-    </file>
-  </component>
   <component name="ProblemsViewState">
     <option name="selectedTabId" value="CurrentFile" />
     <option name="showPreview" value="true" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "customColor": "",
-  "associatedIndex": -1
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;customColor&quot;: &quot;&quot;,
+  &quot;associatedIndex&quot;: -1
+}</component>
   <component name="ProjectId" id="2VTkVIrGxfAGnfr6qBdDTJZKgTt" />
   <component name="ProjectLevelVcsManager">
     <ConfirmationsSetting value="2" id="Add" />
