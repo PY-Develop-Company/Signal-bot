@@ -1,1 +1,1 @@
-[{"id": 741867026, "name": "Sasha Kovalchuk", "status": "Предоставить VIP статус"}, {"id": 2091413236, "name": "Mana None", "status": "none"}]
+[{"id": 741867026, "name": "Sasha Kovalchuk", "status": "Предоставить VIP статус"}, {"id": 2091413236, "name": "Mana None", "status": "none"}, {"id": 5964166439, "name": "Golden None", "status": "Предоставить VIP статус"}, {"id": 1698123362, "name": "Indijko None", "status": "Предоставить VIP статус"}, {"id": 722524498, "name": "Taranto$ None", "status": "Предоставить VIP статус"}]

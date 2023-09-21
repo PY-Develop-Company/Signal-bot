@@ -258,7 +258,8 @@ def open_signal_check_thread(interval):
                 data = price_parser.get_price_data(symbol=currency[0], exchange=currency[1], interval=interval)
 
                 timedelta_interval = data.datetime[0] - data.datetime[1]
-                symbol = data.symbol[0].split(":")[1]
+                symbol = data.symbol[0].split(":")
+                symbol = symbol[1][:3] + "/" + symbol[1][3:]
                 open_signal = signal_maker.check_signal(data, interval, successful_indicators_count=4)
                 if open_signal[0]:
                     for user_id in vip_users_ids:
