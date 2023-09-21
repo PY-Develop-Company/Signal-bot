@@ -14,7 +14,7 @@ import multiprocessing
 BANAN_API_TOKEN = "6037306867:AAE7op0UnUoe4nzZGPFLUGLPOikMpoI4ADc"
 API_TOKEN = "6538527964:AAHUUHZHYVnNFbYAPoMn4bRUMASKR0h9qfA"
 logging.basicConfig(level=logging.INFO)
-bot = Bot(token=API_TOKEN)
+bot = Bot(token=BANAN_API_TOKEN)
 dp = Dispatcher(bot)
 
 db_path = "users/db.txt"
@@ -26,15 +26,18 @@ manager_url = f"https://t.me/{manager_username[1:]}"
 start_search_manager = "Підтвердження VIP-акаунтів"
 check_text = "Який видати статус користувачу"
 
-for_vip_text = "Для отримання VIP виконайте наступні умови:"
+for_vip_id_text = """Напиши сюда свой номер аккаунта с брокера Pocket Option и отправь сообщением ниже ✅
+Для примера "11111111"  и после отправить ✅"""
+
 you_have_vip_text = "У вас вже активний VIP статус"
 get_vip_text = """Вітаю, вашу заявку прийнято, вам надано VIP-статус 
 для початку роботи натисніть: /check """
-reject_vip_text = "На жаль вашу заявку не прийнято"
+reject_vip_id_text = "На жаль вашу заявку не прийнято"
 
 vip_status = "Надати VIP статус"
 none_status = "Відмовити у VIP статусі"
 wait_status = 'Ожидания проверки статуса'
+wait_deposit = 'Ожидания проверки депозит '
 
 contact_manager = "СВЯЗАТЬСЯ С МЕНЕДЖЕРОМ"
 contact_manager_text="Данные менеджера :"
@@ -118,7 +121,7 @@ async def update_status_user(id, status):
             if status == vip_status:
                 await send_message_to_user(id, get_vip_text)
             elif status == none_status:
-                await send_message_to_user(id, reject_vip_text)
+                await send_message_to_user(id, reject_vip_id_text)
             break
         else:
             ...
@@ -233,7 +236,7 @@ async def handle_media(message: types.Message):
             await message.answer(you_have_vip_text)
             await vip_main_menu(message)
         else:
-            await message.answer(for_vip_text)
+            await message.answer(for_vip_id_text)
     elif message.text == apply_for_vip_status:
         if has_user_status(message.from_user.id, vip_status):
             await message.answer(you_have_vip_text)
