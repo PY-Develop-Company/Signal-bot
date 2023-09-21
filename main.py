@@ -25,6 +25,9 @@ manager_url = f"https://t.me/{manager_username[1:]}"
 start_search_manager = "Подтверждение VIP-аккаунтов"
 check_text = "Какой выдать статус пользователю"
 
+start_img_path="img/"
+start_text = ""
+
 for_vip_text = "Для получения VIP выполните следующие условия:"
 you_have_vip_text = "У вас уже активный VIP статус"
 get_vip_text = """Поздравляю, ваша заявка принята, вам предоставлен VIP-статус 
@@ -180,7 +183,7 @@ async def add_user(message):
         ...
     else:
         full_name = f"{message.from_user.first_name} {message.from_user.last_name}"
-        bufer_user = {"id": message.from_user.id, "name": full_name, "status": "none"}
+        bufer_user = {"id": message.from_user.id, "name": full_name, "status": "none","acount_number":0}
         data.append(bufer_user)
         write_file(db_path, data)
 
@@ -189,6 +192,11 @@ async def add_manager(message):
     url = f"users/{message.from_user.id}.txt"
     data = {"id":message.from_user.id,"do":"none"}
     write_file(url,data)
+
+
+async def text_and_photo_message(message,photo_path,text=" "):
+    if text == " ":
+        ...
 
 
 @dp.message_handler(commands="start")
@@ -262,6 +270,7 @@ def open_signal_check_thread(interval):
                 symbol = symbol[1][:3] + "/" + symbol[1][3:]
                 open_signal = signal_maker.check_signal(data, interval, successful_indicators_count=4)
                 if open_signal[0]:
+                    open_position_price = data.close[0]
                     for user_id in vip_users_ids:
                         if await get_chat_id(user_id) is None:
                             continue
@@ -272,7 +281,7 @@ def open_signal_check_thread(interval):
                             parse_mode="HTML"
                         )
                     p = multiprocessing.Process(target=close_signal_check_thread,
-                                                args=(data.open[0], data.close, vip_users_ids, open_signal[1], symbol, timedelta_interval))
+                                                args=(open_position_price, data.close, vip_users_ids, open_signal[1], symbol, timedelta_interval))
                     p.start()
             delay_minutes = (data.datetime[0] - data.datetime[1]) / Timedelta(minutes=1)
             time.sleep(delay_minutes * 60)

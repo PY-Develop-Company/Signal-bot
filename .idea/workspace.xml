@@ -5,14 +5,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c8e52443-fb39-41fa-9e09-4877251a22f1" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/img/logo.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/img/long.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/img/short.jpg" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/signal_maker.py" beforeDir="false" afterPath="$PROJECT_DIR$/signal_maker.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/users/db.txt" beforeDir="false" afterPath="$PROJECT_DIR$/users/db.txt" afterDir="false" />
     </list>
     <list id="cbe571c8-b52a-4250-a9e3-ad1313cd5330" name="Changes by Alex" comment="" />
     <list id="7fa9b9cd-5f0a-41aa-bb8c-dd6d412d680c" name="Changes by SIRIUS" comment="">
-      <change beforePath="$PROJECT_DIR$/signal_maker.py" beforeDir="false" afterPath="$PROJECT_DIR$/signal_maker.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -30,23 +32,13 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="LineStatusTrackerManager">
-    <file path="$PROJECT_DIR$/signal_maker.py">
+    <file path="$PROJECT_DIR$/main.py">
       <ranges>
-        <range start1="5" end1="6" start2="5" end2="6" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
-        <range start1="10" end1="14" start2="10" end2="14" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
-        <range start1="15" end1="15" start2="15" end2="18" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
-        <range start1="25" end1="26" start2="28" end2="29" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
-        <range start1="29" end1="30" start2="32" end2="33" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
-        <range start1="35" end1="37" start2="38" end2="40" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
-        <range start1="41" end1="45" start2="44" end2="44" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
-        <range start1="48" end1="49" start2="47" end2="47" changelist="7fa9b9cd-5f0a-41aa-bb8c-dd6d412d680c" />
-        <range start1="52" end1="53" start2="50" end2="53" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
-        <range start1="55" end1="58" start2="55" end2="56" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
-        <range start1="59" end1="60" start2="57" end2="58" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
-        <range start1="61" end1="64" start2="59" end2="61" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
-        <range start1="70" end1="71" start2="67" end2="68" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
-        <range start1="77" end1="84" start2="74" end2="76" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
-        <range start1="87" end1="89" start2="79" end2="81" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
+        <range start1="26" end1="26" start2="26" end2="29" changelist="7fa9b9cd-5f0a-41aa-bb8c-dd6d412d680c" />
+        <range start1="182" end1="183" start2="185" end2="186" changelist="7fa9b9cd-5f0a-41aa-bb8c-dd6d412d680c" />
+        <range start1="192" end1="192" start2="195" end2="200" changelist="7fa9b9cd-5f0a-41aa-bb8c-dd6d412d680c" />
+        <range start1="264" end1="264" start2="272" end2="273" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
+        <range start1="274" end1="275" start2="283" end2="284" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
       </ranges>
     </file>
   </component>
@@ -76,6 +68,11 @@
     "settings.editor.selected.configurable": "configurable.group.project"
   }
 }]]></component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\Alex\Projects\Programming\Vilors\Signal-bot\img" />
+    </key>
+  </component>
   <component name="RunManager" selected="Python.main">
     <configuration name="indicators_reader" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="Signal-bot" />

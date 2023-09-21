@@ -10,12 +10,14 @@ password = 'Pxp626AmH7_'
 
 buy_signal_smile = "🟢"
 sell_signal_smile = "🔴"
-buy_signal = "<b>LONG</b>️"
+buy_signal = "<b>LONG</b>️⬆"
 sell_signal = "<b>SHORT</b>⬇"
 neutral_signal = "Нет сигнала"
+profit_message = " ✅ "
+loss_message = " ❌ "
 
 def get_smile(signal):
-    return buy_signal_smile if signal ==buy_signal else (sell_signal_smile if signal == sell_signal else "")
+    return buy_signal_smile if signal == buy_signal else (sell_signal_smile if signal == sell_signal else "")
 
 
 def timedelta_to_string(interval):
@@ -36,8 +38,11 @@ def get_open_position_signal_message(signal, symbol, interval, indicators=""):
 
 def get_close_position_signal_message(open, close, signal, symbol, interval):
     profit_percent = 100 - 100*close/open
-    text = " ✅ " if profit_percent >= 0 else " ❌ "
-    message = "Закрито в" + text + get_smile(signal) + symbol + " " + signal + " " + timedelta_to_string(interval)
+    # print("closing:", "profit", profit_percent, "close", close, "open", open)
+    # print()
+
+    text = (profit_message if profit_percent >= 0 else sell_signal) if signal == buy_signal else (profit_message if profit_percent <= 0 else sell_signal)
+    message = get_smile(signal) + "Закрито в" + text + symbol + " " + signal + " " + timedelta_to_string(interval)
     return message
 
 
