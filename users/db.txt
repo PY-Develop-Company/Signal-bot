@@ -1,1 +1,1 @@
-[{"id": 5359645780, "name": "Roman None", "status": "Ожидание проверки статуса", "acount_number": 0}, {"id": 741867026, "name": "Sasha Kovalchuk", "status": "Предоставить VIP статус", "acount_number": 0}]
+[{"id": 5308615063, "name": "Роман Васильковський", "status": "none", "acount_number": "12345678"}, {"id": 741867026, "name": "Sasha Kovalchuk", "status": "status ДЕПОЗИТ", "acount_number": "11111111"}]

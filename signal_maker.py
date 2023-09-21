@@ -70,10 +70,10 @@ def check_signal(prices: DataFrame, interval, successful_indicators_count=4):
         if signal_count[1][0] > main_signal[1][0]:
             main_signal = signal_count
 
-    print("Валютная пара", prices.symbol[0], "таймфрейм", prices.datetime[0]-prices.datetime[1], "час перевірки", datetime.now())
-    print("Есть ли сигнал -", main_signal[1][0] >= successful_indicators_count and indicators_signals[0][0] == main_signal[0])
-    print("Показания индикаторов", signal_counts)
-    print()
+    # print("Валютная пара", prices.symbol[0], "таймфрейм", prices.datetime[0]-prices.datetime[1], "час перевірки", datetime.now())
+    # print("Есть ли сигнал -", main_signal[1][0] >= successful_indicators_count and indicators_signals[0][0] == main_signal[0])
+    # print("Показания индикаторов", signal_counts)
+    # print()
 
     sig = prices.symbol[0] + timedelta_to_string(prices.datetime[0]-prices.datetime[1])
 
