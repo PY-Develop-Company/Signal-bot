@@ -42,14 +42,14 @@ def get_close_position_signal_message(open, close, signal, symbol, interval):
     # print()
 
     text = (profit_message if profit_percent >= 0 else sell_signal) if signal == buy_signal else (profit_message if profit_percent <= 0 else sell_signal)
-    message = get_smile(signal) + "Закрито в" + text + symbol + " " + signal + " " + timedelta_to_string(interval)
+    message = get_smile(signal) + "Сделка в " + text + symbol + " " + signal + " " + timedelta_to_string(interval)
     return message
 
 
-async def close_position(position_open_price, close_prices, signal, symbol, interval: timedelta, bars_count=3):
+async def close_position(position_open_price, close_prices_search_info, signal, symbol, interval: timedelta, bars_count=3):
     delay_minutes = interval / Timedelta(minutes=1)
     time.sleep(delay_minutes * bars_count * 60)
-    return get_close_position_signal_message(position_open_price, close_prices[0], signal, symbol, interval)
+    return get_close_position_signal_message(position_open_price, close_prices_search_info[0], signal, symbol, interval)
 
 
 def check_signal(prices: DataFrame, interval, successful_indicators_count=4):
@@ -71,13 +71,13 @@ def check_signal(prices: DataFrame, interval, successful_indicators_count=4):
             main_signal = signal_count
 
     print("Валютная пара", prices.symbol[0], "таймфрейм", prices.datetime[0]-prices.datetime[1], "час перевірки", datetime.now())
-    print("Есть ли сигнал -", main_signal[1][0] >= successful_indicators_count)
+    print("Есть ли сигнал -", main_signal[1][0] >= successful_indicators_count and indicators_signals[0][0] == main_signal[0])
     print("Показания индикаторов", signal_counts)
     print()
 
     sig = prices.symbol[0] + timedelta_to_string(prices.datetime[0]-prices.datetime[1])
 
-    if main_signal[1][0] >= successful_indicators_count and indicators_signals[0][0] == main_signal[0]:
+    if main_signal[1][0] >= successful_indicators_count: #and indicators_signals[0][0] == main_signal[0]:
         return (True, main_signal[0])
     return False, neutral_signal
 
