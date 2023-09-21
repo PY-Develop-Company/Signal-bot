@@ -8,10 +8,10 @@ from datetime import timedelta, datetime
 username = 't4331662@gmail.com'
 password = 'Pxp626AmH7_'
 
-buy_signal_smile = "🟢"
-sell_signal_smile = "🔴"
-buy_signal = "<b>LONG</b>️⬆"
-sell_signal = "<b>SHORT</b>⬇"
+buy_signal_smile = "🟢 "
+sell_signal_smile = "🔴 "
+buy_signal = "LONG ⬆"
+sell_signal = "SHORT ⬇"
 neutral_signal = "Нет сигнала"
 profit_message = " ✅ "
 loss_message = " ❌ "

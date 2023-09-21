@@ -7,9 +7,10 @@ import json
 import price_parser
 import signal_maker
 from pandas import Timedelta
-from tvDatafeed import Interval
+from tvDatafeed import TvDatafeedLive, Interval
 import asyncio
 import multiprocessing
+from datetime import datetime
 
 API_TOKEN = "6340912636:AAHACm2V2hDJUDXng0y0uhBRVRFJgqrok48"
 logging.basicConfig(level=logging.INFO)
@@ -25,8 +26,13 @@ manager_url = f"https://t.me/{manager_username[1:]}"
 start_search_manager = "Подтверждение VIP-аккаунтов"
 check_text = "Какой выдать статус пользователю"
 
-start_img_path="img/"
-start_text = ""
+start_img_path="img/logo.jpg"
+start_text = """Приветствую тебя трейдер 👋
+
+В моём закрытом сообществе, я ежедневно выдаю более 1ООО торговых прогнозов 🕯 с полной аналитикой валютной пары и проходимостью от 92% 📊"""
+
+photo_long_path="img/long.jpg"
+photo_short_path="img/short.jpg"
 
 for_vip_text = "Для получения VIP выполните следующие условия:"
 you_have_vip_text = "У вас уже активный VIP статус"
@@ -68,7 +74,7 @@ def get_vip_users_ids():
 
 def update_status(message, status):
     url = f"users/{message.from_user.id}.txt"
-    data ={"id":message.from_user.id,"status":status}
+    data ={"id":message.from_user.id, "status": status}
     write_file(url,data)
 
 
@@ -83,7 +89,7 @@ def read_file(url):
     return result
 
 
-async def update_manager_status(message,status):
+async def update_manager_status(message, status):
     url = f"users/{message.from_user.id}.txt"
     manager = read_file(url)
     manager["do"] = status
@@ -108,7 +114,7 @@ async def send_message_to_user(user_id, text):
     if await get_chat_id(user_id) is None:
         ...
     else:
-        await bot.send_message(user_id,text,disable_notification=False)
+        await bot.send_message(user_id, text, disable_notification=False)
 
 
 async def update_status_user(id, status):
@@ -183,25 +189,32 @@ async def add_user(message):
         ...
     else:
         full_name = f"{message.from_user.first_name} {message.from_user.last_name}"
-        bufer_user = {"id": message.from_user.id, "name": full_name, "status": "none","acount_number":0}
+        bufer_user = {"id": message.from_user.id, "name": full_name, "status": "none", "acount_number": 0}
         data.append(bufer_user)
         write_file(db_path, data)
 
 
 async def add_manager(message):
     url = f"users/{message.from_user.id}.txt"
-    data = {"id":message.from_user.id,"do":"none"}
-    write_file(url,data)
+    data = {"id": message.from_user.id, "do": "none"}
+    write_file(url, data)
 
 
-async def text_and_photo_message(message,photo_path,text=" "):
+async def photo_text_message(user_id, img_path, text=" "):
     if text == " ":
         ...
+    elif img_path == start_img_path:
+        await bot.send_photo(user_id, photo=open(img_path, "rb"), caption=text, parse_mode="HTML")
+    elif img_path == photo_long_path:
+        await bot.send_photo(user_id, photo=open(img_path, "rb"), caption=text, parse_mode="HTML")
+    elif img_path == photo_short_path:
+        await bot.send_photo(user_id, photo=open(img_path, "rb"), caption=text, parse_mode="HTML")
 
 
 @dp.message_handler(commands="start")
 async def create_user(message):
     # os.makedirs(f"users/{message.from_user.id}", exist_ok=True)
+    await photo_text_message(message.from_user.id, start_img_path, start_text)
     if message.from_user.id in managers_id:
         await add_manager(message)
         await manager_menu(message)
@@ -261,9 +274,12 @@ async def handle_media(message: types.Message):
 def open_signal_check_thread(interval):
     async def open_signal_check(interval):
         while True:
+            print(datetime.now())
             vip_users_ids = get_vip_users_ids()
             for currency in price_parser.get_currencies():
+                # print("read data time", datetime.now())
                 data = price_parser.get_price_data(symbol=currency[0], exchange=currency[1], interval=interval)
+                # print(data.datetime[0])
 
                 timedelta_interval = data.datetime[0] - data.datetime[1]
                 symbol = data.symbol[0].split(":")
@@ -271,18 +287,25 @@ def open_signal_check_thread(interval):
                 open_signal = signal_maker.check_signal(data, interval, successful_indicators_count=4)
                 if open_signal[0]:
                     open_position_price = data.close[0]
+                    print(open_signal[1])
                     for user_id in vip_users_ids:
                         if await get_chat_id(user_id) is None:
                             continue
-                        message = await bot.send_message(
-                            user_id,
-                            signal_maker.get_open_position_signal_message(open_signal[1], symbol, timedelta_interval),
-                            disable_notification=False,
-                            parse_mode="HTML"
-                        )
+                        if open_signal[1] == signal_maker.buy_signal:
+                            await photo_text_message(user_id, photo_long_path, signal_maker.get_open_position_signal_message(open_signal[1], symbol, timedelta_interval))
+                        if open_signal[1] == signal_maker.sell_signal:
+                            await photo_text_message(user_id, photo_short_path, signal_maker.get_open_position_signal_message(open_signal[1], symbol, timedelta_interval))
+                            # message = await bot.send_message(
+                        #     user_id,
+                        #     signal_maker.get_open_position_signal_message(open_signal[1], symbol, timedelta_interval),
+                        #     disable_notification=False,
+                        #     parse_mode="HTML"
+                        # )
+
                     p = multiprocessing.Process(target=close_signal_check_thread,
                                                 args=(open_position_price, data.close, vip_users_ids, open_signal[1], symbol, timedelta_interval))
                     p.start()
+                    # print("send messages data time", datetime.now())
             delay_minutes = (data.datetime[0] - data.datetime[1]) / Timedelta(minutes=1)
             time.sleep(delay_minutes * 60)
 
@@ -306,8 +329,42 @@ def close_signal_check_thread(open_position_price, close_prices, vip_users_ids, 
     asyncio.set_event_loop(loop)
     loop.run_until_complete(close_signal_check(open_position_price, close_prices, vip_users_ids, open_signal, symbol, interval))
 
+async def text2(open_signal, symbol, timedelta_interval, user_id):
+    if open_signal[1] == signal_maker.buy_signal:
+        await photo_text_message(user_id, photo_long_path,
+                                 signal_maker.get_open_position_signal_message(open_signal[1], symbol,
+                                                                               timedelta_interval))
+    if open_signal[1] == signal_maker.sell_signal:
+        await photo_text_message(user_id, photo_long_path,
+                                 signal_maker.get_open_position_signal_message(open_signal[1], symbol,
+                                                                               timedelta_interval))
+async def test(open_signal, symbol, timedelta_interval):
+    for user_id in get_vip_users_ids():
+        if await get_chat_id(user_id) is None:
+            continue
+        try:
+            await asyncio.wait_for(text2(open_signal, symbol, timedelta_interval, user_id), timeout=30)
+        except asyncio.TimeoutError:
+            print("Timeout in main!")
+
+
+def consumer_func1(seis, data):
+    data = price_parser.get_price_data_seis(seis)
+    open_signal = signal_maker.check_signal(data, seis.interval, successful_indicators_count=1)
+    print(open_signal)
+    if open_signal[0]:
+        timedelta_interval = data.datetime[0] - data.datetime[1]
+        symbol = data.symbol[0].split(":")
+        symbol = symbol[1][:3] + "/" + symbol[1][3:]
+        open_position_price = data.close[0]
+        print(open_signal[1])
+        asyncio.run(test(open_signal, symbol, timedelta_interval))
+
 
 if __name__ == '__main__':
+    # while True:
+    #     print(datetime.now())
+    #     time.sleep(1)
     from aiogram import executor
     p1 = multiprocessing.Process(target=open_signal_check_thread, args=(Interval.in_1_minute,))
     p2 = multiprocessing.Process(target=open_signal_check_thread, args=(Interval.in_15_minute,))
@@ -316,5 +373,17 @@ if __name__ == '__main__':
     p1.start()
     p2.start()
     p3.start()
+
+    # tvl = TvDatafeedLive()
+
+    # currencies = price_parser.get_currencies()
+    # for currency in currencies:
+    #     seis = tvl.new_seis(currency[0], currency[1], Interval.in_1_minute)
+    #     consumer = tvl.new_consumer(seis, consumer_func1)
+    #     seis1 = tvl.new_seis(currency[0], currency[1], Interval.in_5_minute)
+    #     consumer1 = tvl.new_consumer(seis1, consumer_func1)
+    #     seis2 = tvl.new_seis(currency[0], currency[1], Interval.in_15_minute)
+    #     consumer2 = tvl.new_consumer(seis2, consumer_func1)
+    #     print("customer:", consumer)
 
     executor.start_polling(dp, skip_updates=True)

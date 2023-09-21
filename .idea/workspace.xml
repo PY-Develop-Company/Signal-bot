@@ -5,16 +5,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c8e52443-fb39-41fa-9e09-4877251a22f1" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/img/logo.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/img/long.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/img/short.jpg" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/price_parser.py" beforeDir="false" afterPath="$PROJECT_DIR$/price_parser.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/signal_maker.py" beforeDir="false" afterPath="$PROJECT_DIR$/signal_maker.py" afterDir="false" />
     </list>
     <list id="cbe571c8-b52a-4250-a9e3-ad1313cd5330" name="Changes by Alex" comment="" />
     <list id="7fa9b9cd-5f0a-41aa-bb8c-dd6d412d680c" name="Changes by SIRIUS" comment="">
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/users/db.txt" beforeDir="false" afterPath="$PROJECT_DIR$/users/db.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -34,11 +33,27 @@
   <component name="LineStatusTrackerManager">
     <file path="$PROJECT_DIR$/main.py">
       <ranges>
-        <range start1="26" end1="26" start2="26" end2="29" changelist="7fa9b9cd-5f0a-41aa-bb8c-dd6d412d680c" />
-        <range start1="182" end1="183" start2="185" end2="186" changelist="7fa9b9cd-5f0a-41aa-bb8c-dd6d412d680c" />
-        <range start1="192" end1="192" start2="195" end2="200" changelist="7fa9b9cd-5f0a-41aa-bb8c-dd6d412d680c" />
-        <range start1="264" end1="264" start2="272" end2="273" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
-        <range start1="274" end1="275" start2="283" end2="284" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
+        <range start1="9" end1="10" start2="9" end2="10" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
+        <range start1="12" end1="12" start2="12" end2="13" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
+        <range start1="27" end1="29" start2="28" end2="35" changelist="7fa9b9cd-5f0a-41aa-bb8c-dd6d412d680c" />
+        <range start1="70" end1="71" start2="76" end2="77" changelist="7fa9b9cd-5f0a-41aa-bb8c-dd6d412d680c" />
+        <range start1="85" end1="86" start2="91" end2="92" changelist="7fa9b9cd-5f0a-41aa-bb8c-dd6d412d680c" />
+        <range start1="110" end1="111" start2="116" end2="117" changelist="7fa9b9cd-5f0a-41aa-bb8c-dd6d412d680c" />
+        <range start1="185" end1="186" start2="191" end2="192" changelist="7fa9b9cd-5f0a-41aa-bb8c-dd6d412d680c" />
+        <range start1="192" end1="194" start2="198" end2="200" changelist="7fa9b9cd-5f0a-41aa-bb8c-dd6d412d680c" />
+        <range start1="196" end1="197" start2="202" end2="203" changelist="7fa9b9cd-5f0a-41aa-bb8c-dd6d412d680c" />
+        <range start1="199" end1="199" start2="205" end2="211" changelist="7fa9b9cd-5f0a-41aa-bb8c-dd6d412d680c" />
+        <range start1="204" end1="204" start2="216" end2="217" changelist="7fa9b9cd-5f0a-41aa-bb8c-dd6d412d680c" />
+        <range start1="263" end1="263" start2="276" end2="277" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
+        <range start1="265" end1="265" start2="279" end2="280" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
+        <range start1="266" end1="266" start2="281" end2="282" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
+        <range start1="273" end1="273" start2="289" end2="290" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
+        <range start1="276" end1="282" start2="293" end2="304" changelist="7fa9b9cd-5f0a-41aa-bb8c-dd6d412d680c" />
+        <range start1="285" end1="285" start2="307" end2="308" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
+        <range start1="307" end1="307" start2="330" end2="349" changelist="7fa9b9cd-5f0a-41aa-bb8c-dd6d412d680c" />
+        <range start1="308" end1="308" start2="350" end2="362" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
+        <range start1="310" end1="310" start2="364" end2="367" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
+        <range start1="318" end1="318" start2="375" end2="387" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
       </ranges>
     </file>
   </component>
@@ -160,8 +175,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.signal_maker" />
         <item itemvalue="Python.price_parser" />
+        <item itemvalue="Python.signal_maker" />
         <item itemvalue="Python.indicators_reader" />
       </list>
     </recent_temporary>
