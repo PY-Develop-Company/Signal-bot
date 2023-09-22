@@ -6,11 +6,29 @@
   <component name="ChangeListManager">
     <list default="true" id="c8e52443-fb39-41fa-9e09-4877251a22f1" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/currencies_data/AUDCADIntervalin_1_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/AUDCADIntervalin_1_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/currencies_data/AUDCADIntervalin_5_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/AUDCADIntervalin_5_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/currencies_data/AUDCHFIntervalin_1_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/AUDCHFIntervalin_1_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/currencies_data/AUDCHFIntervalin_5_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/AUDCHFIntervalin_5_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/currencies_data/AUDJPYIntervalin_1_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/AUDJPYIntervalin_1_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/currencies_data/AUDJPYIntervalin_5_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/AUDJPYIntervalin_5_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/currencies_data/AUDUSDIntervalin_1_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/AUDUSDIntervalin_1_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/currencies_data/AUDUSDIntervalin_5_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/AUDUSDIntervalin_5_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/currencies_data/EURCADIntervalin_1_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/EURCADIntervalin_1_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/currencies_data/EURCADIntervalin_5_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/EURCADIntervalin_5_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/currencies_data/EURJPYIntervalin_1_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/EURJPYIntervalin_1_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/currencies_data/EURJPYIntervalin_5_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/EURJPYIntervalin_5_minute.csv" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/currencies_data/EURUSDIntervalin_1_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/EURUSDIntervalin_1_minute.csv" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/currencies_data/EURUSDIntervalin_5_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/EURUSDIntervalin_5_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/indicators_reader.py" beforeDir="false" afterPath="$PROJECT_DIR$/indicators_reader.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/currencies_data/GBPAUDIntervalin_1_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/GBPAUDIntervalin_1_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/currencies_data/GBPAUDIntervalin_5_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/GBPAUDIntervalin_5_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/currencies_data/GBPUSDIntervalin_1_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/GBPUSDIntervalin_1_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/currencies_data/GBPUSDIntervalin_5_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/GBPUSDIntervalin_5_minute.csv" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/price_parser.py" beforeDir="false" afterPath="$PROJECT_DIR$/price_parser.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/signal_maker.py" beforeDir="false" afterPath="$PROJECT_DIR$/signal_maker.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/users/741867026.txt" beforeDir="false" afterPath="$PROJECT_DIR$/users/741867026.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/users/db.txt" beforeDir="false" afterPath="$PROJECT_DIR$/users/db.txt" afterDir="false" />
     </list>
     <list id="e176a2a4-581a-46b1-bd82-5c3037557029" name="Changes by ALEX" comment="" />
     <list id="cbe571c8-b52a-4250-a9e3-ad1313cd5330" name="Changes by Alex" comment="" />

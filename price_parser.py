@@ -32,6 +32,7 @@ def is_currency_file_changed(currency, interval):
         if not (current_check_date == last_check_date):
             currencies_requests_last_check_date.update({currency: current_check_date})
             return True, df
+        return False, df
     return False, None
 
 

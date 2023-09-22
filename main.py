@@ -16,10 +16,12 @@ logging.basicConfig(level=logging.INFO)
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot)
 
+seis_dict = {}
+
 db_path = "users/db.txt"
 
 manager_username = "@indddij"
-managers_id = [2091413236, 5359645780]
+managers_id = [741867026]
 manager_url = f"https://t.me/{manager_username[1:]}"
 
 accept_id_message_text = """Поздравляем ваш ID подтвержден. Чтобы получить доступ к сигналам внесите депозит и отправьте заявку боту.
@@ -345,7 +347,7 @@ def open_signal_check_thread(interval):
                 timedelta_interval = data.datetime[0] - data.datetime[1]
                 symbol = data.symbol[0].split(":")
                 symbol = symbol[1][:3] + "/" + symbol[1][3:]
-                open_signal = signal_maker.check_signal(data, interval, successful_indicators_count=4)
+                open_signal = signal_maker.check_signal(data, interval, successful_indicators_count=2)
                 if open_signal[0]:
                     open_position_price = data.close[0]
                     print(open_signal[1])
@@ -384,12 +386,12 @@ def open_signal_check_thread(interval):
     loop.run_until_complete(open_signal_check(interval))
 
 
-def close_signal_check_thread(open_position_price, close_prices_search_info, vip_users_ids, open_signal, symbol,
+def close_signal_check_thread(open_position_price, vip_users_ids, open_signal, symbol,
                               interval):
-    async def close_signal_check(open_position_price, close_prices_search_info, vip_users_ids, open_signal, symbol,
+    async def close_signal_check(open_position_price, vip_users_ids, open_signal, symbol,
                                  interval):
-        close_signal = await signal_maker.close_position(open_position_price, close_prices_search_info, open_signal,
-                                                         symbol, interval, bars_count=3)
+        close_signal = await signal_maker.close_position(open_position_price, open_signal,
+                                                         symbol, interval, bars_count=2)
         for user_id in vip_users_ids:
             await bot.send_message(
                 user_id,
@@ -401,7 +403,7 @@ def close_signal_check_thread(open_position_price, close_prices_search_info, vip
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
     loop.run_until_complete(
-        close_signal_check(open_position_price, close_prices_search_info, vip_users_ids, open_signal, symbol, interval))
+        close_signal_check(open_position_price, vip_users_ids, open_signal, symbol, interval))
 
 
 def update_currency_file_consumer(seis, data):
@@ -426,9 +428,10 @@ def signal_message_check_controller(intervals):
                         date_format = '%Y-%m-%d %H:%M:%S'
 
                         interval = datetime.strptime(priceData.datetime[0], date_format) - datetime.strptime(priceData.datetime[1], date_format)
-                        has_signal, open_signal_type = signal_maker.check_signal(priceData, interval, successful_indicators_count=4)
+                        has_signal, open_signal_type = signal_maker.check_signal(priceData, interval, successful_indicators_count=2)
                         if has_signal:
-                            for user_id in get_deposit_users_ids():
+                            deposit_users_ids = get_deposit_users_ids()
+                            for user_id in deposit_users_ids:
                                 if await get_chat_id(user_id) is None:
                                     continue
 
@@ -443,7 +446,14 @@ def signal_message_check_controller(intervals):
                                                              open_signal_type,
                                                              symbol,
                                                              interval))
-
+                            open_position_price = priceData.close[0]
+                            p = multiprocessing.Process(target=close_signal_check_thread,
+                                                        args=(
+                                                            open_position_price, deposit_users_ids,
+                                                            open_signal_type,
+                                                            symbol,
+                                                            interval))
+                            p.start()
             await asyncio.sleep(2)
 
     loop = asyncio.new_event_loop()
@@ -454,16 +464,13 @@ def signal_message_check_controller(intervals):
 if __name__ == '__main__':
     from aiogram import executor
 
-    intervals = [Interval.in_15_minute, Interval.in_5_minute, Interval.in_1_minute]
-    # intervals = [Interval.in_1_minute]
+    # intervals = [Interval.in_15_minute, Interval.in_5_minute, Interval.in_1_minute]
+    intervals = [Interval.in_1_minute]
     currencies = price_parser.get_currencies()
     tvl = TvDatafeedLive()
-    for currency in currencies[:1]:
-        for i in intervals:
-            seis = tvl.new_seis(currency[0], currency[1], i)
-            consumer = tvl.new_consumer(seis, update_currency_file_consumer)
-        # seis1 = tvl.new_seis(currency[0], currency[1], Interval.in_1_minute)
-        # consumer1 = tvl.new_consumer(seis1, update_currency_file_consumer)
+    for currency in currencies[0:1]:
+        seis1 = tvl.new_seis(currency[0], currency[1], Interval.in_1_minute)
+        consumer1 = tvl.new_consumer(seis1, update_currency_file_consumer)
         # seis5 = tvl.new_seis(currency[0], currency[1], Interval.in_5_minute)
         # consumer5 = tvl.new_consumer(seis5, update_currency_file_consumer)
         # seis15 = tvl.new_seis(currency[0], currency[1], Interval.in_15_minute)
