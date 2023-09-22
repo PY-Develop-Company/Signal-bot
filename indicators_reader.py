@@ -1,4 +1,5 @@
 import numpy as np
+import pandas
 from tvDatafeed import Interval
 import math
 import signal_maker as sm
@@ -63,7 +64,6 @@ def scalp_pro(src, close_price, fast_line=8, slow_line=10, smoothness=8):
         c1 = 1 - c2 - c3
 
         for i in range(len(p)-2, -1, -1):
-            print(i)
             ssm1 = 0
             ssm2 = 0
             if not (i+1 >= len(p) or np.isnan(res[i+1])):
@@ -149,7 +149,7 @@ def volume(open, close, bars_count=3):
     return (signal, "volume")
 
 
-def super_order_block(src, open, close, high, low, interval: timedelta, obMaxBoxSet=10, fvgMaxBoxSet=10):
+def super_order_block(src: pandas.DataFrame, open, close, high, low, interval: timedelta, obMaxBoxSet=10, fvgMaxBoxSet=10):
     class Box:
         def __init__(self, left=0, top=0, right=0, bottom=0, signal_type="box"):
             self.left = left
@@ -157,6 +157,8 @@ def super_order_block(src, open, close, high, low, interval: timedelta, obMaxBox
             self.right = right
             self.bottom = bottom
             self.signal_type = signal_type
+        def print_info(self):
+            print("Created box: ", self.left, self.top, self.right, self.bottom)
 
         def check_signal(self, bar_low, bar_high, bar_date):
             is_price_in_box = not ((bar_high > self.top and bar_low > self.top) or (bar_high < self.bottom and bar_low < self.bottom))
@@ -164,6 +166,7 @@ def super_order_block(src, open, close, high, low, interval: timedelta, obMaxBox
             return self.signal_type if is_price_in_box and is_date_range_in_box else sm.neutral_signal
 
     date_format = '%Y-%m-%d %H:%M:%S'
+    src.datetime = pandas.to_datetime(src.datetime)
 
     is_up_bar = lambda index: close[index] > open[index]
     is_down_bar = lambda index: close[index] < open[index]
@@ -214,7 +217,7 @@ def super_order_block(src, open, close, high, low, interval: timedelta, obMaxBox
     prices_count = len(src)
     # # # # # # # # # # # Order Block # # # # # # # # #
     for i in range(prices_count-3, 0, -1):
-        date_time = datetime.strptime(src.datetime[i], date_format)
+        date_time = src.datetime[i]
         if is_ob_box_up(i+1):
             _bullboxOB = Box(left=date_time - interval*2, top=high[i+2], right=date_time, bottom=min(low[i+2], low[i+1]), signal_type=sm.buy_signal)
             if len(_bullBoxesOB) > obMaxBoxSet:
@@ -232,7 +235,7 @@ def super_order_block(src, open, close, high, low, interval: timedelta, obMaxBox
 
     # # # # # # # # # Fair Value Gap # # # # # # # # #
     for i in range(prices_count-3, 0, -1):
-        date_time = datetime.strptime(src.datetime[i], date_format)
+        date_time = src.datetime[i]
         if is_fvg_box_up(i):
             _bullboxFVG = None
             if (close[i+1] > top[i]) and (low[i+1] < top[i]) and (high[i+2] < top[i]) and (low[i] > top[i]):
@@ -258,10 +261,83 @@ def super_order_block(src, open, close, high, low, interval: timedelta, obMaxBox
         control_box(_bearBoxesFVG, high[i], low[i], i)
         control_box(_bullBoxesFVG, high[i], low[i], i)
 
+    # scatters1 = []
+    # scatters2 = []
+    # scatters3 = []
+    # scatters4 = []
+    # for box in _bullBoxesOB:
+    #     scatters1.append(go.Scatter(x=[box.left, box.left, box.right, box.right, box.left],
+    #                y=[box.bottom, box.top, box.top, box.bottom, box.bottom],
+    #                fill="toself", fillcolor='#42f542'))
+    # for box in _bearBoxesOB:
+    #     scatters2.append(go.Scatter(x=[box.left, box.left, box.right, box.right, box.left],
+    #                                y=[box.bottom, box.top, box.top, box.bottom, box.bottom],
+    #                                fill="toself", fillcolor='#E01400'))
+    # for box in _bullBoxesFVG:
+    #     scatters3.append(go.Scatter(x=[box.left, box.left, box.right, box.right, box.left],
+    #                                y=[box.bottom, box.top, box.top, box.bottom, box.bottom],
+    #                                fill="toself", fillcolor='#00CCCC'))
+    # for box in _bearBoxesFVG:
+    #     scatters4.append(go.Scatter(x=[box.left, box.left, box.right, box.right, box.left],
+    #                                y=[box.bottom, box.top, box.top, box.bottom, box.bottom],
+    #                                fill="toself", fillcolor='#9200E0'))
+    # _bullBoxesOB[-1].print_info()
+    # _bearBoxesOB[-1].print_info()
+    # _bullBoxesFVG[-1].print_info()
+    # _bearBoxesFVG[-1].print_info()
+    # # scatters.append(go.Scatter(x=[src.datetime[x] for x in range(0, 100)], y=[top.get(x) for x in range(0, 100)]))
+    # fig = go.Figure(
+    #     data=[
+    #         go.Candlestick(
+    #             x=src["datetime"],
+    #             open=src["open"],
+    #             high=src["high"],
+    #             low=src["low"],
+    #             close=src["close"]
+    #         ),
+    #         scatters1[-1],
+    #         scatters2[-1],
+    #         scatters3[-1],
+    #         scatters4[-1]
+    #         # go.Scatter(
+    #         #     x=src["datetime"],
+    #         #     y=avg_red,
+    #         #     mode='lines',
+    #         #     name='red_signal',
+    #         #     line={'color': '#eb3434'}
+    #         # )
+    #     ]
+    # )
+    # fig.update_layout(
+    #     title=f'The Candlestick graph for ',
+    #     xaxis_title='Date',
+    #     yaxis_title=f'Price ()',
+    #     xaxis_rangeslider_visible=False,
+    #     xaxis=dict(type="category")
+    # )
+    # fig.show()
+    # print(src.datetime[0])
+    date_time = src.datetime[0]
+    # for box in _bullBoxesOB:
+    #     signal = box.check_signal(low[0], high[0], date_time)
+    #     if not signal == sm.neutral_signal:
+    #         return signal
+    # for box in _bearBoxesOB:
+    #     signal = box.check_signal(low[0], high[0], date_time)
+    #     if not signal == sm.neutral_signal:
+    #         return signal
+    # for box in _bullBoxesFVG:
+    #     signal = box.check_signal(low[0], high[0], date_time)
+    #     if not signal == sm.neutral_signal:
+    #         return signal
+    # for box in _bearBoxesFVG:
+    #     signal = box.check_signal(low[0], high[0], date_time)
+    #     if not signal == sm.neutral_signal:
+    #         return signal
+
     boxes = _bullBoxesOB + _bearBoxesOB + _bullBoxesFVG + _bearBoxesFVG
     return_signal = sm.neutral_signal
     signal_boxes = []
-    date_time = datetime.strptime(src.datetime[0], date_format)
     for box in boxes:
         signal = box.check_signal(low[0], high[0], date_time)
         if not signal == sm.neutral_signal:
