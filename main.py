@@ -20,8 +20,8 @@ seis_dict = {}
 
 db_path = "users/db.txt"
 
-manager_username = "@indddij"
-managers_id = [741867026]
+manager_username = "@bwg_Golden"
+managers_id = [5964166439]
 manager_url = f"https://t.me/{manager_username[1:]}"
 
 accept_id_message_text = """Поздравляем ваш ID подтвержден. Чтобы получить доступ к сигналам внесите депозит и отправьте заявку боту.
@@ -391,7 +391,7 @@ def close_signal_check_thread(open_position_price, vip_users_ids, open_signal, s
     async def close_signal_check(open_position_price, vip_users_ids, open_signal, symbol,
                                  interval):
         close_signal = await signal_maker.close_position(open_position_price, open_signal,
-                                                         symbol, interval, bars_count=2)
+                                                         symbol, interval, bars_count=3)
         for user_id in vip_users_ids:
             await bot.send_message(
                 user_id,
@@ -418,7 +418,7 @@ def update_currency_file_consumer(seis, data):
 def signal_message_check_controller(intervals):
     async def signal_message_check_function(intervals):
         while True:
-            for currency in price_parser.get_currencies()[0:1]:
+            for currency in price_parser.get_currencies():
                 for currency_interval in intervals:
                     is_file_changed, priceData = price_parser.is_currency_file_changed(currency[0], str(currency_interval).replace(".", ""))
                     if is_file_changed:
@@ -428,7 +428,7 @@ def signal_message_check_controller(intervals):
                         date_format = '%Y-%m-%d %H:%M:%S'
 
                         interval = datetime.strptime(priceData.datetime[0], date_format) - datetime.strptime(priceData.datetime[1], date_format)
-                        has_signal, open_signal_type = signal_maker.check_signal(priceData, interval, successful_indicators_count=2)
+                        has_signal, open_signal_type = signal_maker.check_signal(priceData, interval, successful_indicators_count=4)
                         if has_signal:
                             deposit_users_ids = get_deposit_users_ids()
                             for user_id in deposit_users_ids:
@@ -454,6 +454,7 @@ def signal_message_check_controller(intervals):
                                                             symbol,
                                                             interval))
                             p.start()
+            print("signal_message_check_function loop")
             await asyncio.sleep(2)
 
     loop = asyncio.new_event_loop()
@@ -468,7 +469,7 @@ if __name__ == '__main__':
     intervals = [Interval.in_1_minute]
     currencies = price_parser.get_currencies()
     tvl = TvDatafeedLive()
-    for currency in currencies[0:1]:
+    for currency in currencies:
         seis1 = tvl.new_seis(currency[0], currency[1], Interval.in_1_minute)
         consumer1 = tvl.new_consumer(seis1, update_currency_file_consumer)
         # seis5 = tvl.new_seis(currency[0], currency[1], Interval.in_5_minute)
