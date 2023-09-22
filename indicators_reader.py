@@ -163,7 +163,7 @@ def super_order_block(src: pandas.DataFrame, open, close, high, low, interval: t
         def check_signal(self, bar_low, bar_high, bar_date):
             is_price_in_box = not ((bar_high > self.top and bar_low > self.top) or (bar_high < self.bottom and bar_low < self.bottom))
             is_date_range_in_box = self.left <= bar_date <= self.right
-            return self.signal_type if is_price_in_box and is_date_range_in_box else sm.neutral_signal
+            return self.signal_type if (is_price_in_box and is_date_range_in_box) else sm.neutral_signal
 
     date_format = '%Y-%m-%d %H:%M:%S'
     src.datetime = pandas.to_datetime(src.datetime)
@@ -216,7 +216,7 @@ def super_order_block(src: pandas.DataFrame, open, close, high, low, interval: t
 
     prices_count = len(src)
     # # # # # # # # # # # Order Block # # # # # # # # #
-    for i in range(prices_count-3, 0, -1):
+    for i in range(prices_count-3, -1, -1):
         date_time = src.datetime[i]
         if is_ob_box_up(i+1):
             _bullboxOB = Box(left=date_time - interval*2, top=high[i+2], right=date_time, bottom=min(low[i+2], low[i+1]), signal_type=sm.buy_signal)
@@ -234,7 +234,7 @@ def super_order_block(src: pandas.DataFrame, open, close, high, low, interval: t
         control_box(_bullBoxesOB, high[i], low[i], i)
 
     # # # # # # # # # Fair Value Gap # # # # # # # # #
-    for i in range(prices_count-3, 0, -1):
+    for i in range(prices_count-3, -1, -1):
         date_time = src.datetime[i]
         if is_fvg_box_up(i):
             _bullboxFVG = None
@@ -261,31 +261,31 @@ def super_order_block(src: pandas.DataFrame, open, close, high, low, interval: t
         control_box(_bearBoxesFVG, high[i], low[i], i)
         control_box(_bullBoxesFVG, high[i], low[i], i)
 
-    # scatters1 = []
-    # scatters2 = []
-    # scatters3 = []
-    # scatters4 = []
-    # for box in _bullBoxesOB:
-    #     scatters1.append(go.Scatter(x=[box.left, box.left, box.right, box.right, box.left],
-    #                y=[box.bottom, box.top, box.top, box.bottom, box.bottom],
-    #                fill="toself", fillcolor='#42f542'))
-    # for box in _bearBoxesOB:
-    #     scatters2.append(go.Scatter(x=[box.left, box.left, box.right, box.right, box.left],
-    #                                y=[box.bottom, box.top, box.top, box.bottom, box.bottom],
-    #                                fill="toself", fillcolor='#E01400'))
-    # for box in _bullBoxesFVG:
-    #     scatters3.append(go.Scatter(x=[box.left, box.left, box.right, box.right, box.left],
-    #                                y=[box.bottom, box.top, box.top, box.bottom, box.bottom],
-    #                                fill="toself", fillcolor='#00CCCC'))
-    # for box in _bearBoxesFVG:
-    #     scatters4.append(go.Scatter(x=[box.left, box.left, box.right, box.right, box.left],
-    #                                y=[box.bottom, box.top, box.top, box.bottom, box.bottom],
-    #                                fill="toself", fillcolor='#9200E0'))
-    # _bullBoxesOB[-1].print_info()
-    # _bearBoxesOB[-1].print_info()
-    # _bullBoxesFVG[-1].print_info()
-    # _bearBoxesFVG[-1].print_info()
-    # # scatters.append(go.Scatter(x=[src.datetime[x] for x in range(0, 100)], y=[top.get(x) for x in range(0, 100)]))
+    scatters1 = []
+    scatters2 = []
+    scatters3 = []
+    scatters4 = []
+    for box in _bullBoxesOB:
+        scatters1.append(go.Scatter(x=[box.left, box.left, box.right, box.right, box.left],
+                   y=[box.bottom, box.top, box.top, box.bottom, box.bottom],
+                   fill="toself", fillcolor='#42f542'))
+    for box in _bearBoxesOB:
+        scatters2.append(go.Scatter(x=[box.left, box.left, box.right, box.right, box.left],
+                                   y=[box.bottom, box.top, box.top, box.bottom, box.bottom],
+                                   fill="toself", fillcolor='#E01400'))
+    for box in _bullBoxesFVG:
+        scatters3.append(go.Scatter(x=[box.left, box.left, box.right, box.right, box.left],
+                                   y=[box.bottom, box.top, box.top, box.bottom, box.bottom],
+                                   fill="toself", fillcolor='#00CCCC'))
+    for box in _bearBoxesFVG:
+        scatters4.append(go.Scatter(x=[box.left, box.left, box.right, box.right, box.left],
+                                   y=[box.bottom, box.top, box.top, box.bottom, box.bottom],
+                                   fill="toself", fillcolor='#9200E0'))
+    _bullBoxesOB[-1].print_info()
+    _bearBoxesOB[-1].print_info()
+    _bullBoxesFVG[-1].print_info()
+    _bearBoxesFVG[-1].print_info()
+    # scatters.append(go.Scatter(x=[src.datetime[x] for x in range(0, 100)], y=[top.get(x) for x in range(0, 100)]))
     # fig = go.Figure(
     #     data=[
     #         go.Candlestick(
@@ -316,7 +316,7 @@ def super_order_block(src: pandas.DataFrame, open, close, high, low, interval: t
     #     xaxis=dict(type="category")
     # )
     # fig.show()
-    # print(src.datetime[0])
+    print(src.datetime[0])
     date_time = src.datetime[0]
     # for box in _bullBoxesOB:
     #     signal = box.check_signal(low[0], high[0], date_time)
@@ -340,15 +340,19 @@ def super_order_block(src: pandas.DataFrame, open, close, high, low, interval: t
     signal_boxes = []
     for box in boxes:
         signal = box.check_signal(low[0], high[0], date_time)
-        if not signal == sm.neutral_signal:
+        if not (signal == sm.neutral_signal):
             signal_boxes.append(box)
 
     biggest_box_height = 0
+    big_box = Box(0,0,0,0)
     for b in signal_boxes:
         res = b.top-b.bottom
         if res > biggest_box_height:
             biggest_box_height = res
+            big_box=b
             return_signal = b.signal_type
+    print("big box")
+    big_box.print_info()
     return (return_signal, "super order block")
 
 
