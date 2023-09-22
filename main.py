@@ -340,9 +340,7 @@ def open_signal_check_thread(interval):
             print(datetime.now())
             vip_users_ids = get_deposit_users_ids()
             for currency in price_parser.get_currencies():
-                # print("read data time", datetime.now())
                 data = price_parser.get_price_data(symbol=currency[0], exchange=currency[1], interval=interval)
-                # print(data.datetime[0])
 
                 timedelta_interval = data.datetime[0] - data.datetime[1]
                 symbol = data.symbol[0].split(":")
@@ -415,14 +413,11 @@ def update_currency_file_consumer(seis, data):
     price_parser.save_currency_file(price_data, symbol, interval)
 
 
-def test_core_controller(intervals):
-    async def test_core_function(intervals):
-        # print("test_core_function")
+def signal_message_check_controller(intervals):
+    async def signal_message_check_function(intervals):
         while True:
             for currency in price_parser.get_currencies()[0:1]:
-                # print("check", currency)
                 for currency_interval in intervals:
-                    # print("currency_interval", currency_interval)
                     is_file_changed, priceData = price_parser.is_currency_file_changed(currency[0], str(currency_interval).replace(".", ""))
                     if is_file_changed:
 
@@ -449,26 +444,26 @@ def test_core_controller(intervals):
                                                              symbol,
                                                              interval))
 
-            print("test_core_function loop")
             await asyncio.sleep(2)
 
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
-    loop.run_until_complete(test_core_function(intervals))
+    loop.run_until_complete(signal_message_check_function(intervals))
 
 
 if __name__ == '__main__':
     from aiogram import executor
 
-    # intervals = [Interval.in_15_minute, Interval.in_5_minute, Interval.in_1_minute]
-    intervals = [Interval.in_1_minute]
+    intervals = [Interval.in_15_minute, Interval.in_5_minute, Interval.in_1_minute]
+    # intervals = [Interval.in_1_minute]
     currencies = price_parser.get_currencies()
-    # price_parser.create_save_currencies_files(currencies, intervals)
     tvl = TvDatafeedLive()
     for currency in currencies[:1]:
-        # print(currency[0])
-        seis1 = tvl.new_seis(currency[0], currency[1], Interval.in_1_minute)
-        consumer1 = tvl.new_consumer(seis1, update_currency_file_consumer)
+        for i in intervals:
+            seis = tvl.new_seis(currency[0], currency[1], i)
+            consumer = tvl.new_consumer(seis, update_currency_file_consumer)
+        # seis1 = tvl.new_seis(currency[0], currency[1], Interval.in_1_minute)
+        # consumer1 = tvl.new_consumer(seis1, update_currency_file_consumer)
         # seis5 = tvl.new_seis(currency[0], currency[1], Interval.in_5_minute)
         # consumer5 = tvl.new_consumer(seis5, update_currency_file_consumer)
         # seis15 = tvl.new_seis(currency[0], currency[1], Interval.in_15_minute)
@@ -477,10 +472,10 @@ if __name__ == '__main__':
     # p1 = multiprocessing.Process(target=open_signal_check_thread, args=(Interval.in_1_minute,))
     # p2 = multiprocessing.Process(target=open_signal_check_thread, args=(Interval.in_15_minute,))
     # p3 = multiprocessing.Process(target=open_signal_check_thread, args=(Interval.in_5_minute,))
-    test_core = multiprocessing.Process(target=test_core_controller, args=(intervals, ))
+    signal_message_process = multiprocessing.Process(target=signal_message_check_controller, args=(intervals,))
     # # # # p1.start()
     # # # # p2.start()
     # # # # p3.start()
-    test_core.start()
+    signal_message_process.start()
 
     executor.start_polling(dp, skip_updates=True)

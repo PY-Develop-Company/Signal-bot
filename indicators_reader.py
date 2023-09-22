@@ -80,54 +80,6 @@ def scalp_pro(src, close_price, fast_line=8, slow_line=10, smoothness=8):
 
     macd = (smooth1 - smooth2) * 100
     smooth3 = smooth(smoothness, macd)
-    # fig = go.Figure(
-    #     data=[
-    #         go.Candlestick(
-    #             x=src["datetime"],
-    #             open=src["open"],
-    #             high=src["high"],
-    #             low=src["low"],
-    #             close=src["close"]
-    #         ),
-    #
-    #         go.Scatter(
-    #             x=src["datetime"],
-    #             y=smooth3,
-    #             mode='lines',
-    #             name='green_sig',
-    #             line={'color': '#eb3434'}
-    #         ),
-    #         go.Scatter(
-    #             x=src["datetime"],
-    #             y=macd,
-    #             mode='lines',
-    #             name='red_signal',
-    #             line={'color': '#890089'}
-    #         ),
-    #         # go.Scatter(
-    #         #     x=src["datetime"],
-    #         #     y=macd,
-    #         #     mode='lines',
-    #         #     name='macd',
-    #         #     line={'color': '#888888'}
-    #         # ),
-    #         # go.Scatter(
-    #         #     x=src["datetime"],
-    #         #     y=smooth3,
-    #         #     mode='lines',
-    #         #     name='sm3',
-    #         #     line={'color': '#AAAAAA'}
-    #         # )
-    #     ]
-    # )
-    # fig.update_layout(
-    #     title=f'The Candlestick graph for ',
-    #     xaxis_title='Date',
-    #     yaxis_title=f'Price ()',
-    #     xaxis_rangeslider_visible=False,
-    #     xaxis=dict(type="category")
-    # )
-    # fig.show()
     return (sm.buy_signal if macd[0] > smooth3[0] else sm.sell_signal, "scalp_pro")
 
 
@@ -281,59 +233,8 @@ def super_order_block(src: pandas.DataFrame, open, close, high, low, interval: t
         scatters4.append(go.Scatter(x=[box.left, box.left, box.right, box.right, box.left],
                                    y=[box.bottom, box.top, box.top, box.bottom, box.bottom],
                                    fill="toself", fillcolor='#9200E0'))
-    _bullBoxesOB[-1].print_info()
-    _bearBoxesOB[-1].print_info()
-    _bullBoxesFVG[-1].print_info()
-    _bearBoxesFVG[-1].print_info()
-    # scatters.append(go.Scatter(x=[src.datetime[x] for x in range(0, 100)], y=[top.get(x) for x in range(0, 100)]))
-    # fig = go.Figure(
-    #     data=[
-    #         go.Candlestick(
-    #             x=src["datetime"],
-    #             open=src["open"],
-    #             high=src["high"],
-    #             low=src["low"],
-    #             close=src["close"]
-    #         ),
-    #         scatters1[-1],
-    #         scatters2[-1],
-    #         scatters3[-1],
-    #         scatters4[-1]
-    #         # go.Scatter(
-    #         #     x=src["datetime"],
-    #         #     y=avg_red,
-    #         #     mode='lines',
-    #         #     name='red_signal',
-    #         #     line={'color': '#eb3434'}
-    #         # )
-    #     ]
-    # )
-    # fig.update_layout(
-    #     title=f'The Candlestick graph for ',
-    #     xaxis_title='Date',
-    #     yaxis_title=f'Price ()',
-    #     xaxis_rangeslider_visible=False,
-    #     xaxis=dict(type="category")
-    # )
-    # fig.show()
-    print(src.datetime[0])
+
     date_time = src.datetime[0]
-    # for box in _bullBoxesOB:
-    #     signal = box.check_signal(low[0], high[0], date_time)
-    #     if not signal == sm.neutral_signal:
-    #         return signal
-    # for box in _bearBoxesOB:
-    #     signal = box.check_signal(low[0], high[0], date_time)
-    #     if not signal == sm.neutral_signal:
-    #         return signal
-    # for box in _bullBoxesFVG:
-    #     signal = box.check_signal(low[0], high[0], date_time)
-    #     if not signal == sm.neutral_signal:
-    #         return signal
-    # for box in _bearBoxesFVG:
-    #     signal = box.check_signal(low[0], high[0], date_time)
-    #     if not signal == sm.neutral_signal:
-    #         return signal
 
     boxes = _bullBoxesOB + _bearBoxesOB + _bullBoxesFVG + _bearBoxesFVG
     return_signal = sm.neutral_signal
@@ -344,15 +245,11 @@ def super_order_block(src: pandas.DataFrame, open, close, high, low, interval: t
             signal_boxes.append(box)
 
     biggest_box_height = 0
-    big_box = Box(0,0,0,0)
     for b in signal_boxes:
         res = b.top-b.bottom
         if res > biggest_box_height:
             biggest_box_height = res
-            big_box=b
             return_signal = b.signal_type
-    print("big box")
-    big_box.print_info()
     return (return_signal, "super order block")
 
 
