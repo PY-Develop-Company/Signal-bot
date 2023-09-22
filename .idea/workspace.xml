@@ -5,21 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c8e52443-fb39-41fa-9e09-4877251a22f1" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/Signal-bot.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Signal-bot.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/currencies_data/EURUSDIntervalin_1_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/EURUSDIntervalin_1_minute.csv" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/indicators_reader.py" beforeDir="false" afterPath="$PROJECT_DIR$/indicators_reader.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/price_parser.py" beforeDir="false" afterPath="$PROJECT_DIR$/price_parser.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/signal_maker.py" beforeDir="false" afterPath="$PROJECT_DIR$/signal_maker.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/users/db.txt" beforeDir="false" afterPath="$PROJECT_DIR$/users/db.txt" afterDir="false" />
     </list>
     <list id="cbe571c8-b52a-4250-a9e3-ad1313cd5330" name="Changes by Alex" comment="" />
-    <list id="e176a2a4-581a-46b1-bd82-5c3037557029" name="Changes by ALEX" comment="">
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/price_parser.py" beforeDir="false" afterPath="$PROJECT_DIR$/price_parser.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/signal_maker.py" beforeDir="false" afterPath="$PROJECT_DIR$/signal_maker.py" afterDir="false" />
-    </list>
+    <list id="e176a2a4-581a-46b1-bd82-5c3037557029" name="Changes by ALEX" comment="" />
     <list id="7fa9b9cd-5f0a-41aa-bb8c-dd6d412d680c" name="Changes by SIRIUS" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -35,51 +26,6 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
-  </component>
-  <component name="LineStatusTrackerManager">
-    <file path="$PROJECT_DIR$/signal_maker.py">
-      <ranges>
-        <range start1="1" end1="2" start2="1" end2="1" changelist="e176a2a4-581a-46b1-bd82-5c3037557029" />
-        <range start1="54" end1="55" start2="53" end2="54" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
-        <range start1="72" end1="76" start2="71" end2="76" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
-        <range start1="77" end1="78" start2="77" end2="78" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
-        <range start1="79" end1="81" start2="79" end2="81" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
-        <range start1="82" end1="86" start2="82" end2="82" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
-      </ranges>
-    </file>
-    <file path="$PROJECT_DIR$/main.py">
-      <ranges>
-        <range start1="0" end1="1" start2="0" end2="0" changelist="e176a2a4-581a-46b1-bd82-5c3037557029" />
-        <range start1="2" end1="6" start2="1" end2="3" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
-        <range start1="7" end1="8" start2="4" end2="4" changelist="e176a2a4-581a-46b1-bd82-5c3037557029" />
-        <range start1="14" end1="15" start2="10" end2="10" changelist="e176a2a4-581a-46b1-bd82-5c3037557029" />
-        <range start1="16" end1="17" start2="11" end2="11" changelist="e176a2a4-581a-46b1-bd82-5c3037557029" />
-        <range start1="31" end1="32" start2="25" end2="27" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
-        <range start1="37" end1="38" start2="32" end2="34" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
-        <range start1="92" end1="93" start2="88" end2="89" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
-        <range start1="239" end1="240" start2="235" end2="235" changelist="e176a2a4-581a-46b1-bd82-5c3037557029" />
-        <range start1="345" end1="346" start2="340" end2="341" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
-        <range start1="413" end1="424" start2="408" end2="438" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
-        <range start1="425" end1="425" start2="439" end2="444" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
-        <range start1="426" end1="432" start2="445" end2="450" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
-        <range start1="433" end1="433" start2="451" end2="457" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
-        <range start1="434" end1="434" start2="458" end2="459" changelist="e176a2a4-581a-46b1-bd82-5c3037557029" />
-        <range start1="437" end1="437" start2="462" end2="476" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
-        <range start1="440" end1="443" start2="479" end2="484" changelist="e176a2a4-581a-46b1-bd82-5c3037557029" />
-      </ranges>
-    </file>
-    <file path="$PROJECT_DIR$/price_parser.py">
-      <ranges>
-        <range start1="0" end1="1" start2="0" end2="1" changelist="e176a2a4-581a-46b1-bd82-5c3037557029" />
-        <range start1="2" end1="3" start2="2" end2="4" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
-        <range start1="5" end1="5" start2="6" end2="35" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
-        <range start1="23" end1="25" start2="53" end2="55" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
-        <range start1="30" end1="31" start2="60" end2="61" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
-        <range start1="32" end1="33" start2="62" end2="62" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
-        <range start1="34" end1="35" start2="63" end2="63" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
-        <range start1="38" end1="59" start2="66" end2="66" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
-      </ranges>
-    </file>
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />

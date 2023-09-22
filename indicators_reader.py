@@ -4,6 +4,7 @@ import math
 import signal_maker as sm
 from datetime import timedelta, datetime
 from pandas import Series
+import plotly.graph_objects as go
 
 
 def clamp(value, min_value, max_value):
@@ -53,7 +54,7 @@ def get_interval_string(datetime):
 
 def scalp_pro(src, close_price, fast_line=8, slow_line=10, smoothness=8):
     def smooth(par, p: Series):
-        res = np.empty(len(close_price), dtype=float)
+        res = np.zeros(len(close_price), dtype=float)
 
         f = (1.414 * math.pi) / float(par)
         a = math.exp(-f)
@@ -62,7 +63,7 @@ def scalp_pro(src, close_price, fast_line=8, slow_line=10, smoothness=8):
         c1 = 1 - c2 - c3
 
         for i in range(len(p)-2, -1, -1):
-
+            print(i)
             ssm1 = 0
             ssm2 = 0
             if not (i+1 >= len(p) or np.isnan(res[i+1])):
@@ -70,7 +71,7 @@ def scalp_pro(src, close_price, fast_line=8, slow_line=10, smoothness=8):
             if not (i+2 >= len(p) or np.isnan(res[i+2])):
                 ssm2 = res[i+2]
 
-            res[i] += c1 * (p[i] + p[i + 1]) + c2 * ssm1 + c3 * ssm2
+            res[i] = c1 * (p[i] + p[i + 1]) + c2 * ssm1 + c3 * ssm2
         return res
 
     smooth1 = smooth(fast_line, close_price)
@@ -79,7 +80,54 @@ def scalp_pro(src, close_price, fast_line=8, slow_line=10, smoothness=8):
 
     macd = (smooth1 - smooth2) * 100
     smooth3 = smooth(smoothness, macd)
-
+    # fig = go.Figure(
+    #     data=[
+    #         go.Candlestick(
+    #             x=src["datetime"],
+    #             open=src["open"],
+    #             high=src["high"],
+    #             low=src["low"],
+    #             close=src["close"]
+    #         ),
+    #
+    #         go.Scatter(
+    #             x=src["datetime"],
+    #             y=smooth3,
+    #             mode='lines',
+    #             name='green_sig',
+    #             line={'color': '#eb3434'}
+    #         ),
+    #         go.Scatter(
+    #             x=src["datetime"],
+    #             y=macd,
+    #             mode='lines',
+    #             name='red_signal',
+    #             line={'color': '#890089'}
+    #         ),
+    #         # go.Scatter(
+    #         #     x=src["datetime"],
+    #         #     y=macd,
+    #         #     mode='lines',
+    #         #     name='macd',
+    #         #     line={'color': '#888888'}
+    #         # ),
+    #         # go.Scatter(
+    #         #     x=src["datetime"],
+    #         #     y=smooth3,
+    #         #     mode='lines',
+    #         #     name='sm3',
+    #         #     line={'color': '#AAAAAA'}
+    #         # )
+    #     ]
+    # )
+    # fig.update_layout(
+    #     title=f'The Candlestick graph for ',
+    #     xaxis_title='Date',
+    #     yaxis_title=f'Price ()',
+    #     xaxis_rangeslider_visible=False,
+    #     xaxis=dict(type="category")
+    # )
+    # fig.show()
     return (sm.buy_signal if macd[0] > smooth3[0] else sm.sell_signal, "scalp_pro")
 
 
