@@ -1,20 +1,14 @@
-import os
 import time
-import threading
-from fileinput import fileno
-
-from aiogram import Bot, Dispatcher, types, exceptions
+import indicators_reader
+from aiogram import Bot, Dispatcher, types
 import logging
-import json
 import price_parser
 import signal_maker
 from pandas import Timedelta
 from tvDatafeed import TvDatafeedLive, Interval
 import asyncio
 import multiprocessing
-from threading import Thread
 from datetime import datetime
-import file_manager
 from user_module import *
 
 API_TOKEN = "6340912636:AAHACm2V2hDJUDXng0y0uhBRVRFJgqrok48"
@@ -29,13 +23,15 @@ managers_id = [2091413236, 5359645780]
 manager_url = f"https://t.me/{manager_username[1:]}"
 
 accept_id_message_text = """Поздравляем ваш ID подтвержден. Чтобы получить доступ к сигналам внесите депозит и отправьте заявку боту.
-Для отправки проверки на депозит /checkDeposit """
+Для отправки проверки на депозит нажмите:
+ /checkDeposit """
 accept_deposit_message_text = """Поздравляем ваш депозит внесен. Теперь вы имеете полный доступ к сигналам"""
 reject_id_message_text = """К сожалению ваш ID не подтвержден. Проверьте правильно ли вы его указали и попробуйте снова
 
 нажмите /start что бы продолжит"""
 reject_deposit_message_text = """Ваш депозит не внесен. Проверьте действительно ли вы его внесли и отправьте запрос на проверку снова
-Для отправки проверки на депозит /checkDeposit"""
+Для отправки проверки на депозит нажмите:
+/checkDeposit"""
 
 accept_button = "ПОДТВЕРДИТЬ"
 reject_button = "ОТКЛОНИТЬ"
@@ -90,7 +86,7 @@ async def get_chat_id(user_id):
         return 0
 
 
-def get_vip_users_ids():
+def get_deposit_users_ids():
     data = file_manager.read_file(db_path)
     vip_users = []
     for user in data:
@@ -237,7 +233,6 @@ async def photo_text_message(user_id, img_path, text=" "):
 
 @dp.message_handler(commands="start")
 async def create_user(message):
-    # os.makedirs(f"users/{message.from_user.id}", exist_ok=True)
     await photo_text_message(message.from_user.id, start_img_path, start_text)
     if message.from_user.id in managers_id:
         await add_manager(message)
@@ -343,7 +338,7 @@ def open_signal_check_thread(interval):
     async def open_signal_check(interval):
         while True:
             print(datetime.now())
-            vip_users_ids = get_vip_users_ids()
+            vip_users_ids = get_deposit_users_ids()
             for currency in price_parser.get_currencies():
                 # print("read data time", datetime.now())
                 data = price_parser.get_price_data(symbol=currency[0], exchange=currency[1], interval=interval)
@@ -411,35 +406,81 @@ def close_signal_check_thread(open_position_price, close_prices_search_info, vip
         close_signal_check(open_position_price, close_prices_search_info, vip_users_ids, open_signal, symbol, interval))
 
 
-def consumer_func1(seis, data):
-    data = price_parser.get_price_data_seis(seis)
-    open_signal = signal_maker.check_signal(data, seis.interval, successful_indicators_count=1)
-    if open_signal[0]:
-        timedelta_interval = data.datetime[0] - data.datetime[1]
-        symbol = data.symbol[0].split(":")
-        symbol = symbol[1][:3] + "/" + symbol[1][3:]
-        open_position_price = data.close[0]
-        # loop = asyncio.new_event_loop()
-        # asyncio.set_event_loop(loop)
-        # loop.run_until_complete(test(open_signal, symbol, timedelta_interval))
+def update_currency_file_consumer(seis, data):
+    price_data = price_parser.get_price_data_seis(seis)
+    interval = indicators_reader.get_interval_string(indicators_reader.get_interval(price_data.datetime[0] - price_data.datetime[1]))
+
+    symbol = price_data.symbol[0].split(":")[1]
+    print(symbol, interval)
+    price_parser.save_currency_file(price_data, symbol, interval)
 
 
-def main():
-    currencies = price_parser.get_currencies()
-    for currency in currencies[:2]:
-        tvl = TvDatafeedLive()
-        seis = tvl.new_seis(currency[0], currency[1], Interval.in_1_minute)
-        consumer = tvl.new_consumer(seis, consumer_func1)
+def test_core_controller(intervals):
+    async def test_core_function(intervals):
+        # print("test_core_function")
+        while True:
+            for currency in price_parser.get_currencies()[0:1]:
+                # print("check", currency)
+                for currency_interval in intervals:
+                    # print("currency_interval", currency_interval)
+                    is_file_changed, priceData = price_parser.is_currency_file_changed(currency[0], str(currency_interval).replace(".", ""))
+                    if is_file_changed:
+
+                        symbol = priceData.symbol[0].split(":")
+                        symbol = symbol[1][:3] + "/" + symbol[1][3:]
+                        date_format = '%Y-%m-%d %H:%M:%S'
+
+                        interval = datetime.strptime(priceData.datetime[0], date_format) - datetime.strptime(priceData.datetime[1], date_format)
+                        has_signal, open_signal_type = signal_maker.check_signal(priceData, interval, successful_indicators_count=4)
+                        if has_signal:
+                            for user_id in get_deposit_users_ids():
+                                if await get_chat_id(user_id) is None:
+                                    continue
+
+                                photo_path = photo_long_path
+                                if open_signal_type == signal_maker.buy_signal:
+                                    photo_path = photo_long_path
+                                elif open_signal_type == signal_maker.sell_signal:
+                                    photo_path = photo_short_path
+
+                                await photo_text_message(user_id, photo_path,
+                                                         signal_maker.get_open_position_signal_message(
+                                                             open_signal_type,
+                                                             symbol,
+                                                             interval))
+
+            print("test_core_function loop")
+            await asyncio.sleep(2)
+
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    loop.run_until_complete(test_core_function(intervals))
 
 
 if __name__ == '__main__':
     from aiogram import executor
 
+    # intervals = [Interval.in_15_minute, Interval.in_5_minute, Interval.in_1_minute]
+    intervals = [Interval.in_1_minute]
+    currencies = price_parser.get_currencies()
+    # price_parser.create_save_currencies_files(currencies, intervals)
+    tvl = TvDatafeedLive()
+    for currency in currencies[:1]:
+        # print(currency[0])
+        seis1 = tvl.new_seis(currency[0], currency[1], Interval.in_1_minute)
+        consumer1 = tvl.new_consumer(seis1, update_currency_file_consumer)
+        # seis5 = tvl.new_seis(currency[0], currency[1], Interval.in_5_minute)
+        # consumer5 = tvl.new_consumer(seis5, update_currency_file_consumer)
+        # seis15 = tvl.new_seis(currency[0], currency[1], Interval.in_15_minute)
+        # consumer15 = tvl.new_consumer(seis15, update_currency_file_consumer)
+
     # p1 = multiprocessing.Process(target=open_signal_check_thread, args=(Interval.in_1_minute,))
     # p2 = multiprocessing.Process(target=open_signal_check_thread, args=(Interval.in_15_minute,))
     # p3 = multiprocessing.Process(target=open_signal_check_thread, args=(Interval.in_5_minute,))
-    # p1.start()
-    # p2.start()
-    # p3.start()
+    test_core = multiprocessing.Process(target=test_core_controller, args=(intervals, ))
+    # # # # p1.start()
+    # # # # p2.start()
+    # # # # p3.start()
+    test_core.start()
 
     executor.start_polling(dp, skip_updates=True)

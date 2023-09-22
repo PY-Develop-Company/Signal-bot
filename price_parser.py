@@ -1,8 +1,38 @@
-from tvDatafeed import TvDatafeedLive, TvDatafeed, Interval
+from tvDatafeed import TvDatafeed, Interval
 import json
-import indicators_reader
+import os
+from pandas import DataFrame, read_csv
 
 currencies_path = "users/currencies.txt"
+currencies_data_path = "currencies_data/"
+
+currencies_requests_last_check_date = {}
+
+
+def create_save_currencies_files(currencies, intervals):
+    for cur in currencies:
+        for interval in intervals:
+            path = currencies_data_path+cur[0]+str(interval).replace(".", "")+".csv"
+            with open(path, "a", encoding="utf-8") as file:
+                file.write(" ")
+
+
+def save_currency_file(df: DataFrame, currency, interval):
+    # print("Save currency", currency)
+    df.to_csv(currencies_data_path + currency + interval + ".csv")
+
+
+def is_currency_file_changed(currency, interval):
+    path = currencies_data_path + currency + interval + ".csv"
+    if os.path.exists(path):
+        last_check_date = currencies_requests_last_check_date.get(currency)
+        df = read_csv(path)
+
+        current_check_date = df.datetime[0]
+        if not (current_check_date == last_check_date):
+            currencies_requests_last_check_date.update({currency: current_check_date})
+            return True, df
+    return False, None
 
 
 def read_currencies_file():
@@ -21,39 +51,15 @@ def get_currencies():
     return currencies
 
 
-def get_price_data_seis(seis):
-    priceData = seis.get_hist(n_bars=1000)
+def get_price_data_seis(seis, bars_count=500):
+    priceData = seis.get_hist(n_bars=bars_count)
     priceData = priceData.drop(priceData.index[len(priceData) - 1])
     priceData = priceData.reindex(index=priceData.index[::-1]).reset_index()
     return priceData
 
 
-def get_price_data(symbol='EURUSD', exchange='OANDA', interval=Interval.in_5_minute, bars_count=1000, username='t4331662@gmail.com', password='Pxp626AmH7_'):
+def get_price_data(symbol='EURUSD', exchange='OANDA', interval=Interval.in_5_minute, bars_count=500):
     tv = TvDatafeed()
-    # tv = TvDatafeed(username=username, password=password)
     priceData = tv.get_hist(symbol=symbol, exchange=exchange, interval=interval, n_bars=bars_count)
-    # seis = tv.new_seis(symbol, exchange, interval)
     priceData = priceData.reindex(index=priceData.index[::-1]).reset_index()
     return priceData
-
-
-if __name__ == '__main__':
-    username = 't4331662@gmail.com'
-    password = 'Pxp626AmH7_'
-
-    tv = TvDatafeedLive()
-
-    def consumer_func1(seis, data):
-        print(
-            "Open price for " + seis.symbol + " on " + seis.exchange + " exchange with " + seis.interval.name + " interval was " + str(
-                data.open[0]))
-
-        print(data.to_string())
-        full_data = seis.get_hist(n_bars=100)
-        full_data = full_data.drop(full_data.index[len(full_data)-1])
-
-        print(full_data.to_string())
-
-    seis = tv.new_seis("AUDCAD", "OANDA", Interval.in_1_minute)
-    consumer1 = tv.new_consumer(seis, consumer_func1)
-    cur = get_currencies()[0]

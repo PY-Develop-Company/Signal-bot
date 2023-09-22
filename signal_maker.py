@@ -1,5 +1,4 @@
 import indicators_reader
-import price_parser
 from pandas import DataFrame
 import time
 from pandas import Timedelta
@@ -52,7 +51,7 @@ async def close_position(position_open_price, close_prices_search_info, signal, 
     return get_close_position_signal_message(position_open_price, close_prices_search_info[0], signal, symbol, interval)
 
 
-def check_signal(prices: DataFrame, interval, successful_indicators_count=4):
+def check_signal(prices: DataFrame, interval: timedelta, successful_indicators_count=4):
     indicators_signals = [indicators_reader.super_order_block(prices, prices.open, prices.close, prices.high,
                                                               prices.low, interval),
                           indicators_reader.volume(prices.open, prices.close),
@@ -70,17 +69,14 @@ def check_signal(prices: DataFrame, interval, successful_indicators_count=4):
         if signal_count[1][0] > main_signal[1][0]:
             main_signal = signal_count
 
-    # print("Валютная пара", prices.symbol[0], "таймфрейм", prices.datetime[0]-prices.datetime[1], "час перевірки", datetime.now())
-    # print("Есть ли сигнал -", main_signal[1][0] >= successful_indicators_count and indicators_signals[0][0] == main_signal[0])
-    # print("Показания индикаторов", signal_counts)
-    # print()
+    has_signal = main_signal[1][0] >= successful_indicators_count and indicators_signals[0][0] == main_signal[0]
+    print("Валютная пара", prices.symbol[0], "таймфрейм", interval, "час перевірки", datetime.now())
+    print("Есть ли сигнал -", has_signal)
+    print("Показания индикаторов", signal_counts)
+    print()
 
-    sig = prices.symbol[0] + timedelta_to_string(prices.datetime[0]-prices.datetime[1])
+    sig = prices.symbol[0] + timedelta_to_string(interval)
 
-    if main_signal[1][0] >= successful_indicators_count: #and indicators_signals[0][0] == main_signal[0]:
-        return (True, main_signal[0])
+    if has_signal:
+        return True, main_signal[0]
     return False, neutral_signal
-
-
-# if __name__ == "__main__":
-#     print(check_signal(price_parser.get_price_data(), successful_indicators_count=2))

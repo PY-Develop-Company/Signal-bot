@@ -1,1 +1,1 @@
-[{"id": 5308615063, "name": "Роман Васильковський", "status": "none", "acount_number": "12345678"}, {"id": 741867026, "name": "Sasha Kovalchuk", "status": "status ДЕПОЗИТ", "acount_number": "11111111"}]
+[{"id": 5308615063, "name": "Роман Васильковський", "status": "status ДЕПОЗИТ", "acount_number": "12345678"}, {"id": 741867026, "name": "Sasha Kovalchuk", "status": "status ДЕПОЗИТ", "acount_number": "11111111"}]

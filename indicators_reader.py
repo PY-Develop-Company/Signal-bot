@@ -2,7 +2,7 @@ import numpy as np
 from tvDatafeed import Interval
 import math
 import signal_maker as sm
-from datetime import timedelta
+from datetime import timedelta, datetime
 from pandas import Series
 
 
@@ -25,6 +25,30 @@ def get_datetime(interval):
         return timedelta(minutes=45)
     else:
         return timedelta(days=1)
+
+
+def get_interval(datetime):
+    datetime = math.floor(datetime.total_seconds() / 60)
+    if datetime == 15:
+        return Interval.in_1_minute
+    elif datetime == 5:
+        return Interval.in_5_minute
+    elif datetime == 1:
+        return Interval.in_1_minute
+    else:
+        return Interval.in_daily
+
+
+def get_interval_string(datetime):
+    return str(datetime).replace(".", "")
+    # if datetime == 15:
+    #     return Interval.in_1_minute
+    # elif datetime == 5:
+    #     return Interval.in_5_minute
+    # elif datetime == 1:
+    #     return Interval.in_1_minute
+    # else:
+    #     return Interval.in_daily
 
 
 def scalp_pro(src, close_price, fast_line=8, slow_line=10, smoothness=8):
@@ -91,6 +115,8 @@ def super_order_block(src, open, close, high, low, interval: timedelta, obMaxBox
             is_date_range_in_box = self.left <= bar_date <= self.right
             return self.signal_type if is_price_in_box and is_date_range_in_box else sm.neutral_signal
 
+    date_format = '%Y-%m-%d %H:%M:%S'
+
     is_up_bar = lambda index: close[index] > open[index]
     is_down_bar = lambda index: close[index] < open[index]
     is_ob_box_up = lambda index: is_down_bar(index + 1) and is_up_bar(index) and close[index] > high[index + 1]
@@ -139,16 +165,16 @@ def super_order_block(src, open, close, high, low, interval: timedelta, obMaxBox
 
     prices_count = len(src)
     # # # # # # # # # # # Order Block # # # # # # # # #
-    interval = get_datetime(Interval.in_5_minute)
     for i in range(prices_count-3, 0, -1):
+        date_time = datetime.strptime(src.datetime[i], date_format)
         if is_ob_box_up(i+1):
-            _bullboxOB = Box(left=src.datetime[i] - interval*2, top=high[i+2], right=src.datetime[i], bottom=min(low[i+2], low[i+1]), signal_type=sm.buy_signal)
+            _bullboxOB = Box(left=date_time - interval*2, top=high[i+2], right=date_time, bottom=min(low[i+2], low[i+1]), signal_type=sm.buy_signal)
             if len(_bullBoxesOB) > obMaxBoxSet:
                 _bullBoxesOB.remove(_bullBoxesOB[0])
             _bullBoxesOB.append(_bullboxOB)
 
         if is_ob_box_down(i+1):
-            _bearboxOB = Box(left=src.datetime[i] - interval*2, top=max(high[i+2], high[i+1]), right=src.datetime[i], bottom=low[i+2], signal_type=sm.sell_signal)
+            _bearboxOB = Box(left=date_time - interval*2, top=max(high[i+2], high[i+1]), right=date_time, bottom=low[i+2], signal_type=sm.sell_signal)
             if len(_bearBoxesOB) > obMaxBoxSet:
                 _bearBoxesOB.remove(_bearBoxesOB[0])
             _bearBoxesOB.append(_bearboxOB)
@@ -158,12 +184,13 @@ def super_order_block(src, open, close, high, low, interval: timedelta, obMaxBox
 
     # # # # # # # # # Fair Value Gap # # # # # # # # #
     for i in range(prices_count-3, 0, -1):
+        date_time = datetime.strptime(src.datetime[i], date_format)
         if is_fvg_box_up(i):
             _bullboxFVG = None
             if (close[i+1] > top[i]) and (low[i+1] < top[i]) and (high[i+2] < top[i]) and (low[i] > top[i]):
-                _bullboxFVG = Box(left=src.datetime[i] - interval*2, top=low[i], right=src.datetime[i], bottom=high[i+2], signal_type=sm.buy_signal)
+                _bullboxFVG = Box(left=date_time - interval*2, top=low[i], right=date_time, bottom=high[i+2], signal_type=sm.buy_signal)
             else:
-                _bullboxFVG = Box(left=src.datetime[i] - interval*2, top=low[i], right=src.datetime[i], bottom=high[i+2], signal_type=sm.buy_signal)
+                _bullboxFVG = Box(left=date_time - interval*2, top=low[i], right=date_time, bottom=high[i+2], signal_type=sm.buy_signal)
 
             if len(_bullBoxesFVG) > fvgMaxBoxSet:
                 _bullBoxesFVG.remove(_bullBoxesFVG[0])
@@ -172,9 +199,9 @@ def super_order_block(src, open, close, high, low, interval: timedelta, obMaxBox
         if is_fvg_box_down(i):
             _bearboxFVG = None
             if (close[i+1] < bottom[i]) and (high[i+1] > bottom[i]) and (low[i+2] > bottom[i]) and (high[i] < bottom[i]):
-                _bearboxFVG = Box(left=src.datetime[i] - interval*2, top=low[i+2], right=src.datetime[i], bottom=high[i], signal_type=sm.sell_signal)
+                _bearboxFVG = Box(left=date_time - interval*2, top=low[i+2], right=date_time, bottom=high[i], signal_type=sm.sell_signal)
             else:
-                _bearboxFVG = Box(left=src.datetime[i] - interval*2, top=low[i+2], right=src.datetime[i], bottom=high[i], signal_type=sm.sell_signal)
+                _bearboxFVG = Box(left=date_time - interval*2, top=low[i+2], right=date_time, bottom=high[i], signal_type=sm.sell_signal)
 
             if len(_bearBoxesFVG) > fvgMaxBoxSet:
                 _bearBoxesFVG.remove(_bearBoxesFVG[0])
@@ -186,8 +213,9 @@ def super_order_block(src, open, close, high, low, interval: timedelta, obMaxBox
     boxes = _bullBoxesOB + _bearBoxesOB + _bullBoxesFVG + _bearBoxesFVG
     return_signal = sm.neutral_signal
     signal_boxes = []
+    date_time = datetime.strptime(src.datetime[0], date_format)
     for box in boxes:
-        signal = box.check_signal(low[0], high[0], src.datetime[0])
+        signal = box.check_signal(low[0], high[0], date_time)
         if not signal == sm.neutral_signal:
             signal_boxes.append(box)
 
