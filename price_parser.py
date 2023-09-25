@@ -29,6 +29,8 @@ def is_currency_file_changed(currency, interval):
         df = read_csv(path)
 
         current_check_date = df.datetime[0]
+        # print(f"check for {currency} {interval} current_check_date == last_check_date ---> {not (current_check_date == last_check_date)}\n"
+        #       f"current_check_date {current_check_date}, last_check_date {last_check_date}")
         if not (current_check_date == last_check_date):
             currencies_requests_last_check_date.update({currency: current_check_date})
             return True, df
@@ -52,14 +54,14 @@ def get_currencies():
     return currencies
 
 
-def get_price_data_seis(seis, bars_count=500):
+def get_price_data_seis(seis, bars_count=100):
     priceData = seis.get_hist(n_bars=bars_count)
     priceData = priceData.drop(priceData.index[len(priceData) - 1])
     priceData = priceData.reindex(index=priceData.index[::-1]).reset_index()
     return priceData
 
 
-def get_price_data(symbol='EURUSD', exchange='OANDA', interval=Interval.in_5_minute, bars_count=500):
+def get_price_data(symbol='EURUSD', exchange='OANDA', interval=Interval.in_5_minute, bars_count=100):
     tv = TvDatafeed()
     priceData = tv.get_hist(symbol=symbol, exchange=exchange, interval=interval, n_bars=bars_count)
     priceData = priceData.reindex(index=priceData.index[::-1]).reset_index()

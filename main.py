@@ -10,19 +10,13 @@ import asyncio
 import multiprocessing
 from datetime import datetime
 from user_module import *
+from manager_module import *
 
-API_TOKEN = "6340912636:AAHACm2V2hDJUDXng0y0uhBRVRFJgqrok48"
+# API_TOKEN = "6340912636:AAHACm2V2hDJUDXng0y0uhBRVRFJgqrok48"
+API_TOKEN = "6538527964:AAHUUHZHYVnNFbYAPoMn4bRUMASKR0h9qfA"
 logging.basicConfig(level=logging.INFO)
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot)
-
-seis_dict = {}
-
-db_path = "users/db.txt"
-
-manager_username = "@bwg_Golden"
-managers_id = [5964166439]
-manager_url = f"https://t.me/{manager_username[1:]}"
 
 accept_id_message_text = """Поздравляем ваш ID подтвержден. Чтобы получить доступ к сигналам внесите депозит и отправьте заявку боту.
 Для отправки проверки на депозит нажмите:
@@ -57,9 +51,6 @@ get_vip_text = """Поздравляю, ваша заявка принята, в
 для начала работы нажмите: /check """
 reject_vip_text = "К сожалению, ваша заявка не принята"
 
-search_id_manager_status = "пошук ID статус"
-search_deposit_manager_status = "пошук депозиту статус"
-
 wait_id = "Отправте свой ID"
 
 check_deposit_text = "ПРОВЕРИТЬ ДЕПОЗИТ"
@@ -76,7 +67,7 @@ vip_status_info = "ДОСТУП К СИГНАЛАМ"
 no_id_requests_text = "Все заявки на проверку ID обработаны"
 no_deposit_requests_text = "Все заявки на проверки депозита обработаны"
 
-wait_comand_text = "Ожидание команды:"
+wait_command_text = "Ожидание команды:"
 
 
 async def get_chat_id(user_id):
@@ -84,54 +75,18 @@ async def get_chat_id(user_id):
         chat = await bot.get_chat(user_id)
         return chat.id
     except Exception as e:
-        print(f"Error: {e}")
         return 0
 
 
-def get_deposit_users_ids():
-    data = file_manager.read_file(db_path)
-    vip_users = []
-    for user in data:
-        if has_user_status(user['id'], deposit_status):
-            vip_users.append(user['id'])
-    return vip_users
-
-
-def update_manager_do(message, do):
-    url = f"users/{message.from_user.id}.txt"
-    manager = file_manager.read_file(url)
-    manager["do"] = do
-    file_manager.write_file(url, manager)
-
-
-async def update_manager_status(message, status):
-    url = f"users/{message.from_user.id}.txt"
-    manager = file_manager.read_file(url)
-    manager["status"] = status
-    file_manager.write_file(url, manager)
-
-
-def check_manager_do(message):
-    url = f"users/{message.from_user.id}.txt"
-    manager = file_manager.read_file(url)
-    return manager["do"]
-
-
-def check_manager_status(message, status):
-    url = f"users/{message.from_user.id}.txt"
-    manager = file_manager.read_file(url)
-    return manager["status"] == status
-
-
 async def send_message_to_user(user_id, text):
-    if await get_chat_id(user_id) is None:
-        ...
-    else:
-        await bot.send_message(user_id, text, disable_notification=False)
+    if await get_chat_id(user_id) == 0:
+        return
+
+    await bot.send_message(user_id, text, disable_notification=False)
 
 
 async def update_status_user(id, status):
-    data = file_manager.read_file(db_path)
+    data = file_manager.read_file(user_db_path)
     for user in data:
         found_user = user['id'] == id
         if found_user:
@@ -141,29 +96,27 @@ async def update_status_user(id, status):
             elif status == none_status:
                 await send_message_to_user(id, reject_vip_text)
             break
-        else:
-            ...
-    file_manager.write_file(db_path, data)
+    file_manager.write_file(user_db_path, data)
 
 
-async def update_acount_user(id, acount_number):
-    data = file_manager.read_file(db_path)
+async def update_account_user(id, account_number):
+    data = file_manager.read_file(user_db_path)
     for user in data:
         found_user = user['id'] == id
         if found_user:
-            user['acount_number'] = acount_number
+            user['acount_number'] = account_number
             if user['status'] == deposit_status:
                 await send_message_to_user(id, get_vip_text)
-            elif acount_number == none_status:
+            elif account_number == none_status:
                 await send_message_to_user(id, reject_vip_text)
             break
         else:
             ...
-    file_manager.write_file(db_path, data)
+    file_manager.write_file(user_db_path, data)
 
 
 async def search_user_with_status(message, status):
-    data = file_manager.read_file(db_path)
+    data = file_manager.read_file(user_db_path)
     for user in data:
         user_id = user['id']
         if status == wait_id_status:
@@ -182,7 +135,7 @@ async def manager_menu(message):
     item1 = types.KeyboardButton(search_id_request)
     item2 = types.KeyboardButton(search_deposit_request)
     markup.add(item1, item2)
-    await message.answer(wait_comand_text, reply_markup=markup)
+    await message.answer(wait_command_text, reply_markup=markup)
 
 
 async def reg_id_menu(message):
@@ -190,14 +143,14 @@ async def reg_id_menu(message):
     item1 = types.KeyboardButton(deposit_status)
     item2 = types.KeyboardButton(contact_manager)
     markup.add(item1, item2)
-    await message.answer(wait_comand_text, reply_markup=markup)
+    await message.answer(wait_command_text, reply_markup=markup)
 
 
 async def vip_main_menu(message):
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
     item1 = types.KeyboardButton(contact_manager)
     markup.add(item1)
-    await message.answer(wait_comand_text, reply_markup=markup)
+    await message.answer(wait_command_text, reply_markup=markup)
     pass
 
 
@@ -207,7 +160,7 @@ async def not_vip_main_menu(message):
     item2 = types.KeyboardButton(check_id_text)
     item3 = types.KeyboardButton(contact_manager)
     markup.add(item1, item2, item3)
-    await message.answer(wait_comand_text, reply_markup=markup)
+    await message.answer(wait_command_text, reply_markup=markup)
 
 
 async def accept_id_and_deposit_menu(message):
@@ -215,7 +168,7 @@ async def accept_id_and_deposit_menu(message):
     item1 = types.KeyboardButton(accept_button)
     item2 = types.KeyboardButton(reject_button)
     markup.add(item1, item2)
-    await message.answer(wait_comand_text, reply_markup=markup)
+    await message.answer(wait_command_text, reply_markup=markup)
 
 
 async def add_manager(message):
@@ -234,7 +187,7 @@ async def photo_text_message(user_id, img_path, text=" "):
 
 
 @dp.message_handler(commands="start")
-async def create_user(message):
+async def start_command(message):
     await photo_text_message(message.from_user.id, start_img_path, start_text)
     if message.from_user.id in managers_id:
         await add_manager(message)
@@ -247,15 +200,15 @@ async def create_user(message):
 
 
 @dp.message_handler(commands="checkDeposit")
-async def check_deposit(message):
-    if has_user_status(message.from_user.id,id_status):
+async def check_deposit_command(message):
+    if has_user_status(message.from_user.id, id_status):
         await message.answer(wait_deposit_status)
         print(0)
         await update_status_user(message.from_user.id, wait_deposit_status)
 
 
 @dp.message_handler(commands="check")
-async def create_user(message):
+async def check_command(message):
     if has_user_status(message.from_user.id, deposit_status):
         await vip_main_menu(message)
     else:
@@ -269,45 +222,45 @@ async def handle_media(message: types.Message):
         if message.text == search_id_request:
             is_user_exists, user_id = await search_user_with_status(message, wait_id_status)
             if is_user_exists:
-                update_manager_do(message, user_id)
-                await update_manager_status(message, search_id_manager_status)
-                await message.answer(check_manager_do(message))
+                update_manager_do(message.from_user.id, user_id)
+                await update_manager_status(message.from_user.id, search_id_manager_status)
+                await message.answer(check_manager_do(message.from_user.id))
                 await accept_id_and_deposit_menu(message)
             else:
                 await message.answer(no_id_requests_text)
         elif message.text == search_deposit_request:
             is_user_exists, user_id = await search_user_with_status(message, wait_deposit_status)
             if is_user_exists:
-                update_manager_do(message, user_id)
-                await update_manager_status(message, search_deposit_manager_status)
-                await message.answer(check_manager_do(message))
+                update_manager_do(message.from_user.id, user_id)
+                await update_manager_status(message.from_user.id, search_deposit_manager_status)
+                await message.answer(check_manager_do(message.from_user.id))
                 await accept_id_and_deposit_menu(message)
             else:
                 await message.answer(no_deposit_requests_text)
         else:
             if message.text == accept_button or message.text == reject_button:
-                if message.text == accept_button and check_manager_status(message, search_id_manager_status):
-                    await update_status_user(check_manager_do(message), id_status)
-                    await send_message_to_user(check_manager_do(message), accept_id_message_text)
-                elif message.text == reject_button and check_manager_status(message, search_id_manager_status):
-                    await update_status_user(check_manager_do(message), none_status)
-                    await send_message_to_user(check_manager_do(message), reject_id_message_text)
+                if message.text == accept_button and check_manager_status(message.from_user.id, search_id_manager_status):
+                    await update_status_user(check_manager_do(message.from_user.id), id_status)
+                    await send_message_to_user(check_manager_do(message.from_user.id), accept_id_message_text)
+                elif message.text == reject_button and check_manager_status(message.from_user.id, search_id_manager_status):
+                    await update_status_user(check_manager_do(message.from_user.id), none_status)
+                    await send_message_to_user(check_manager_do(message.from_user.id), reject_id_message_text)
                     await not_vip_main_menu(message)
-                elif message.text == accept_button and check_manager_status(message, search_deposit_manager_status):
-                    await update_status_user(check_manager_do(message), deposit_status)
-                    await send_message_to_user(check_manager_do(message), accept_deposit_message_text)
-                elif message.text == reject_button and check_manager_status(message, search_deposit_manager_status):
-                    await update_status_user(check_manager_do(message), id_status)
-                    await send_message_to_user(check_manager_do(message), reject_deposit_message_text)
+                elif message.text == accept_button and check_manager_status(message.from_user.id, search_deposit_manager_status):
+                    await update_status_user(check_manager_do(message.from_user.id), deposit_status)
+                    await send_message_to_user(check_manager_do(message.from_user.id), accept_deposit_message_text)
+                elif message.text == reject_button and check_manager_status(message.from_user.id, search_deposit_manager_status):
+                    await update_status_user(check_manager_do(message.from_user.id), id_status)
+                    await send_message_to_user(check_manager_do(message.from_user.id), reject_deposit_message_text)
                 await manager_menu(message)
-                update_manager_do(message, "none")
-                await update_manager_status(message, none_manager_status)
+                update_manager_do(message.from_user.id, "none")
+                await update_manager_status(message.from_user.id, none_manager_status)
     #user part
     elif has_user_status(message.from_user.id, wait_id):
         #get id
         if message.text.isdigit() and len(message.text) == 8 and has_user_status(message.from_user.id, wait_id):
             await update_status_user(message.from_user.id, wait_id_status)
-            await update_acount_user(message.from_user.id, message.text)
+            await update_account_user(message.from_user.id, message.text)
             await message.answer(wait_id_status)
             await vip_main_menu(message)
         else:
@@ -352,7 +305,7 @@ def open_signal_check_thread(interval):
                     open_position_price = data.close[0]
                     print(open_signal[1])
                     for user_id in vip_users_ids:
-                        if await get_chat_id(user_id) is None:
+                        if await get_chat_id(user_id) == 0:
                             continue
                         if open_signal[1] == signal_maker.buy_signal:
                             await photo_text_message(user_id, photo_long_path,
@@ -393,6 +346,8 @@ def close_signal_check_thread(open_position_price, vip_users_ids, open_signal, s
         close_signal = await signal_maker.close_position(open_position_price, open_signal,
                                                          symbol, interval, bars_count=3)
         for user_id in vip_users_ids:
+            if await get_chat_id(user_id) == 0:
+                continue
             await bot.send_message(
                 user_id,
                 close_signal,
@@ -418,8 +373,9 @@ def update_currency_file_consumer(seis, data):
 def signal_message_check_controller(intervals):
     async def signal_message_check_function(intervals):
         while True:
-            for currency in price_parser.get_currencies():
-                for currency_interval in intervals:
+            start_check_time = datetime.now()
+            for currency_interval in intervals:
+                for currency in price_parser.get_currencies():
                     is_file_changed, priceData = price_parser.is_currency_file_changed(currency[0], str(currency_interval).replace(".", ""))
                     if is_file_changed:
 
@@ -428,11 +384,12 @@ def signal_message_check_controller(intervals):
                         date_format = '%Y-%m-%d %H:%M:%S'
 
                         interval = datetime.strptime(priceData.datetime[0], date_format) - datetime.strptime(priceData.datetime[1], date_format)
-                        has_signal, open_signal_type = signal_maker.check_signal(priceData, interval, successful_indicators_count=4)
+                        has_signal, open_signal_type, debug_text = signal_maker.check_signal(priceData, interval, successful_indicators_count=4)
+                        print(f"File changed {currency}, {interval}, {has_signal}")
                         if has_signal:
                             deposit_users_ids = get_deposit_users_ids()
                             for user_id in deposit_users_ids:
-                                if await get_chat_id(user_id) is None:
+                                if await get_chat_id(user_id) == 0:
                                     continue
 
                                 photo_path = photo_long_path
@@ -445,7 +402,9 @@ def signal_message_check_controller(intervals):
                                                          signal_maker.get_open_position_signal_message(
                                                              open_signal_type,
                                                              symbol,
-                                                             interval))
+                                                             interval) + debug_text)
+                                await bot.send_message(user_id, f"\n задержка: {datetime.now()-start_check_time}")
+                                print(f"\n задержка: {datetime.now()-start_check_time}")
                             open_position_price = priceData.close[0]
                             p = multiprocessing.Process(target=close_signal_check_thread,
                                                         args=(
@@ -465,25 +424,17 @@ def signal_message_check_controller(intervals):
 if __name__ == '__main__':
     from aiogram import executor
 
-    # intervals = [Interval.in_15_minute, Interval.in_5_minute, Interval.in_1_minute]
     intervals = [Interval.in_1_minute]
     currencies = price_parser.get_currencies()
     tvl = TvDatafeedLive()
     for currency in currencies:
-        seis1 = tvl.new_seis(currency[0], currency[1], Interval.in_1_minute)
-        consumer1 = tvl.new_consumer(seis1, update_currency_file_consumer)
-        # seis5 = tvl.new_seis(currency[0], currency[1], Interval.in_5_minute)
-        # consumer5 = tvl.new_consumer(seis5, update_currency_file_consumer)
-        # seis15 = tvl.new_seis(currency[0], currency[1], Interval.in_15_minute)
-        # consumer15 = tvl.new_consumer(seis15, update_currency_file_consumer)
+        for interval in intervals:
+            seis1 = tvl.new_seis(currency[0], currency[1], interval)
+            consumer1 = tvl.new_consumer(seis1, update_currency_file_consumer)
 
-    # p1 = multiprocessing.Process(target=open_signal_check_thread, args=(Interval.in_1_minute,))
-    # p2 = multiprocessing.Process(target=open_signal_check_thread, args=(Interval.in_15_minute,))
-    # p3 = multiprocessing.Process(target=open_signal_check_thread, args=(Interval.in_5_minute,))
-    signal_message_process = multiprocessing.Process(target=signal_message_check_controller, args=(intervals,))
-    # # # # p1.start()
-    # # # # p2.start()
-    # # # # p3.start()
-    signal_message_process.start()
+    # multiprocessing.Process(target=open_signal_check_thread, args=(Interval.in_1_minute,)).start()
+    # multiprocessing.Process(target=open_signal_check_thread, args=(Interval.in_15_minute,)).start()
+    # multiprocessing.Process(target=open_signal_check_thread, args=(Interval.in_5_minute,)).start()
+    multiprocessing.Process(target=signal_message_check_controller, args=(intervals,)).start()
 
     executor.start_polling(dp, skip_updates=True)

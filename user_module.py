@@ -18,6 +18,15 @@ def has_user_status(id, status):
     return False
 
 
+def get_deposit_users_ids():
+    data = file_manager.read_file(user_db_path)
+    vip_users = []
+    for user in data:
+        if has_user_status(user['id'], deposit_status):
+            vip_users.append(user['id'])
+    return vip_users
+
+
 def add_user(id, first_name, last_name):
     data = file_manager.read_file(user_db_path)
     user_exists = any(user['id'] == id for user in data)

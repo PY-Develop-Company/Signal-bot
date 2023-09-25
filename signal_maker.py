@@ -44,8 +44,8 @@ def get_close_position_signal_message(open, close, signal, symbol, interval):
     # print()
 
     text = (profit_message if close >= open else loss_message) if (signal == buy_signal) else (profit_message if (close <= open) else loss_message)
-    print(text)
-    message = get_smile(signal) + "Сделка в " + text + symbol + " " + signal + " " + timedelta_to_string(interval)
+    debug_text = f"\nЦіна закриття позиції {str(close)} Ціна відкриття позиції: {str(open)}"
+    message = get_smile(signal) + "Сделка в " + text + symbol + " " + signal + " " + timedelta_to_string(interval) + debug_text
     return message
 
 
@@ -54,19 +54,20 @@ async def close_position(position_open_price, signal, symbol, interval: timedelt
     time.sleep(delay_minutes * bars_count * 60)
     print("symbol, interval:", symbol, interval)
     interval = indicators_reader.get_interval(interval)
-    price_data = price_parser.get_price_data(symbol.replace("/", ""), exchange, interval, bars_count=10)
+    price_data = price_parser.get_price_data(symbol.replace("/", ""), exchange, interval, bars_count=2)
     # has_signal, price_data = price_parser.is_currency_file_changed(symbol.replace("/", ""),
     #                                                    indicators_reader.get_interval_string(interval).replace(".", ""))
     return get_close_position_signal_message(position_open_price, price_data.close[0], signal, symbol, price_data.datetime[0]-price_data.datetime[1])
 
 
 def check_signal(prices: DataFrame, interval: timedelta, successful_indicators_count=4):
-    indicators_signals = [indicators_reader.super_order_block(prices, prices.open, prices.close, prices.high,
-                                                              prices.low, interval),
-                          indicators_reader.volume(prices.open, prices.close),
-                          indicators_reader.ultimate_moving_average(prices.close),
-                          indicators_reader.nadaraya_watson_envelope(prices.close),
-                          indicators_reader.scalp_pro(prices, prices.close)]
+    before_check_time = datetime.now()
+    indicators_signals = [indicators_reader.get_super_order_block_signal(prices, prices.open, prices.close, prices.high,
+                                                                         prices.low, interval),
+                          indicators_reader.get_volume_signal(prices.open, prices.close),
+                          indicators_reader.get_ultimate_moving_average_signal(prices.close),
+                          indicators_reader.get_nadaraya_watson_envelope_signal(prices.close),
+                          indicators_reader.get_scalp_pro_signal(prices.close)]
 
     signal_counts = {buy_signal: [0, []], sell_signal: [0, []], neutral_signal:[0, []]}
     for signal in indicators_signals:
@@ -79,12 +80,15 @@ def check_signal(prices: DataFrame, interval: timedelta, successful_indicators_c
             main_signal = signal_count
 
     has_signal = main_signal[1][0] >= successful_indicators_count and indicators_signals[0][0] == main_signal[0]
-    print("Проверка сигнала", "(время пероверки", datetime.now(), "):")
-    print("\tВалютная пара:", prices.symbol[0], "таймфрейм:", interval, "время свечи:", prices.datetime[0])
-    print("\tЕсть ли сигнал:", has_signal)
-    print("\tПоказания индикаторов:", signal_counts)
-    print("="*200, "\n")
+    
+    debug_text = f"""\n\nПроверка сигнала:
+    \tВалютная пара: {prices.symbol[0]}" таймфрейм: {interval} время свечи: {prices.datetime[0]}
+    \tЕсть ли сигнал: {has_signal}
+    \tПоказания индикаторов: {signal_counts})
+    """
+    # print(debug_text)
+    # print("="*200, "\n")
 
     if has_signal:
-        return True, main_signal[0]
-    return False, neutral_signal
+        return True, main_signal[0], debug_text
+    return False, neutral_signal, debug_text
