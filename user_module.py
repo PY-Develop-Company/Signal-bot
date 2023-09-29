@@ -37,3 +37,28 @@ def add_user(id, first_name, last_name):
         bufer_user = {"id": id, "name": full_name, "status": "none", "acount_number": 0}
         data.append(bufer_user)
         file_manager.write_file(user_db_path, data)
+
+
+async def update_status_user(id, status):
+    data = file_manager.read_file(user_db_path)
+    for user in data:
+        found_user = user['id'] == id
+        if found_user:
+            user['status'] = status
+            break
+    file_manager.write_file(user_db_path, data)
+
+
+async def get_user_with_status(status):
+    data = file_manager.read_file(user_db_path)
+    for user in data:
+        user_id = user['id']
+        if status == wait_id_status:
+            is_status = has_user_status(user_id, status)
+            if is_status:
+                return True, user_id
+        if status == wait_deposit_status:
+            is_status = has_user_status(user_id, status)
+            if is_status:
+                return True, user_id
+    return False, None

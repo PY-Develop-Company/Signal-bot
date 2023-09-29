@@ -1,12 +1,18 @@
-from tvDatafeed import TvDatafeed, Interval
+import time
+from datetime import datetime
+from tvDatafeed import TvDatafeed, TvDatafeedLive, Interval
+from tvDatafeed.seis import Seis
 import json
 import os
 from pandas import DataFrame, read_csv
+import indicators_reader
 
 currencies_path = "users/currencies.txt"
 currencies_data_path = "currencies_data/"
 
 currencies_requests_last_check_date = {}
+tv = TvDatafeed()
+tvl = TvDatafeedLive()
 
 
 def create_save_currencies_files(currencies, intervals):
@@ -17,25 +23,39 @@ def create_save_currencies_files(currencies, intervals):
                 file.write(" ")
 
 
-def save_currency_file(df: DataFrame, currency, interval):
-    # print("Save currency", currency)
+def save_currency_file(df: DataFrame, currency, interval: Interval):
+    interval = str(interval).replace(".", "")
     df.to_csv(currencies_data_path + currency + interval + ".csv")
 
 
-def is_currency_file_changed(currency, interval):
+def update_last_check_date(currency, interval: Interval):
+    interval = str(interval).replace(".", "")
     path = currencies_data_path + currency + interval + ".csv"
-    if os.path.exists(path):
-        last_check_date = currencies_requests_last_check_date.get(currency)
-        df = read_csv(path)
+    if not os.path.exists(path):
+        return False, None
 
-        current_check_date = df.datetime[0]
-        # print(f"check for {currency} {interval} current_check_date == last_check_date ---> {not (current_check_date == last_check_date)}\n"
-        #       f"current_check_date {current_check_date}, last_check_date {last_check_date}")
-        if not (current_check_date == last_check_date):
-            currencies_requests_last_check_date.update({currency: current_check_date})
-            return True, df
+    last_check_date = currencies_requests_last_check_date.get(currency+interval)
+    df = read_csv(path)
+    current_check_date = df.datetime[0]
+    currencies_requests_last_check_date.update({currency+interval: current_check_date})
+
+
+def is_currency_file_changed(currency, interval: Interval):
+    interval = str(interval).replace(".", "")
+    path = currencies_data_path + currency + interval + ".csv"
+    if not os.path.exists(path):
+        return False, None
+
+    last_check_date = currencies_requests_last_check_date.get(currency+interval)
+    print(path)
+    df = read_csv(path)
+    current_check_date = df.datetime[0]
+    # print("currency", currency, "interval", interval, "current date:", current_check_date, "last date:", last_check_date)
+    if current_check_date == last_check_date:
         return False, df
-    return False, None
+
+    currencies_requests_last_check_date.update({currency+interval: current_check_date})
+    return True, df
 
 
 def read_currencies_file():
@@ -54,15 +74,31 @@ def get_currencies():
     return currencies
 
 
-def get_price_data_seis(seis, bars_count=100):
+def get_price_data_seis(seis, bars_count=200):
     priceData = seis.get_hist(n_bars=bars_count)
     priceData = priceData.drop(priceData.index[len(priceData) - 1])
     priceData = priceData.reindex(index=priceData.index[::-1]).reset_index()
     return priceData
 
 
-def get_price_data(symbol='EURUSD', exchange='OANDA', interval=Interval.in_5_minute, bars_count=100):
-    tv = TvDatafeed()
-    priceData = tv.get_hist(symbol=symbol, exchange=exchange, interval=interval, n_bars=bars_count)
+def get_price_data(symbol, exchange, interval, bars_count=200):
+    priceData = tvl.get_hist(symbol=symbol, exchange=exchange, interval=interval, n_bars=bars_count)
     priceData = priceData.reindex(index=priceData.index[::-1]).reset_index()
     return priceData
+
+
+def update_currency_file_consumer(seis: Seis, data):
+    # print("update:", seis.symbol, seis.interval, datetime.now())
+    price_data = get_price_data_seis(seis)
+
+    interval = seis.interval
+    symbol = seis.symbol
+    save_currency_file(price_data, symbol, interval)
+
+
+def create_parce_currencies_with_intervals_callbacks(intervals: [Interval]):
+    currencies = get_currencies()
+    for currency in currencies:
+        for interval in intervals:
+            seis = tvl.new_seis(currency[0], currency[1], interval)
+            consumer = tvl.new_consumer(seis, update_currency_file_consumer)

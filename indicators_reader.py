@@ -107,7 +107,7 @@ def get_super_order_block_signal(src: pandas.DataFrame, open, close, high, low, 
 
         def check_signal(self, bar_low, bar_high, bar_date):
             is_price_in_box = not ((bar_high > self.top and bar_low > self.top) or (
-                        bar_high < self.bottom and bar_low < self.bottom))
+                    bar_high < self.bottom and bar_low < self.bottom))
             is_date_range_in_box = self.left <= bar_date <= self.right
             return self.signal_type if (is_price_in_box and is_date_range_in_box) else sm.neutral_signal
 
@@ -143,7 +143,7 @@ def get_super_order_block_signal(src: pandas.DataFrame, open, close, high, low, 
     def control_box(boxes, high, low, box_index):
         for i in range(len(boxes) - 1, 0, -1):
             is_price_in_box = (high > boxes[i].bottom and low < boxes[i].bottom) or (
-                        high > boxes[i].top and low < boxes[i].top)
+                    high > boxes[i].top and low < boxes[i].top)
             if src.datetime[box_index] == boxes[i].right and not is_price_in_box:
                 boxes[i].right = src.datetime[box_index] + interval
 
@@ -273,7 +273,8 @@ def get_ultimate_moving_average_signal(close_price, rolling=20, smooth=2):
 
 
 def get_nadaraya_watson_envelope_signal(close_price, h=8.0, mult=3.0):
-    gauss = lambda x, h: math.exp(-(math.pow(x, 2) / (h * h * 2)))
+    def gauss(x, k):
+        return math.exp(-(math.pow(x, 2) / (k * k * 2)))
 
     price_count = len(close_price)
     nwe = []
