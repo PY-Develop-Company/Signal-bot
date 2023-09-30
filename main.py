@@ -1,3 +1,5 @@
+import time
+
 import indicators_reader
 from aiogram import Bot, Dispatcher, types
 import logging
@@ -319,11 +321,13 @@ def signal_message_check_controller(currency, interval):
 if __name__ == '__main__':
     from aiogram import executor
 
-    price_parser.create_parce_currencies_with_intervals_callbacks(intervals)
+    currencies = [("BTCUSD", "COINBASE")]#price_parser.get_currencies()
+    price_parser.create_parce_currencies_with_intervals_callbacks(currencies, intervals)
+
     # threading.Thread(target=signal_message_check_controller).start()
     # multiprocessing.Process(target=signal_message_check_controller).start()
     # for interval in intervals:
     for interval in intervals:
-        for currency in price_parser.get_currencies():
+        for currency in currencies:
             multiprocessing.Process(target=signal_message_check_controller, args=(currency, interval, )).start()
     executor.start_polling(dp, skip_updates=True)

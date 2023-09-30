@@ -68,13 +68,14 @@ async def close_position(position_open_price, signal, symbol, exchange, interval
                                              price_data.datetime[0] - price_data.datetime[1])
 
 
-def check_signal(prices: DataFrame, interval: timedelta, successful_indicators_count=4):
-    indicators_signals = [indicators_reader.get_super_order_block_signal(prices, prices.open, prices.close, prices.high,
-                                                                         prices.low, interval),
-                          indicators_reader.get_volume_signal(prices.open, prices.close),
-                          indicators_reader.get_ultimate_moving_average_signal(prices.close),
-                          indicators_reader.get_nadaraya_watson_envelope_signal(prices.close),
-                          indicators_reader.get_scalp_pro_signal(prices.close)]
+def check_signal(prices_df: DataFrame, interval: timedelta, successful_indicators_count=4):
+    indicators_signals = [
+        indicators_reader.get_super_order_block_signal(prices_df, prices_df.open, prices_df.close, prices_df.high,
+                                                       prices_df.low, interval),
+        indicators_reader.get_volume_signal(prices_df.open, prices_df.close),
+        indicators_reader.get_ultimate_moving_average_signal(prices_df.close),
+        indicators_reader.get_nadaraya_watson_envelope_signal(prices_df.close),
+        indicators_reader.get_scalp_pro_signal(prices_df.close)]
 
     signal_counts = {buy_signal: [0, []], sell_signal: [0, []], neutral_signal: [0, []]}
     for signal in indicators_signals:
@@ -89,7 +90,7 @@ def check_signal(prices: DataFrame, interval: timedelta, successful_indicators_c
     has_signal = main_signal[1][0] >= successful_indicators_count and indicators_signals[0][0] == main_signal[0]
 
     debug_text = f"""\n\nПроверка сигнала:
-    \tВалютная пара: {prices.symbol[0]}" таймфрейм: {interval} время свечи: {prices.datetime[0]}
+    \tВалютная пара: {prices_df.symbol[0]}" таймфрейм: {interval} время свечи: {prices_df.datetime[0]}
     \tЕсть ли сигнал: {has_signal}
     \tПоказания индикаторов: {signal_counts})
     """

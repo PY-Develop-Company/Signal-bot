@@ -7,6 +7,8 @@ import os
 from pandas import DataFrame, read_csv
 import indicators_reader
 
+trade_pause_wait_time = 60*60  # 1 hour
+
 currencies_path = "users/currencies.txt"
 currencies_data_path = "currencies_data/"
 
@@ -47,7 +49,7 @@ def is_currency_file_changed(currency, interval: Interval):
         return False, None
 
     last_check_date = currencies_requests_last_check_date.get(currency+interval)
-    print(path)
+    # print(path)
     df = read_csv(path)
     current_check_date = df.datetime[0]
     # print("currency", currency, "interval", interval, "current date:", current_check_date, "last date:", last_check_date)
@@ -96,9 +98,20 @@ def update_currency_file_consumer(seis: Seis, data):
     save_currency_file(price_data, symbol, interval)
 
 
-def create_parce_currencies_with_intervals_callbacks(intervals: [Interval]):
-    currencies = get_currencies()
-    for currency in currencies:
-        for interval in intervals:
-            seis = tvl.new_seis(currency[0], currency[1], interval)
-            consumer = tvl.new_consumer(seis, update_currency_file_consumer)
+def create_parce_currencies_with_intervals_callbacks(currencies, intervals: [Interval]):
+    while True:
+        try:
+            for currency in currencies:
+                for interval in intervals:
+                    seis = tvl.new_seis(currency[0], currency[1], interval)
+                    print("seis", seis)
+                    consumer = tvl.new_consumer(seis, update_currency_file_consumer)
+            break
+        except ValueError as e:
+            print("Error", e)
+            time.sleep(trade_pause_wait_time)
+            print("waited")
+
+
+if __name__ == "__main__":
+    print(tv.search_symbol("BTCUSD", "COINBASE"))

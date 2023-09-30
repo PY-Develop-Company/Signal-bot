@@ -3,9 +3,10 @@ import pandas
 from tvDatafeed import Interval
 import math
 import signal_maker as sm
-from datetime import timedelta
+from datetime import timedelta, datetime
 from pandas import Series
 import plotly.graph_objects as go
+import price_parser
 
 
 def clamp(value, min_value, max_value):
@@ -49,29 +50,67 @@ def get_scalp_pro_signal(close_price, fast_line=8, slow_line=10, smoothness=8):
     def smooth(par, p: Series):
         res = np.zeros(len(close_price), dtype=float)
 
-        f = (1.414 * math.pi) / float(par)
+        f = (1.414 * 3.141592653589793238462643) / float(par)
         a = math.exp(-f)
-        c3 = -a * a
         c2 = 2 * a * math.cos(f)
+        c3 = -a * a
         c1 = 1 - c2 - c3
 
         for i in range(len(p) - 2, -1, -1):
             ssm1 = 0
             ssm2 = 0
-            if not (i + 1 >= len(p) or np.isnan(res[i + 1])):
+            if i + 1 < len(p):
                 ssm1 = res[i + 1]
-            if not (i + 2 >= len(p) or np.isnan(res[i + 2])):
+            if i + 2 < len(p):
                 ssm2 = res[i + 2]
 
-            res[i] = c1 * (p[i] + p[i + 1]) + c2 * ssm1 + c3 * ssm2
+            res[i] = c1 * (p[i] + p[i + 1]) * 0.5 + c2 * ssm1 + c3 * ssm2
         return res
 
     smooth1 = smooth(fast_line, close_price)
     smooth2 = smooth(slow_line, close_price)
 
-    macd = (smooth1 - smooth2) * 100
+    macd = (smooth1 - smooth2) * 10000000
     smooth3 = smooth(smoothness, macd)
-    return sm.buy_signal if macd[0] > smooth3[0] else sm.sell_signal, "scalp_pro"
+
+    # fig = go.Figure(
+    #     data=[
+    #         go.Candlestick(
+    #             x=src["datetime"],
+    #             open=src["open"],
+    #             high=src["high"],
+    #             low=src["low"],
+    #             close=src["close"]
+    #         ),
+    #         go.Scatter(
+    #             x=src["datetime"],
+    #             y=smooth3,
+    #             mode='lines',
+    #             name='red_signal',
+    #             line={'color': '#eb3434'}
+    #         ),
+    #         go.Scatter(
+    #             x=src["datetime"],
+    #             y=macd,
+    #             mode='lines',
+    #             name='red_signal',
+    #             line={'color': '#37eb34'}
+    #         )
+    #     ]
+    # )
+    # fig.update_layout(
+    #     title=f'The Candlestick graph for {src["symbol"][0]}',
+    #     xaxis_title='Date',
+    #     yaxis_title=f'Price ()',
+    #     xaxis_rangeslider_visible=False,
+    #     xaxis=dict(type="category")
+    # )
+    # fig.show()
+    if macd[0] == smooth3[0]:
+        res_signal = sm.buy_signal if macd[1] > smooth3[1] else (sm.sell_signal if macd[1] < smooth3[1] else sm.neutral_signal)
+    else:
+        res_signal = sm.buy_signal if macd[0] > smooth3[0] else (sm.sell_signal if macd[0] < smooth3[0] else sm.neutral_signal)
+    return res_signal, "scalp_pro"
 
 
 def get_volume_signal(open_price, close_price, bars_count=3):
@@ -106,8 +145,8 @@ def get_super_order_block_signal(src: pandas.DataFrame, open, close, high, low, 
             print("Created box: ", self.left, self.top, self.right, self.bottom)
 
         def check_signal(self, bar_low, bar_high, bar_date):
-            is_price_in_box = not ((bar_high > self.top and bar_low > self.top) or (
-                    bar_high < self.bottom and bar_low < self.bottom))
+            is_price_in_box = (bar_high > self.top and bar_low < self.top) or (
+                    bar_high > self.bottom and bar_low < self.bottom)
             is_date_range_in_box = self.left <= bar_date <= self.right
             return self.signal_type if (is_price_in_box and is_date_range_in_box) else sm.neutral_signal
 
@@ -179,8 +218,9 @@ def get_super_order_block_signal(src: pandas.DataFrame, open, close, high, low, 
                 _bearBoxesOB.remove(_bearBoxesOB[0])
             _bearBoxesOB.append(_bearboxOB)
 
-        control_box(_bearBoxesOB, high[i], low[i], i)
-        control_box(_bullBoxesOB, high[i], low[i], i)
+        if i > 0:
+            control_box(_bearBoxesOB, high[i], low[i], i)
+            control_box(_bullBoxesOB, high[i], low[i], i)
 
     # # # # # # # # # Fair Value Gap # # # # # # # # #
     for i in range(prices_count - 3, -1, -1):
@@ -212,29 +252,30 @@ def get_super_order_block_signal(src: pandas.DataFrame, open, close, high, low, 
                 _bearBoxesFVG.remove(_bearBoxesFVG[0])
             _bearBoxesFVG.append(_bearboxFVG)
 
-        control_box(_bearBoxesFVG, high[i], low[i], i)
-        control_box(_bullBoxesFVG, high[i], low[i], i)
+        if i > 0:
+            control_box(_bearBoxesFVG, high[i], low[i], i)
+            control_box(_bullBoxesFVG, high[i], low[i], i)
 
-    scatters1 = []
-    scatters2 = []
-    scatters3 = []
-    scatters4 = []
-    for box in _bullBoxesOB:
-        scatters1.append(go.Scatter(x=[box.left, box.left, box.right, box.right, box.left],
-                                    y=[box.bottom, box.top, box.top, box.bottom, box.bottom],
-                                    fill="toself", fillcolor='#42f542'))
-    for box in _bearBoxesOB:
-        scatters2.append(go.Scatter(x=[box.left, box.left, box.right, box.right, box.left],
-                                    y=[box.bottom, box.top, box.top, box.bottom, box.bottom],
-                                    fill="toself", fillcolor='#E01400'))
-    for box in _bullBoxesFVG:
-        scatters3.append(go.Scatter(x=[box.left, box.left, box.right, box.right, box.left],
-                                    y=[box.bottom, box.top, box.top, box.bottom, box.bottom],
-                                    fill="toself", fillcolor='#00CCCC'))
-    for box in _bearBoxesFVG:
-        scatters4.append(go.Scatter(x=[box.left, box.left, box.right, box.right, box.left],
-                                    y=[box.bottom, box.top, box.top, box.bottom, box.bottom],
-                                    fill="toself", fillcolor='#9200E0'))
+    # scatters1 = []
+    # scatters2 = []
+    # scatters3 = []
+    # scatters4 = []
+    # for box in _bullBoxesOB:
+    #     scatters1.append(go.Scatter(x=[box.left, box.left, box.right, box.right, box.left],
+    #                                 y=[box.bottom, box.top, box.top, box.bottom, box.bottom],
+    #                                 fill="toself", fillcolor='rgba(0, 255, 0,0.1)'))
+    # for box in _bearBoxesOB:
+    #     scatters2.append(go.Scatter(x=[box.left, box.left, box.right, box.right, box.left],
+    #                                 y=[box.bottom, box.top, box.top, box.bottom, box.bottom],
+    #                                 fill="toself", fillcolor='rgba(255, 0, 0,0.1)'))
+    # for box in _bullBoxesFVG:
+    #     scatters3.append(go.Scatter(x=[box.left, box.left, box.right, box.right, box.left],
+    #                                 y=[box.bottom, box.top, box.top, box.bottom, box.bottom],
+    #                                 fill="toself", fillcolor='rgba(0, 255, 0,0.1)'))
+    # for box in _bearBoxesFVG:
+    #     scatters4.append(go.Scatter(x=[box.left, box.left, box.right, box.right, box.left],
+    #                                 y=[box.bottom, box.top, box.top, box.bottom, box.bottom],
+    #                                 fill="toself", fillcolor='rgba(255, 0, 0,0.1)'))
 
     date_time = src.datetime[0]
 
@@ -246,29 +287,107 @@ def get_super_order_block_signal(src: pandas.DataFrame, open, close, high, low, 
         if not (signal == sm.neutral_signal):
             signal_boxes.append(box)
 
-    biggest_box_height = 0
-    for b in signal_boxes:
-        res = b.top - b.bottom
-        if res > biggest_box_height:
-            biggest_box_height = res
-            return_signal = b.signal_type
+    if len(signal_boxes) > 0:
+        biggest_box = signal_boxes[0]
+        biggest_box_height = biggest_box.top - biggest_box.bottom
+        for b in signal_boxes:
+            if b.left < biggest_box.left:
+                biggest_box = b
+                biggest_box_height = biggest_box.top - biggest_box.bottom
+            elif b.left == biggest_box.left:
+                b_height = b.top - b.bottom
+                if b_height > biggest_box_height:
+                    biggest_box = b
+                    biggest_box_height = biggest_box.top - biggest_box.bottom
+        return_signal = biggest_box.signal_type
+
+    # fig = go.Figure(
+    #     data=[
+    #         go.Candlestick(
+    #             x=src["datetime"],
+    #             open=src["open"],
+    #             high=src["high"],
+    #             low=src["low"],
+    #             close=src["close"]
+    #         ),
+    #         *scatters1,
+    #         *scatters2,
+    #         *scatters3,
+    #         *scatters4,
+    #         go.Candlestick(
+    #             x=src["datetime"],
+    #             open=src["open"],
+    #             high=src["high"],
+    #             low=src["low"],
+    #             close=src["close"]
+    #         )
+    #     ]
+    # )
+    # fig.update_layout(
+    #     title=f'The Candlestick graph for {src["symbol"][0]}',
+    #     xaxis_title='Date',
+    #     yaxis_title=f'Price ()',
+    #     xaxis_rangeslider_visible=False,
+    #     xaxis=dict(type="category")
+    # )
+    # fig.show()
+
     return return_signal, "super order block"
 
 
 def get_ultimate_moving_average_signal(close_price, rolling=20, smooth=2):
     avg = close_price.rolling(window=rolling).mean()
-    avg = avg.shift(periods=-rolling)
+    avg = avg.shift(periods=-(rolling-1))
 
+    # avg_long = []
+    # avg_short = []
     signals = []
     for i in range(len(avg)):
         if np.isnan(avg[i]) or np.isnan(avg[i + smooth]):
             continue
 
-        ma_up = avg[i] >= avg[i + smooth]
-        signals.append(sm.buy_signal if ma_up else sm.sell_signal)
+        ma_up = avg[i] > avg[i + smooth]
+        ma_down = avg[i] < avg[i + smooth]
+        signals.append(sm.buy_signal if ma_up else (sm.sell_signal if ma_down else sm.neutral_signal))
+        # avg_long.append(avg[i] if ma_up else 0)
+        # avg_short.append(avg[i] if ma_down else 0)
     if len(signals) == 0:
         print("not enough data warning ultimate moving average")
         signals.append(sm.neutral_signal)
+
+    # fig = go.Figure(
+    #     data=[
+    #         go.Candlestick(
+    #             x=src["datetime"],
+    #             open=src["open"],
+    #             high=src["high"],
+    #             low=src["low"],
+    #             close=src["close"]
+    #         ),
+    #         go.Scatter(
+    #             x=src["datetime"],
+    #             y=avg_short,
+    #             mode='lines',
+    #             name='red_signal',
+    #             line={'color': '#eb3434'}
+    #         ),
+    #         go.Scatter(
+    #             x=src["datetime"],
+    #             y=avg_long,
+    #             mode='lines',
+    #             name='red_signal',
+    #             line={'color': '#37eb34'}
+    #         )
+    #     ]
+    # )
+    # fig.update_layout(
+    #     title=f'The Candlestick graph for {src["symbol"][0]}',
+    #     xaxis_title='Date',
+    #     yaxis_title=f'Price ()',
+    #     xaxis_rangeslider_visible=False,
+    #     xaxis=dict(type="category")
+    # )
+    # fig.show()
     return signals[0], "ultimate moving average"
 
 
@@ -302,4 +421,63 @@ def get_nadaraya_watson_envelope_signal(close_price, h=8.0, mult=3.0):
     if len(signals) == 0:
         signals.append((0, sm.neutral_signal))
         print("not enough data warning Nadaraya Watson envelope")
+
+    # buy_sig = []
+    # sell_sig = []
+    #
+    # j = 0
+    # curr_signal = signals[0]
+    # for i in range(0, price_count - 2):
+    #     buy_append_val = 0
+    #     sell_append_val = 0
+    #     if i == curr_signal[0]:
+    #         if curr_signal[1] == sm.buy_signal:
+    #             buy_append_val = 0.6
+    #         elif curr_signal[1] == sm.sell_signal:
+    #             sell_append_val = 0.6
+    #
+    #         j += 1
+    #         if j < len(signals):
+    #             curr_signal = signals[j]
+    #     buy_sig.append(buy_append_val)
+    #     sell_sig.append(sell_append_val)
+    # fig = go.Figure(
+    #     data=[
+    #         go.Candlestick(
+    #             x=src["datetime"],
+    #             open=src["open"],
+    #             high=src["high"],
+    #             low=src["low"],
+    #             close=src["close"]
+    #         ),
+    #         go.Scatter(
+    #             x=src["datetime"],
+    #             y=sell_sig,
+    #             mode='lines',
+    #             name='red_signal',
+    #             line={'color': '#eb3434'}
+    #         ),
+    #         go.Scatter(
+    #             x=src["datetime"],
+    #             y=buy_sig,
+    #             mode='lines',
+    #             name='red_signal',
+    #             line={'color': '#37eb34'}
+    #         )
+    #     ]
+    # )
+    # fig.update_layout(
+    #     title=f'The Candlestick graph for {src["symbol"][0]}',
+    #     xaxis_title='Date',
+    #     yaxis_title=f'Price ()',
+    #     xaxis_rangeslider_visible=False,
+    #     xaxis=dict(type="category")
+    # )
+    # fig.show()
     return signals[0][1], "Nadaraya Watson envelope"
+
+
+# if __name__ == "__main__":
+#     df = price_parser.get_price_data("EURUSD", "OANDA", Interval.in_1_minute, bars_count=1000)
+#     interval = df.datetime[0] - df.datetime[1]
+#     data = get_super_order_block_signal(df, df.open, df.close, df.high, df.low, interval)
