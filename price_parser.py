@@ -51,6 +51,7 @@ def is_currency_file_changed(currency, interval: Interval):
     last_check_date = currencies_requests_last_check_date.get(currency+interval)
     # print(path)
     df = read_csv(path)
+    df["datetime"] = df.apply(lambda row: datetime.strptime(row["datetime"], '%Y-%m-%d %H:%M:%S'), axis=1)
     current_check_date = df.datetime[0]
     # print("currency", currency, "interval", interval, "current date:", current_check_date, "last date:", last_check_date)
     if current_check_date == last_check_date:

@@ -6,8 +6,9 @@ user_db_path = "users/db.txt"
 deposit_status = "status ДЕПОЗИТ"
 id_status = "status ID"
 none_status = "status none"
-wait_id_status = 'Ожидание проверки ID'
-wait_deposit_status = 'Ожидание проверки депозита'
+wait_id_status = 'Ожидайте проверку ID ⏳'
+wait_id_input_status = 'Ожидание ввода проверки ID 🔖'
+wait_deposit_status = 'Ожидание проверки депозита 💵'
 
 
 def has_user_status(id, status):
@@ -62,3 +63,11 @@ async def get_user_with_status(status):
             if is_status:
                 return True, user_id
     return False, None
+
+
+def get_user_account_number(id):
+    data = file_manager.read_file(user_db_path)
+    for user in data:
+        if user['id'] == id:
+            return user["acount_number"]
+    return None

@@ -1,9 +1,11 @@
 from pandas import DataFrame
 from pandas import Timedelta
 from datetime import timedelta, datetime
+from tvDatafeed import Interval
 import price_parser
 import indicators_reader
 import asyncio
+from multiprocessing import Process, Array
 
 username = 't4331662@gmail.com'
 password = 'Pxp626AmH7_'
@@ -48,13 +50,14 @@ def get_open_position_signal_message(signal, symbol, interval):
 
 
 def get_close_position_signal_message(open, close, signal, symbol, interval):
-    text = (profit_message if close >= open else loss_message) if (signal == buy_signal) else (
-        profit_message if (close <= open) else loss_message)
+    is_profit = (True if close >= open else False) if (signal == buy_signal) else (
+        True if (close <= open) else False)
+    text = profit_message if is_profit else loss_message
     debug_text = f"\nЦіна закриття позиції {str(close)} Ціна відкриття позиції: {str(open)}"
 
     message = get_smile(signal) + "Сделка в " + text + symbol + " " + signal + " " + timedelta_to_string(
         interval) + debug_text
-    return message
+    return message, is_profit
 
 
 async def close_position(position_open_price, signal, symbol, exchange, interval: timedelta, bars_count=3):
@@ -64,8 +67,9 @@ async def close_position(position_open_price, signal, symbol, exchange, interval
     interval = indicators_reader.get_interval(interval)
     print(symbol, interval, exchange)
     price_data = price_parser.get_price_data(symbol.replace("/", ""), exchange, interval, bars_count=2)
-    return get_close_position_signal_message(position_open_price, price_data.close[0], signal, symbol,
+    msg, is_profit = get_close_position_signal_message(position_open_price, price_data.close[0], signal, symbol,
                                              price_data.datetime[0] - price_data.datetime[1])
+    return msg, is_profit
 
 
 def check_signal(prices_df: DataFrame, interval: timedelta, successful_indicators_count=4):
@@ -99,3 +103,49 @@ def check_signal(prices_df: DataFrame, interval: timedelta, successful_indicator
     if has_signal:
         return True, main_signal[0], debug_text
     return False, neutral_signal, debug_text
+
+
+#test
+
+
+def signal_message_check_function(price_data_frame: DataFrame, profit_dict, bars_to_analyse=200):
+    if len(price_data_frame) < bars_to_analyse:
+        return
+
+    interval = price_data_frame["datetime"][0] - price_data_frame["datetime"][1]
+
+    loop_count = len(price_data_frame) - bars_to_analyse
+    full_df = price_data_frame
+    for i in range(loop_count):
+        check_df = full_df.iloc[3:].reset_index(drop=True)
+        start_check_time = datetime.now()
+
+        has_signal, open_signal_type, debug_text = check_signal(check_df, interval, successful_indicators_count=4)
+        # print("delay", datetime.now() - start_check_time)
+
+        if has_signal:
+            open_position_price = check_df.close[0]
+            close_position_price = full_df.close[0]
+            is_profit = (True if close_position_price >= open_position_price else False) if (
+                        open_signal_type == buy_signal) else (True if (close_position_price <= open_position_price) else False)
+            profit_dict[is_profit] += 1
+        print("Profit data:", "\n\tprofit ---> ", profit_dict[1], "\n\tloss ---> ", profit_dict[0])
+
+        full_df = price_data_frame[i+1:i+bars_to_analyse+4].reset_index(drop=True)
+        full_df = full_df.iloc[1:].reset_index(drop=True)
+
+
+if __name__ == "__main__":
+    currencies = price_parser.get_currencies() #, [("BTCUSD", "COINBASE"), ("ETHUSD", "COINBASE")]  #
+    intervals = [Interval.in_15_minute] #, Interval.in_5_minute, Interval.in_15_minute]
+
+    profit_dict = Array('i', [0, 0])
+
+    print("Profit data", profit_dict[:])
+    for interval in intervals:
+        for currency in currencies:
+            df = price_parser.get_price_data(currency[0], currency[1], interval, 1000)
+            Process(target=signal_message_check_function, args=(df, profit_dict,)).start()
+            # signal_message_check_function(df, profit_dict)
+
+    print("Profit data:", "\n\tprofit ---> ", profit_dict[1], "\n\tloss ---> ", profit_dict[0])
