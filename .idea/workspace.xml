@@ -5,21 +5,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c8e52443-fb39-41fa-9e09-4877251a22f1" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Debug/4z5_minutes15_profit_loss" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Debug/4z5_minutes1_profit_loss" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/menu_text.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/indicators_reader.py" beforeDir="false" afterPath="$PROJECT_DIR$/indicators_reader.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/price_parser.py" beforeDir="false" afterPath="$PROJECT_DIR$/price_parser.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/signal_maker.py" beforeDir="false" afterPath="$PROJECT_DIR$/signal_maker.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user_module.py" beforeDir="false" afterPath="$PROJECT_DIR$/user_module.py" afterDir="false" />
-    </list>
-    <list id="cbe571c8-b52a-4250-a9e3-ad1313cd5330" name="Changes by Alex" comment="" />
-    <list id="e176a2a4-581a-46b1-bd82-5c3037557029" name="Changes by ALEX" comment="">
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/manager_module.py" beforeDir="false" afterPath="$PROJECT_DIR$/manager_module.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/users/db.txt" beforeDir="false" afterPath="$PROJECT_DIR$/users/db.txt" afterDir="false" />
     </list>
+    <list id="cbe571c8-b52a-4250-a9e3-ad1313cd5330" name="Changes by Alex" comment="" />
+    <list id="e176a2a4-581a-46b1-bd82-5c3037557029" name="Changes by ALEX" comment="" />
     <list id="7fa9b9cd-5f0a-41aa-bb8c-dd6d412d680c" name="Changes by SIRIUS" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -35,38 +29,6 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
-  </component>
-  <component name="LineStatusTrackerManager">
-    <file path="$PROJECT_DIR$/main.py">
-      <ranges>
-        <range start1="10" end1="10" start2="10" end2="11" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
-        <range start1="14" end1="14" start2="15" end2="16" changelist="e176a2a4-581a-46b1-bd82-5c3037557029" />
-        <range start1="20" end1="68" start2="22" end2="22" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
-        <range start1="122" end1="138" start2="76" end2="76" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
-        <range start1="143" end1="143" start2="81" end2="97" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
-        <range start1="159" end1="159" start2="113" end2="116" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
-        <range start1="166" end1="166" start2="123" end2="126" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
-        <range start1="180" end1="181" start2="140" end2="141" changelist="e176a2a4-581a-46b1-bd82-5c3037557029" />
-        <range start1="189" end1="190" start2="149" end2="150" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
-        <range start1="217" end1="223" start2="177" end2="177" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
-        <range start1="230" end1="231" start2="184" end2="185" changelist="e176a2a4-581a-46b1-bd82-5c3037557029" />
-        <range start1="232" end1="233" start2="186" end2="187" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
-        <range start1="251" end1="253" start2="205" end2="207" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
-        <range start1="264" end1="265" start2="218" end2="219" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
-        <range start1="267" end1="268" start2="221" end2="222" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
-        <range start1="269" end1="270" start2="223" end2="223" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
-        <range start1="271" end1="276" start2="224" end2="226" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
-        <range start1="279" end1="280" start2="229" end2="229" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
-        <range start1="281" end1="283" start2="230" end2="231" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
-        <range start1="296" end1="297" start2="244" end2="246" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
-        <range start1="298" end1="301" start2="247" end2="247" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
-        <range start1="302" end1="303" start2="248" end2="249" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
-        <range start1="305" end1="315" start2="251" end2="252" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
-        <range start1="317" end1="318" start2="254" end2="255" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
-        <range start1="323" end1="328" start2="260" end2="266" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
-        <range start1="329" end1="332" start2="267" end2="270" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
-      </ranges>
-    </file>
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />

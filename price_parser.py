@@ -77,14 +77,14 @@ def get_currencies():
     return currencies
 
 
-def get_price_data_seis(seis, bars_count=200):
+def get_price_data_seis(seis, bars_count=500):
     priceData = seis.get_hist(n_bars=bars_count)
     priceData = priceData.drop(priceData.index[len(priceData) - 1])
     priceData = priceData.reindex(index=priceData.index[::-1]).reset_index()
     return priceData
 
 
-def get_price_data(symbol, exchange, interval, bars_count=200):
+def get_price_data(symbol, exchange, interval, bars_count=500):
     priceData = tvl.get_hist(symbol=symbol, exchange=exchange, interval=interval, n_bars=bars_count)
     priceData = priceData.reindex(index=priceData.index[::-1]).reset_index()
     return priceData

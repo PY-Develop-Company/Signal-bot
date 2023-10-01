@@ -229,20 +229,20 @@ def signal_message_check_controller(currency, interval, profit_dict):
             symbol = currency[0][:3] + "/" + currency[0][3:]
 
             interval = price_data_frame.datetime[0] - price_data_frame.datetime[1]
-            has_signal, open_signal_type, debug_text = signal_maker.check_signal(
-                price_data_frame, interval, successful_indicators_count=4)
+            has_signal, signal_type, debug_text = signal_maker.check_signal(
+                price_data_frame, interval, successful_indicators_count=2)
 
             if has_signal:
                 deposit_users_ids = get_deposit_users_ids()
 
-                msg, photo_path = signal_maker.get_open_position_signal_message(open_signal_type, symbol, interval)
+                msg = signal_type.get_msg(symbol, interval)
 
-                await send_photo_text_message_to_users(deposit_users_ids, photo_path, msg)
-                delay_text = f"\n {currency} задержка: {datetime.now() - start_check_time}"
+                await send_photo_text_message_to_users(deposit_users_ids, signal_type.photo_path, msg + debug_text)
+                delay_text = f"\n {currency} {interval} задержка: {datetime.now() - start_check_time}"
                 await send_message_to_users(deposit_users_ids, delay_text)
 
                 open_position_price = price_data_frame.close[0]
-                is_profit = await close_signal_message_check_function(open_position_price, deposit_users_ids, open_signal_type, symbol, currency[1], interval)
+                is_profit = await close_signal_message_check_function(open_position_price, deposit_users_ids, signal_type, symbol, currency[1], interval)
                 profit_dict[is_profit] += 1
                 price_parser.update_last_check_date(currency[0], interval)
 
@@ -258,14 +258,14 @@ def signal_message_check_controller(currency, interval, profit_dict):
 if __name__ == '__main__':
     from aiogram import executor
 
-    # profit_dict = Array('i', [0, 0])
+    profit_dict = Array('i', [0, 0])
     #
-    # currencies = [("BTCUSD", "COINBASE"), ("ETHUSD", "COINBASE")]  #price_parser.get_currencies()
-    # intervals = [Interval.in_1_minute, Interval.in_5_minute, Interval.in_15_minute]
-    # price_parser.create_parce_currencies_with_intervals_callbacks(currencies, intervals)
+    currencies = [("BTCUSD", "COINBASE")] #("ETHUSD", "COINBASE")]  #price_parser.get_currencies()
+    intervals = [Interval.in_1_minute]
+    price_parser.create_parce_currencies_with_intervals_callbacks(currencies, intervals)
     #
-    # for interval in intervals:
-    #     for currency in currencies:
-    #         multiprocessing.Process(target=signal_message_check_controller, args=(currency, interval, profit_dict,)).start()
+    for interval in intervals:
+        for currency in currencies:
+            multiprocessing.Process(target=signal_message_check_controller, args=(currency, interval, profit_dict,)).start()
 
     executor.start_polling(dp, skip_updates=True)
