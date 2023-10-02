@@ -2,7 +2,7 @@ import file_manager
 from user_module import *
 
 manager_username = "@bwg_Golden"
-managers_id = [5964166439, 741867026]
+managers_id = [5964166439] #741867026]
 manager_url = f"https://t.me/{manager_username[1:]}"
 
 search_id_manager_status = "пошук ID статус"

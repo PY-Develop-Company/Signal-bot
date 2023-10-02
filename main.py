@@ -1,5 +1,4 @@
 import time
-
 import indicators_reader
 from aiogram import Bot, Dispatcher, types
 import logging
@@ -15,8 +14,8 @@ from user_module import *
 from manager_module import *
 from menu_text import *
 
-# API_TOKEN = "6340912636:AAHACm2V2hDJUDXng0y0uhBRVRFJgqrok48"
-API_TOKEN = "6538527964:AAHUUHZHYVnNFbYAPoMn4bRUMASKR0h9qfA"
+API_TOKEN = "6340912636:AAHACm2V2hDJUDXng0y0uhBRVRFJgqrok48"
+# API_TOKEN = "6538527964:AAHUUHZHYVnNFbYAPoMn4bRUMASKR0h9qfA"
 logging.basicConfig(level=logging.INFO)
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot)
@@ -103,8 +102,10 @@ async def start_command(message):
         await add_manager(message)
         await open_menu(message, manager_markup)
     elif has_user_status(message.from_user.id, deposit_status):
+        print(0)
         await open_menu(message, vip_markup)
     else:
+        print(1)
         add_user(message.from_user.id, message.from_user.first_name, message.from_user.last_name)
         await open_menu(message, not_vip_markup)
 
@@ -230,7 +231,7 @@ def signal_message_check_controller(currency, interval, profit_dict):
 
             interval = price_data_frame.datetime[0] - price_data_frame.datetime[1]
             has_signal, signal_type, debug_text = signal_maker.check_signal(
-                price_data_frame, interval, successful_indicators_count=2)
+                price_data_frame, interval, successful_indicators_count=4)
 
             if has_signal:
                 deposit_users_ids = get_deposit_users_ids()
@@ -260,10 +261,10 @@ if __name__ == '__main__':
 
     profit_dict = Array('i', [0, 0])
     #
-    currencies = [("BTCUSD", "COINBASE")] #("ETHUSD", "COINBASE")]  #price_parser.get_currencies()
-    intervals = [Interval.in_1_minute]
+    currencies = price_parser.get_currencies() #[("BTCUSD", "COINBASE")] #("ETHUSD", "COINBASE")]  #price_parser.get_currencies()
+    intervals = [Interval.in_1_minute, Interval.in_5_minute, Interval.in_15_minute]
     price_parser.create_parce_currencies_with_intervals_callbacks(currencies, intervals)
-    #
+
     for interval in intervals:
         for currency in currencies:
             multiprocessing.Process(target=signal_message_check_controller, args=(currency, interval, profit_dict,)).start()

@@ -7,7 +7,7 @@ import os
 from pandas import DataFrame, read_csv
 import indicators_reader
 
-trade_pause_wait_time = 60*60  # 1 hour
+trade_pause_wait_time = 60*60 # 1 hour
 
 currencies_path = "users/currencies.txt"
 currencies_data_path = "currencies_data/"
@@ -101,6 +101,8 @@ def update_currency_file_consumer(seis: Seis, data):
 
 def create_parce_currencies_with_intervals_callbacks(currencies, intervals: [Interval]):
     while True:
+        tvl = TvDatafeedLive()
+        tv = TvDatafeed()
         try:
             for currency in currencies:
                 for interval in intervals:
