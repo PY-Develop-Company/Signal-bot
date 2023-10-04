@@ -1,11 +1,10 @@
 import numpy as np
 import pandas
-from tvDatafeed import Interval
 import math
-import signal_maker as sm
 from datetime import timedelta
 from pandas import Series
 import plotly.graph_objects as go
+from signals import *
 
 
 class Indicator:
@@ -17,9 +16,9 @@ class Indicator:
         self.low = low
         self.name = "indicator"
 
-    def get_signal(self) -> sm.Signal:
+    def get_signal(self) -> Signal:
         print("no get_signal implemented")
-        return sm.neutral_signal_text, self.name
+        return NeutralSignal(), self.name
 
     def graph(self):
         print("no graph implemented")
@@ -54,12 +53,12 @@ class SuperOrderBlockIndicator(Indicator):
         return self.high[index] < self.low[index + 2]
 
     class Box:
-        def __init__(self, left=0, top=0, right=0, bottom=0, signal_type=sm.ns):
+        def __init__(self, left=0, top=0, right=0, bottom=0, signal=Signal()):
             self.left = left
             self.top = top
             self.right = right
             self.bottom = bottom
-            self.signal_type = signal_type
+            self.signal = signal
 
         def print_info(self):
             print("Created box: ", self.left, self.top, self.right, self.bottom)
@@ -67,7 +66,7 @@ class SuperOrderBlockIndicator(Indicator):
         def check_signal(self, bar_low, bar_high, bar_date):
             is_price_in_box = (bar_high > self.top > bar_low) or (bar_high > self.bottom > bar_low)
             is_date_range_in_box = self.left <= bar_date <= self.right
-            return self.signal_type if (is_price_in_box and is_date_range_in_box) else sm.neutral_signal_text
+            return self.signal if (is_price_in_box and is_date_range_in_box) else NeutralSignal()
 
     def pivot_high(self, price):
         highs = {}
@@ -114,14 +113,14 @@ class SuperOrderBlockIndicator(Indicator):
             date_time = self.src.datetime[i]
             if self.is_ob_box_up(i + 1):
                 _bullboxOB = self.Box(left=date_time - self.interval * 2, top=self.high[i + 2], right=date_time,
-                                      bottom=min(self.low[i + 2], self.low[i + 1]), signal_type=sm.ls)
+                                      bottom=min(self.low[i + 2], self.low[i + 1]), signal=LongSignal())
                 if len(_bullBoxesOB) > self.obMaxBoxSet:
                     _bullBoxesOB.remove(_bullBoxesOB[0])
                 _bullBoxesOB.append(_bullboxOB)
 
             if self.is_ob_box_down(i + 1):
                 _bearboxOB = self.Box(left=date_time - self.interval * 2, top=max(self.high[i + 2], self.high[i + 1]),
-                                      right=date_time, bottom=self.low[i + 2], signal_type=sm.ss)
+                                      right=date_time, bottom=self.low[i + 2], signal=ShortSignal())
                 if len(_bearBoxesOB) > self.obMaxBoxSet:
                     _bearBoxesOB.remove(_bearBoxesOB[0])
                 _bearBoxesOB.append(_bearboxOB)
@@ -138,10 +137,10 @@ class SuperOrderBlockIndicator(Indicator):
                 if (self.close[i + 1] > top[i]) and (self.low[i + 1] < top[i]) and (
                         self.high[i + 2] < top[i]) and (self.low[i] > top[i]):
                     _bullboxFVG = self.Box(left=date_time - self.interval * 2, top=self.low[i], right=date_time,
-                                           bottom=self.high[i + 2], signal_type=sm.ls)
+                                           bottom=self.high[i + 2], signal=LongSignal())
                 else:
                     _bullboxFVG = self.Box(left=date_time - self.interval * 2, top=self.low[i], right=date_time,
-                                           bottom=self.high[i + 2], signal_type=sm.ls)
+                                           bottom=self.high[i + 2], signal=LongSignal())
 
                 if len(_bullBoxesFVG) > self.fvgMaxBoxSet:
                     _bullBoxesFVG.remove(_bullBoxesFVG[0])
@@ -152,10 +151,10 @@ class SuperOrderBlockIndicator(Indicator):
                 if (self.close[i + 1] < bottom[i]) and (self.high[i + 1] > bottom[i]) and (
                         self.low[i + 2] > bottom[i]) and (self.high[i] < bottom[i]):
                     _bearboxFVG = self.Box(left=date_time - self.interval * 2, top=self.low[i + 2], right=date_time,
-                                           bottom=self.high[i], signal_type=sm.ss)
+                                           bottom=self.high[i], signal=ShortSignal())
                 else:
                     _bearboxFVG = self.Box(left=date_time - self.interval * 2, top=self.low[i + 2], right=date_time,
-                                           bottom=self.high[i], signal_type=sm.ss)
+                                           bottom=self.high[i], signal=ShortSignal())
 
                 if len(_bearBoxesFVG) > self.fvgMaxBoxSet:
                     _bearBoxesFVG.remove(_bearBoxesFVG[0])
@@ -168,11 +167,11 @@ class SuperOrderBlockIndicator(Indicator):
         date_time = self.src.datetime[0]
 
         boxes = _bullBoxesOB + _bearBoxesOB + _bullBoxesFVG + _bearBoxesFVG
-        return_signal = sm.ns
+        return_signal = NeutralSignal()
         signal_boxes = []
         for box in boxes:
             signal = box.check_signal(self.low[0], self.high[0], date_time)
-            if not (signal == sm.neutral_signal_text):
+            if not (signal.type == NeutralSignal.type):
                 signal_boxes.append(box)
 
         if len(signal_boxes) > 0:
@@ -187,7 +186,7 @@ class SuperOrderBlockIndicator(Indicator):
                     if b_height > biggest_box_height:
                         biggest_box = b
                         biggest_box_height = biggest_box.top - biggest_box.bottom
-            return_signal = biggest_box.signal_type
+            return_signal = biggest_box.signal
 
         # self.graph(_bullBoxesOB, _bearBoxesOB, _bullBoxesFVG, _bearBoxesFVG)
 
@@ -283,11 +282,11 @@ class ScalpProIndicator(Indicator):
 
         # self.graph(smooth3, macd)
         if macd[0] == smooth3[0]:
-            res_signal = sm.ls if macd[1] > smooth3[1] else (
-                sm.ss if macd[1] < smooth3[1] else sm.ns)
+            res_signal = LongSignal() if macd[1] > smooth3[1] else (
+                ShortSignal() if macd[1] < smooth3[1] else NeutralSignal())
         else:
-            res_signal = sm.ls if macd[0] > smooth3[0] else (
-                sm.ss if macd[0] < smooth3[0] else sm.ns)
+            res_signal = LongSignal() if macd[0] > smooth3[0] else (
+                ShortSignal() if macd[0] < smooth3[0] else NeutralSignal())
         return res_signal, self.name
 
     def graph(self, smooth3, macd):
@@ -341,11 +340,11 @@ class VolumeIndicator(Indicator):
             else:
                 sell_signal_count += 1
 
-        signal = sm.ns
+        signal = NeutralSignal()
         if buy_signal_count == self.bars_count:
-            signal = sm.ls
+            signal = LongSignal()
         elif sell_signal_count == self.bars_count:
-            signal = sm.ss
+            signal = ShortSignal()
 
         return signal, self.name
 
@@ -370,12 +369,12 @@ class UMAIndicator(Indicator):
 
             ma_up = avg[i] > avg[i + self.smooth]
             ma_down = avg[i] < avg[i + self.smooth]
-            signals.append(sm.ls if ma_up else (sm.ss if ma_down else sm.ns))
+            signals.append(LongSignal() if ma_up else (ShortSignal() if ma_down else NeutralSignal()))
             avg_long.append(avg[i] if ma_up else 0)
             avg_short.append(avg[i] if ma_down else 0)
         if len(signals) == 0:
             print("not enough data warning ultimate moving average")
-            signals.append(sm.ns)
+            signals.append(NeutralSignal())
 
         # self.graph(avg_short, avg_long)
         return signals[0], self.name
@@ -446,11 +445,11 @@ class NadarayaWatsonIndicator(Indicator):
         signals = []
         for i in range(0, min(price_count - 2, 499)):
             if self.close[i] > (nwe[i] + sae) > self.close[i + 1]:
-                signals.append((i, sm.ss))
+                signals.append((i, ShortSignal()))
             elif self.close[i] < (nwe[i] - sae) < self.close[i + 1]:
-                signals.append((i, sm.ls))
+                signals.append((i, LongSignal()))
         if len(signals) == 0:
-            signals.append((0, sm.ns))
+            signals.append((0, NeutralSignal()))
             print(f"not enough data warning {self.name} envelope")
 
         # buy_sig = []
@@ -461,9 +460,9 @@ class NadarayaWatsonIndicator(Indicator):
         #     buy_append_val = 0
         #     sell_append_val = 0
         #     if i == curr_signal[0]:
-        #         if curr_signal[1] == sm.ls:
+        #         if curr_signal[1] == ls:
         #             buy_append_val = 30000
-        #         elif curr_signal[1] == sm.ss:
+        #         elif curr_signal[1] == ss:
         #             sell_append_val = 30000
         #
         #         j += 1
@@ -527,38 +526,6 @@ class NadarayaWatsonIndicator(Indicator):
 def clamp(value, min_value, max_value):
     return max(min(value, max_value), min_value)
 
-
-def get_datetime(interval):
-    if interval == Interval.in_1_minute:
-        return timedelta(minutes=1)
-    elif interval == Interval.in_3_minute:
-        return timedelta(minutes=3)
-    elif interval == Interval.in_5_minute:
-        return timedelta(minutes=5)
-    elif interval == Interval.in_15_minute:
-        return timedelta(minutes=15)
-    elif interval == Interval.in_30_minute:
-        return timedelta(minutes=30)
-    elif interval == Interval.in_45_minute:
-        return timedelta(minutes=45)
-    else:
-        return timedelta(days=1)
-
-
-def get_interval(datetime):
-    datetime = math.floor(datetime.total_seconds() / 60)
-    if datetime == 15:
-        return Interval.in_1_minute
-    elif datetime == 5:
-        return Interval.in_5_minute
-    elif datetime == 1:
-        return Interval.in_1_minute
-    else:
-        return Interval.in_daily
-
-
-def get_interval_string(datetime):
-    return str(datetime).replace(".", "")
 
 # if __name__ == "__main__":
 #     df = price_parser.get_price_data("EURUSD", "OANDA", Interval.in_1_minute, bars_count=1000)

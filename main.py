@@ -1,5 +1,5 @@
-import time
-import indicators_reader
+import random
+
 from aiogram import Bot, Dispatcher, types
 import logging
 import price_parser
@@ -7,12 +7,11 @@ import signal_maker
 from tvDatafeed import Interval
 import asyncio
 import multiprocessing
-from multiprocessing import Value, Array
-import threading
-from datetime import datetime
-from user_module import *
+from datetime import datetime, timedelta
 from manager_module import *
 from menu_text import *
+
+from signals import get_signal_by_type
 
 API_TOKEN = "6340912636:AAHACm2V2hDJUDXng0y0uhBRVRFJgqrok48"
 # API_TOKEN = "6538527964:AAHUUHZHYVnNFbYAPoMn4bRUMASKR0h9qfA"
@@ -216,57 +215,98 @@ async def handle_media(message: types.Message):
                 await open_menu(message, not_vip_markup)
 
 
-async def close_signal_message_check_function(open_position_price, vip_users_ids, open_signal, symbol, exchange, interval):
-    close_signal_message, is_profit = await signal_maker.close_position(open_position_price, open_signal, symbol, exchange, interval, bars_count=3)
-    print("closing", symbol, interval)
-    await send_message_to_users(vip_users_ids, close_signal_message)
-    return is_profit
+def handle_signal_msg_controller(signal, msg, symbol, exchange, interval, open_position_price):
+    try:
+        asyncio.run(handle_signal_msg(signal, msg, symbol, exchange, interval, open_position_price))
+    except Exception as e:
+        print("aaa", e)
 
 
-def signal_message_check_controller(currency, interval, profit_dict):
-    async def signal_message_check_function(currency, interval, start_check_time, profit_dict):
-        is_file_changed, price_data_frame = price_parser.is_currency_file_changed(currency[0], interval)
-        if is_file_changed:
-            symbol = currency[0][:3] + "/" + currency[0][3:]
+async def handle_signal_msg(signal, msg, symbol, exchange, interval, open_position_price):
+    try:
+        deposit_users_ids = get_deposit_users_ids()
+        await send_photo_text_message_to_users(deposit_users_ids, signal.photo_path, msg)
+        print("signal mgs:", signal, msg, symbol, exchange, interval, open_position_price)
 
-            interval = price_data_frame.datetime[0] - price_data_frame.datetime[1]
-            has_signal, signal_type, debug_text = signal_maker.check_signal(
-                price_data_frame, interval, successful_indicators_count=4)
+        close_signal_message, is_profit = await signal_maker.close_position(open_position_price, signal, symbol, exchange, interval, bars_count=3)
+        img_path = "./img/profit.jpg" if is_profit else "./img/loss.jpg"
+        await send_photo_text_message_to_users(deposit_users_ids, img_path, close_signal_message)
+    except Exception as e:
+        print("aaa_", e)
 
-            if has_signal:
-                deposit_users_ids = get_deposit_users_ids()
 
-                msg = signal_type.get_msg(symbol, interval)
+async def signal_msg_send_delay():
+    await asyncio.sleep(300)
 
-                await send_photo_text_message_to_users(deposit_users_ids, signal_type.photo_path, msg + debug_text)
-                delay_text = f"\n {currency} {interval} задержка: {datetime.now() - start_check_time}"
-                await send_message_to_users(deposit_users_ids, delay_text)
 
-                open_position_price = price_data_frame.close[0]
-                is_profit = await close_signal_message_check_function(open_position_price, deposit_users_ids, signal_type, symbol, currency[1], interval)
-                profit_dict[is_profit] += 1
-                price_parser.update_last_check_date(currency[0], interval)
-
-    async def signal_message_check_loop(currency, interval, profit_dict):
+def signals_message_sender_controller(currencies, intervals):
+    async def signals_message_sender_function(currencies, intervals):
+        signal_maker.reset_signals(currencies, intervals)
         while True:
-            start_check_time = datetime.now()
-            await signal_message_check_function(currency, interval, start_check_time, profit_dict)
-            await asyncio.sleep(2)
+            dfs = []
+            is_1min_created, _1 = signal_maker.is_signals_analized(currencies, [intervals[0]])
+            is_all_signals_created = is_1min_created
+            if is_1min_created and not(_1 is None):
+                print("is_1min_created:", is_1min_created)
+                print(_1)
+                if (_1.minute+1) % 5 == 0:
+                    is_5min_created, _5 = signal_maker.is_signals_analized(currencies, [intervals[1]])
+                    is_all_signals_created = is_all_signals_created and is_5min_created
+                    print("is_5min_created:", is_5min_created)
+                    if (_1.minute+1) % 15 == 0:
+                        is_15min_created, _15 = signal_maker.is_signals_analized(currencies, [intervals[2]])
+                        is_all_signals_created = is_all_signals_created and is_15min_created
+                        print("is_15min_created:", is_15min_created)
 
-    asyncio.run(signal_message_check_loop(currency, interval, profit_dict))
+            if is_all_signals_created:
+                print("all created")
+                for interval in intervals:
+                    for currency in currencies:
+                        df = signal_maker.read_signal_data(currency[0], interval)
+                        if df is None:
+                            continue
+                        if df.has_signal[0]:
+                            dfs.append(df)
+
+                # print(dfs)
+                if len(dfs) > 0:
+                    max_indicators_count = 0
+                    for df in dfs:
+                        indicators_count = int(df.indicators_count[0])
+                        if indicators_count > max_indicators_count:
+                            max_indicators_count = indicators_count
+                    max_indicators_count = 0
+                    max_indicators_dfs = []
+                    for df in dfs:
+                        if not (int(df.indicators_count[0]) == max_indicators_count):
+                            max_indicators_dfs.append(df)
+
+                    df = random.choice(max_indicators_dfs)
+                    print(df.to_string())
+                    signal = get_signal_by_type(df.signal_type[0])
+
+                    time_str = df.interval[0].split()[-1]
+                    hours, minutes, seconds = map(int, time_str.split(':'))
+                    time_duration = timedelta(hours=hours, minutes=minutes, seconds=seconds)
+                    multiprocessing.Process(target=handle_signal_msg_controller, args=(signal, df.msg[0], df.symbol[0], df.exchange[0], time_duration, df.open_price[0], ), daemon=True).start()
+                    await signal_msg_send_delay()
+                signal_maker.reset_signals(currencies, intervals)
+            await asyncio.sleep(1)
+
+    asyncio.run(signals_message_sender_function(currencies, intervals))
 
 
 if __name__ == '__main__':
     from aiogram import executor
 
-    profit_dict = Array('i', [0, 0])
-    #
-    currencies = price_parser.get_currencies() #[("BTCUSD", "COINBASE")] #("ETHUSD", "COINBASE")]  #price_parser.get_currencies()
+    currencies = price_parser.get_currencies()
     intervals = [Interval.in_1_minute, Interval.in_5_minute, Interval.in_15_minute]
     price_parser.create_parce_currencies_with_intervals_callbacks(currencies, intervals)
 
     for interval in intervals:
         for currency in currencies:
-            multiprocessing.Process(target=signal_message_check_controller, args=(currency, interval, profit_dict,)).start()
+            multiprocessing.Process(target=signal_maker.analize_currency_data_controller, args=(currency, interval,)).start()
+
+    multiprocessing.Process(target=signals_message_sender_controller, args=(currencies, intervals,)).start()
 
     executor.start_polling(dp, skip_updates=True)
