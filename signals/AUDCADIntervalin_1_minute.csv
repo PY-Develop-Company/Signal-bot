@@ -1,2 +1,9 @@
 ,has_signal,signal_type,msg,date,open_price,interval,indicators_count,symbol,exchange
-0,False,neutral,NoneAUD/CAD Нет сигнала 3мин,2023-10-04 15:29:00,0.86806,0 days 00:01:00,0,AUDCAD,OANDA
+0,False,neutral,"NoneAUD/CAD Нет сигнала 3мин
+
+Проверка сигнала:
+    	Валютная пара: OANDA:AUDCAD"" таймфрейм: 0 days 00:01:00 время свечи: 2023-10-05 21:03:00
+    	Есть ли сигнал: False
+    	Показания индикаторов: {'LONG ⬆': [2, [', UMA', ', ScalpPro']], 'SHORT ⬇': [1, [', NadarayaWatson']], 'Нет сигнала': [2, [', SuperOrderBlock', ', Volume']]})
+
+    ",2023-10-05 21:03:00,0.87324,0 days 00:01:00,0,AUDCAD,OANDA

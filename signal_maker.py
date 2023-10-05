@@ -144,7 +144,6 @@ def reset_signals(currencies, intervals):
 
 def analize_currency_data_controller(currency, interval):
     def analize_currency_data_function(currency, interval):
-
         try:
             is_file_changed, price_data_frame = price_parser.is_currency_file_changed(currency[0], interval)
         except Exception as e:
@@ -159,7 +158,7 @@ def analize_currency_data_controller(currency, interval):
 
             open_position_price = price_data_frame.close[0]
             msg = signal.get_open_msg_text(symbol, interval_td)
-            data = [[has_signal, signal.type, msg, price_data_frame.datetime[0], open_position_price, interval_td, indicators_count, currency[0], currency[1]]]
+            data = [[has_signal, signal.type, msg + debug_text, price_data_frame.datetime[0], open_position_price, interval_td, indicators_count, currency[0], currency[1]]]
             df = DataFrame(data, columns=["has_signal", "signal_type", "msg", "date", "open_price", "interval", "indicators_count", "symbol", "exchange"])
             save_signal_data(df, currency[0], interval)
 
@@ -179,54 +178,110 @@ def analize_currency_data_controller(currency, interval):
 #test
 
 
-def signal_message_check_function(price_data_frame: DataFrame, bars_to_analyse=200, successful_indicators_count=4):
-    if len(price_data_frame) < bars_to_analyse:
-        return
+def check_signal_test(prices_df: DataFrame, interval: timedelta, successful_indicators_count=4):
+    volume_ind_signal = indicators_reader.VolumeIndicator(prices_df, prices_df.open, prices_df.close, prices_df.high, prices_df.low).get_signal()
+    sp_ind_signal = indicators_reader.ScalpProIndicator(prices_df, prices_df.open, prices_df.close, prices_df.high, prices_df.low).get_signal()
+    uma_ind_signal = indicators_reader.UMAIndicator(prices_df, prices_df.open, prices_df.close, prices_df.high, prices_df.low).get_signal()
+    sob_ind_signal = indicators_reader.SuperOrderBlockIndicator(prices_df, prices_df.open, prices_df.close, prices_df.high, prices_df.low, interval).get_signal()
+    nw_ind_signal = indicators_reader.NadarayaWatsonIndicator(prices_df, prices_df.open, prices_df.close, prices_df.high, prices_df.low).get_signal()
 
-    data = []
-    interval = price_data_frame["datetime"][0] - price_data_frame["datetime"][1]
+    indicators_signals = [sob_ind_signal, volume_ind_signal, uma_ind_signal, nw_ind_signal, sp_ind_signal]
 
-    profit_dict = [0, 0]
+    signal_counts = {LongSignal.type: [0, [], LongSignal()], ShortSignal.type: [0, [], ShortSignal()], NeutralSignal.type: [0, [], NeutralSignal()]}
+    for ind_signal in indicators_signals:
+        signal_counts.get(ind_signal[0].type)[0] += 1
+        signal_counts.get(ind_signal[0].type)[1].append(", " + ind_signal[1])
 
-    loop_count = len(price_data_frame) - bars_to_analyse
-    full_df = price_data_frame
-    for i in range(loop_count):
-        check_df = full_df.iloc[3:].reset_index(drop=True)
+    main_signal = (NeutralSignal.type, [0, [], NeutralSignal()])
+    for signal_count in signal_counts.items():
+        if signal_count[1][0] > main_signal[1][0] and not(signal_count[0] == NeutralSignal.type):
+            main_signal = signal_count
 
-        has_signal, open_signal, debug_text = check_signal(check_df, interval, successful_indicators_count=successful_indicators_count)
+    has_signal = main_signal[1][0] >= successful_indicators_count and indicators_signals[0][0].type == main_signal[0]
 
-        if has_signal:
-            open_position_price = check_df.close[0]
-            close_position_price = full_df.close[0]
-            has_profit = is_profit(open_position_price, close_position_price, open_signal)
-            profit_dict[has_profit] += 1
-            print("open_position_price", open_position_price)
-            print("close_position_price", close_position_price)
+    debug_dict = {}
+    for sig in signal_counts.items():
+        debug_dict[sig[1][2].text] = sig[1][:2]
+    debug_text = f"""\n\nПроверка сигнала:
+    \tВалютная пара: {prices_df.symbol[0]}" таймфрейм: {interval} время свечи: {prices_df.datetime[0]}
+    \tЕсть ли сигнал: {has_signal}
+    \tПоказания индикаторов: {debug_dict})\n
+    """
+    print(debug_text)
+    # print("="*200, "\n")
+    if has_signal:
+        return True, main_signal[1][2], main_signal[1][0], debug_text, indicators_signals
+    return False, NeutralSignal(), 0, debug_text, indicators_signals
 
-            print(debug_text)
-            print("Profit data:", "\n\tprofit ---> ", profit_dict[1], "\n\tloss ---> ", profit_dict[0])
-            data_el = [profit_dict[1], profit_dict[0], open_signal.type, open_position_price, close_position_price, debug_text]
-            data.append(data_el)
 
-        full_df = price_data_frame[i+1:i+bars_to_analyse+4].reset_index(drop=True)
-        full_df = full_df.iloc[1:].reset_index(drop=True)
+async def signal_message_check_function_child(symbol, deal_time, check_df, full_df, interval, successful_indicators_count):
+    has_signal, open_signal, ind_count, debug_text, ind_data = check_signal_test(check_df, interval,
+                                                                  successful_indicators_count=successful_indicators_count)
+    # print("check signal")
+    if has_signal:
+        print("wehavesignal")
+        open_position_price = check_df.close[0]
+        close_position_price = full_df.close[0]
+        has_profit = is_profit(open_position_price, close_position_price, open_signal)
+        print("open_position_price", open_position_price)
+        print("close_position_price", close_position_price)
 
-    path = "debug/" + price_data_frame.symbol[0].split(":")[1] + str(datetime_to_interval(interval)).replace(".", "") + "_indicators_count_" + str(successful_indicators_count) + ".csv"
-    df = DataFrame(data, columns=["profit", "loss", "signal", "open_signal_price", "close_signal_price", "data"])
-    df.to_csv(path)
+        print(debug_text)
+        data_el = [check_df["datetime"][0],
+                   has_profit, open_signal.type, open_position_price, close_position_price,
+                   ind_data[0][0].type, ind_data[1][0].type, ind_data[2][0].type, ind_data[3][0].type, ind_data[4][0].type]
+        return data_el
+    return None
+
+
+def signal_message_check_controller(price_data_frame: DataFrame, bars_to_analyse=200, successful_indicators_count=4, deal_time=3):
+    async def signal_message_check_function(price_data_frame: DataFrame, bars_to_analyse=200, successful_indicators_count=4, deal_time=3):
+        if len(price_data_frame) < bars_to_analyse:
+            return
+
+        df_data = []
+        interval = price_data_frame["datetime"][0] - price_data_frame["datetime"][1]
+        symbol = price_data_frame["symbol"][0]
+
+        loop_count = len(price_data_frame) - bars_to_analyse
+        full_df = price_data_frame
+        tasks = []
+        for i in range(loop_count):
+            check_df = full_df.iloc[deal_time:].reset_index(drop=True)
+            t = asyncio.create_task(coro=signal_message_check_function_child(symbol, deal_time, check_df, full_df, interval, successful_indicators_count))
+            tasks.append(t)
+            full_df = price_data_frame[i + 1:i + bars_to_analyse + deal_time + 1].reset_index(drop=True)
+            full_df = full_df.iloc[1:].reset_index(drop=True)
+
+        data = await asyncio.gather(*tasks)
+        for d in data:
+            if d is None:
+                continue
+            df_data.append([*d])
+        if len(df_data) > 0:
+            path = "debug/" + price_data_frame.symbol[0].split(":")[1] + str(datetime_to_interval(interval)).replace(".", "") + "_indicators_count_" + str(successful_indicators_count) + "deal_time" + str(deal_time) + ".csv"
+            df = DataFrame(df_data, columns=["datetime",
+                "is_profit", "signal", "open_signal_price", "close_signal_price",
+                "SuperOrderBlock", "Volume", "UMA", "NW", "ScalpPro"])
+            df.to_csv(path)
+        else:
+            print("No signals")
+    asyncio.run(signal_message_check_function(price_data_frame, bars_to_analyse, successful_indicators_count, deal_time))
 
 
 if __name__ == "__main__":
-    currencies = price_parser.get_currencies() #, [("BTCUSD", "COINBASE"), ("ETHUSD", "COINBASE")]  #
-    intervals = [Interval.in_1_minute, Interval.in_5_minute, Interval.in_15_minute]
+    currencies = [price_parser.get_currencies()[1]]  # [("BTCUSD", "COINBASE"), ("ETHUSD", "COINBASE")]  #
+    intervals = [Interval.in_1_minute]  # Interval.in_1_minute, Interval.in_5_minute, Interval.in_15_minute]
 
     # profit_dict = Array('i', [0, 0])
 
     # print("Profit data", profit_dict[:])
     for interval in intervals:
         for currency in currencies:
-            df = price_parser.get_price_data(currency[0], currency[1], interval, 2000)
-            Process(target=signal_message_check_function, args=(df, )).start()
-            # signal_message_check_function(df, profit_dict)
+            for ind_count in [4]:  # range(3, 5):
+                for deal_time in [3]:  # range(1, 6):
+                    df = price_parser.get_price_data(currency[0], currency[1], interval, 5000)
+                    Process(target=signal_message_check_controller, args=(df, 500, ind_count, deal_time,)).start()
+                    # signal_message_check_function(df, profit_dict)
 
     # print("Profit data:", "\n\tprofit ---> ", profit_dict[1], "\n\tloss ---> ", profit_dict[0])

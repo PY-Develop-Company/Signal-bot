@@ -360,18 +360,18 @@ class UMAIndicator(Indicator):
         avg = self.close.rolling(window=self.rolling).mean()
         avg = avg.shift(periods=-(self.rolling - 1))
 
-        avg_long = []
-        avg_short = []
+        # avg_long = []
+        # avg_short = []
         signals = []
-        for i in range(len(avg)):
+        for i in range(0, len(avg), len(avg)):
             if np.isnan(avg[i]) or np.isnan(avg[i + self.smooth]):
                 continue
 
             ma_up = avg[i] > avg[i + self.smooth]
             ma_down = avg[i] < avg[i + self.smooth]
             signals.append(LongSignal() if ma_up else (ShortSignal() if ma_down else NeutralSignal()))
-            avg_long.append(avg[i] if ma_up else 0)
-            avg_short.append(avg[i] if ma_down else 0)
+            # avg_long.append(avg[i] if ma_up else 0)
+            # avg_short.append(avg[i] if ma_down else 0)
         if len(signals) == 0:
             print("not enough data warning ultimate moving average")
             signals.append(NeutralSignal())
@@ -446,8 +446,10 @@ class NadarayaWatsonIndicator(Indicator):
         for i in range(0, min(price_count - 2, 499)):
             if self.close[i] > (nwe[i] + sae) > self.close[i + 1]:
                 signals.append((i, ShortSignal()))
+                break
             elif self.close[i] < (nwe[i] - sae) < self.close[i + 1]:
                 signals.append((i, LongSignal()))
+                break
         if len(signals) == 0:
             signals.append((0, NeutralSignal()))
             print(f"not enough data warning {self.name} envelope")
