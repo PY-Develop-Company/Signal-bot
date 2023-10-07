@@ -34,10 +34,14 @@ def interval_to_datetime(interval: Interval):
 
 def datetime_to_interval(datetime):
     datetime = math.floor(datetime.total_seconds() / 60)
+    if datetime == 30:
+        return Interval.in_15_minute
     if datetime == 15:
         return Interval.in_15_minute
     elif datetime == 5:
         return Interval.in_5_minute
+    elif datetime == 3:
+        return Interval.in_3_minute
     elif datetime == 1:
         return Interval.in_1_minute
     else:

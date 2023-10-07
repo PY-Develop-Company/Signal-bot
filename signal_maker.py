@@ -1,7 +1,10 @@
 from pandas import DataFrame, Timedelta, read_csv
 from datetime import timedelta, datetime, time
 from tvDatafeed import Interval
+
+import interval_convertor
 import price_parser
+from price_parser import PriceData
 import indicators_reader
 import asyncio
 from multiprocessing import Process
@@ -50,10 +53,11 @@ async def close_position(position_open_price, signal, symbol, exchange, interval
 
 
 def check_signal(prices_df: DataFrame, interval: timedelta, successful_indicators_count=4):
+    analize_block_delta = indicators_reader.sob_dict.get(prices_df["symbol"][0].split(":")[1]).get(interval_convertor.datetime_to_interval(interval))
     volume_ind = indicators_reader.VolumeIndicator(prices_df, prices_df.open, prices_df.close, prices_df.high, prices_df.low)
     sp_ind = indicators_reader.ScalpProIndicator(prices_df, prices_df.open, prices_df.close, prices_df.high, prices_df.low)
     uma_ind = indicators_reader.UMAIndicator(prices_df, prices_df.open, prices_df.close, prices_df.high, prices_df.low)
-    sob_ind = indicators_reader.SuperOrderBlockIndicator(prices_df, prices_df.open, prices_df.close, prices_df.high, prices_df.low, interval)
+    sob_ind = indicators_reader.SuperOrderBlockIndicator(prices_df, prices_df.open, prices_df.close, prices_df.high, prices_df.low, interval, analize_block_delta)
     nw_ind = indicators_reader.NadarayaWatsonIndicator(prices_df, prices_df.open, prices_df.close, prices_df.high, prices_df.low)
 
     indicators_signals = [sob_ind.get_signal(), volume_ind.get_signal(), uma_ind.get_signal(), nw_ind.get_signal(), sp_ind.get_signal()]
@@ -91,32 +95,25 @@ def save_signal_data(df, currency, interval: Interval):
     df.to_csv(path)
 
 
-def is_signals_analized(currencies, intervals):
+def is_signals_analized(prices_data):
     prev_path = None
     date = None
-    for interval in intervals:
-        for currency in currencies:
-            path = currency_check_ended + currency[0] + str(interval).replace(".", "") + ".txt"
-            if not os.path.exists(path):
-                return False, date
+    for pd in prices_data:
+        path = currency_check_ended + pd.symbol + str(pd.interval).replace(".", "") + ".txt"
+        if not os.path.exists(path):
+            return False, date
 
-            path = signals_data_path + currency[0] + str(interval).replace(".", "") + ".csv"
-            if not os.path.exists(path):
-                if not (prev_path is None):
-                    df = read_csv(prev_path)
-                    print(df.date[0])
-                    date = datetime.strptime(df.date[0], '%Y-%m-%d %H:%M:%S')
-                return False, date
-            prev_path = path
+        path = signals_data_path + pd.symbol + str(pd.interval).replace(".", "") + ".csv"
+        if not os.path.exists(path):
+            if not (prev_path is None):
+                df = read_csv(prev_path)
+                print(df.date[0])
+                date = datetime.strptime(df.date[0], '%Y-%m-%d %H:%M:%S')
+            return False, date
+        prev_path = path
     df = read_csv(prev_path)
     date = datetime.strptime(df.date[0], '%Y-%m-%d %H:%M:%S')
     return True, date
-    # if not os.path.exists(path):
-    #     return False
-    # df = read_csv(path)
-    # print("change date", df.date[0])
-    # print("signal_last_check_date", df.date[0])
-    # return df.date[0] > signals_analysis_last_date.date[0]
 
 
 def read_signal_data(currency, interval):
@@ -131,58 +128,60 @@ def read_signal_data(currency, interval):
     return df
 
 
-def reset_signals(currencies, intervals):
-    for interval in intervals:
-        for currency in currencies:
-            path = currency_check_ended + currency[0] + str(interval).replace(".", "") + ".txt"
-            if os.path.exists(path):
-                os.remove(path)
-            path = signals_data_path + currency[0] + str(interval).replace(".", "") + ".csv"
-            if os.path.exists(path):
-                os.remove(path)
+def reset_signals_files(prices_data: []):
+    for pd in prices_data:
+        interval = str(pd.interval).replace(".", "")
+        path = currency_check_ended + pd.symbol + interval + ".txt"
+        if os.path.exists(path):
+            os.remove(path)
+        path = signals_data_path + pd.symbol + interval + ".csv"
+        if os.path.exists(path):
+            os.remove(path)
 
 
-def analize_currency_data_controller(currency, interval):
-    def analize_currency_data_function(currency, interval):
+def analize_currency_data_controller(price_data):
+    def analize_currency_data_function(price_data: PriceData):
         try:
-            is_file_changed, price_data_frame = price_parser.is_currency_file_changed(currency[0], interval)
+            is_file_changed, price_df = price_parser.is_currency_file_changed(price_data.symbol, price_data.interval)
         except Exception as e:
             print("handle", e)
-            print(currency[0], interval)
+            print(price_data.symbol, price_data.interval)
             return
         if is_file_changed:
-            symbol = currency[0][:3] + "/" + currency[0][3:]
+            symbol = price_data.symbol + price_data.exchange
 
-            interval_td = price_data_frame.datetime[0] - price_data_frame.datetime[1]
-            has_signal, signal, indicators_count, debug_text = check_signal(price_data_frame, interval_td, successful_indicators_count=4)
+            interval_td = price_df.datetime[0] - price_df.datetime[1]
+            has_signal, signal, indicators_count, debug_text = check_signal(price_df, interval_td, successful_indicators_count=4)
 
-            open_position_price = price_data_frame.close[0]
+            open_position_price = price_df.close[0]
             msg = signal.get_open_msg_text(symbol, interval_td)
-            data = [[has_signal, signal.type, msg + debug_text, price_data_frame.datetime[0], open_position_price, interval_td, indicators_count, currency[0], currency[1]]]
+            data = [[has_signal, signal.type, msg + debug_text, price_df.datetime[0], open_position_price, interval_td, indicators_count, price_data.symbol, price_data.exchange]]
             df = DataFrame(data, columns=["has_signal", "signal_type", "msg", "date", "open_price", "interval", "indicators_count", "symbol", "exchange"])
-            save_signal_data(df, currency[0], interval)
+            save_signal_data(df, price_data.symbol, price_data.interval)
 
-            with open(f"{currency_check_ended}{currency[0]}{str(interval).replace('.', '')}.txt", "w") as file:
+            with open(f"{currency_check_ended}{price_data.symbol}{str(price_data.interval).replace('.', '')}.txt", "w") as file:
                 pass
             # await handle_signal_msg(signal_type, msg + debug_text, currency[0], currency[1], interval_td, open_position_price, start_check_time)
             # price_parser.update_last_check_date(currency[0], interval_td)
 
-    async def analize_currency_data_loop(currency, interval):
-        price_parser.reset_currency_file(currency, interval)
+    async def analize_currency_data_loop(price_data):
+        price_parser.reset_currency_file(price_data.symbol, price_data.interval)
         while True:
-            analize_currency_data_function(currency, interval)
+            analize_currency_data_function(price_data)
             await asyncio.sleep(1)
 
-    asyncio.run(analize_currency_data_loop(currency, interval))
+    asyncio.run(analize_currency_data_loop(price_data))
 
 #test
 
 
 def check_signal_test(prices_df: DataFrame, interval: timedelta, successful_indicators_count=4):
+    analize_block_delta = indicators_reader.sob_dict.get(prices_df["symbol"][0].split(":")[1]).get(interval_convertor.datetime_to_interval(interval))
+    print(analize_block_delta)
     volume_ind_signal = indicators_reader.VolumeIndicator(prices_df, prices_df.open, prices_df.close, prices_df.high, prices_df.low).get_signal()
     sp_ind_signal = indicators_reader.ScalpProIndicator(prices_df, prices_df.open, prices_df.close, prices_df.high, prices_df.low).get_signal()
     uma_ind_signal = indicators_reader.UMAIndicator(prices_df, prices_df.open, prices_df.close, prices_df.high, prices_df.low).get_signal()
-    sob_ind_signal = indicators_reader.SuperOrderBlockIndicator(prices_df, prices_df.open, prices_df.close, prices_df.high, prices_df.low, interval).get_signal()
+    sob_ind_signal = indicators_reader.SuperOrderBlockIndicator(prices_df, prices_df.open, prices_df.close, prices_df.high, prices_df.low, interval, analize_block_delta).get_signal()
     nw_ind_signal = indicators_reader.NadarayaWatsonIndicator(prices_df, prices_df.open, prices_df.close, prices_df.high, prices_df.low).get_signal()
 
     indicators_signals = [sob_ind_signal, volume_ind_signal, uma_ind_signal, nw_ind_signal, sp_ind_signal]
@@ -271,7 +270,7 @@ def signal_message_check_controller(price_data_frame: DataFrame, bars_to_analyse
 
 if __name__ == "__main__":
     currencies = [price_parser.get_currencies()[1]]  # [("BTCUSD", "COINBASE"), ("ETHUSD", "COINBASE")]  #
-    intervals = [Interval.in_1_minute]  # Interval.in_1_minute, Interval.in_5_minute, Interval.in_15_minute]
+    intervals = [Interval.in_1_minute, Interval.in_5_minute, Interval.in_15_minute]
 
     # profit_dict = Array('i', [0, 0])
 
@@ -280,7 +279,7 @@ if __name__ == "__main__":
         for currency in currencies:
             for ind_count in [4]:  # range(3, 5):
                 for deal_time in [3]:  # range(1, 6):
-                    df = price_parser.get_price_data(currency[0], currency[1], interval, 5000)
+                    df = price_parser.get_price_data(currency[0], currency[1], interval, 1500)
                     Process(target=signal_message_check_controller, args=(df, 500, ind_count, deal_time,)).start()
                     # signal_message_check_function(df, profit_dict)
 

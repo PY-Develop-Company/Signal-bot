@@ -1,9 +1,0 @@
-,has_signal,signal_type,msg,date,open_price,interval,indicators_count,symbol,exchange
-0,False,neutral,"NoneGBP/AUD Нет сигнала 3мин
-
-Проверка сигнала:
-    	Валютная пара: OANDA:GBPAUD"" таймфрейм: 0 days 00:01:00 время свечи: 2023-10-05 21:03:00
-    	Есть ли сигнал: False
-    	Показания индикаторов: {'LONG ⬆': [3, [', SuperOrderBlock', ', NadarayaWatson', ', ScalpPro']], 'SHORT ⬇': [1, [', UMA']], 'Нет сигнала': [1, [', Volume']]})
-
-    ",2023-10-05 21:03:00,1.91396,0 days 00:01:00,0,GBPAUD,OANDA

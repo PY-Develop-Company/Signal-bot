@@ -2,7 +2,10 @@ import random
 
 from aiogram import Bot, Dispatcher, types
 import logging
+
+import indicators_reader
 import price_parser
+from price_parser import PriceData
 import signal_maker
 from tvDatafeed import Interval
 import asyncio
@@ -13,8 +16,8 @@ from menu_text import *
 
 from signals import get_signal_by_type
 
-API_TOKEN = "6340912636:AAHACm2V2hDJUDXng0y0uhBRVRFJgqrok48"
-# API_TOKEN = "6538527964:AAHUUHZHYVnNFbYAPoMn4bRUMASKR0h9qfA"
+# API_TOKEN = "6340912636:AAHACm2V2hDJUDXng0y0uhBRVRFJgqrok48"
+API_TOKEN = "6538527964:AAHUUHZHYVnNFbYAPoMn4bRUMASKR0h9qfA"
 logging.basicConfig(level=logging.INFO)
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot)
@@ -239,34 +242,36 @@ async def signal_msg_send_delay():
     await asyncio.sleep(300)
 
 
-def signals_message_sender_controller(currencies, intervals):
-    async def signals_message_sender_function(currencies, intervals):
-        signal_maker.reset_signals(currencies, intervals)
+def signals_message_sender_controller(prices_data):
+    async def signals_message_sender_function(prices_data):
+        signal_maker.reset_signals_files(prices_data)
+        min1_prices_data = [pd for pd in prices_data if pd.interval == Interval.in_1_minute]
+        min5_prices_data = [pd for pd in prices_data if pd.interval == Interval.in_5_minute]
+        min15_prices_data = [pd for pd in prices_data if pd.interval == Interval.in_15_minute]
         while True:
             dfs = []
-            is_1min_created, _1 = signal_maker.is_signals_analized(currencies, [intervals[0]])
+            is_1min_created, _1 = signal_maker.is_signals_analized(min1_prices_data)
             is_all_signals_created = is_1min_created
             if is_1min_created and not(_1 is None):
                 print("is_1min_created:", is_1min_created)
                 print(_1)
                 if (_1.minute+1) % 5 == 0:
-                    is_5min_created, _5 = signal_maker.is_signals_analized(currencies, [intervals[1]])
+                    is_5min_created, _5 = signal_maker.is_signals_analized(min5_prices_data)
                     is_all_signals_created = is_all_signals_created and is_5min_created
                     print("is_5min_created:", is_5min_created)
                     if (_1.minute+1) % 15 == 0:
-                        is_15min_created, _15 = signal_maker.is_signals_analized(currencies, [intervals[2]])
+                        is_15min_created, _15 = signal_maker.is_signals_analized(min15_prices_data)
                         is_all_signals_created = is_all_signals_created and is_15min_created
                         print("is_15min_created:", is_15min_created)
 
             if is_all_signals_created:
                 print("all created")
-                for interval in intervals:
-                    for currency in currencies:
-                        df = signal_maker.read_signal_data(currency[0], interval)
-                        if df is None:
-                            continue
-                        if df.has_signal[0]:
-                            dfs.append(df)
+                for pd in prices_data:
+                    df = signal_maker.read_signal_data(pd.symbol, pd.interval)
+                    if df is None:
+                        continue
+                    if df.has_signal[0]:
+                        dfs.append(df)
 
                 # print(dfs)
                 if len(dfs) > 0:
@@ -290,23 +295,27 @@ def signals_message_sender_controller(currencies, intervals):
                     time_duration = timedelta(hours=hours, minutes=minutes, seconds=seconds)
                     multiprocessing.Process(target=handle_signal_msg_controller, args=(signal, df.msg[0], df.symbol[0], df.exchange[0], time_duration, df.open_price[0], ), daemon=True).start()
                     await signal_msg_send_delay()
-                signal_maker.reset_signals(currencies, intervals)
+                signal_maker.reset_signals_files(prices_data)
             await asyncio.sleep(1)
 
-    asyncio.run(signals_message_sender_function(currencies, intervals))
+    asyncio.run(signals_message_sender_function(prices_data))
 
 
 if __name__ == '__main__':
     from aiogram import executor
 
     currencies = price_parser.get_currencies()
-    intervals = [Interval.in_1_minute, Interval.in_5_minute, Interval.in_15_minute]
+    intervals = [Interval.in_15_minute] #[Interval.in_1_minute, Interval.in_5_minute, Interval.in_15_minute]
     price_parser.create_parce_currencies_with_intervals_callbacks(currencies, intervals)
+
+    prices_data = []
 
     for interval in intervals:
         for currency in currencies:
-            multiprocessing.Process(target=signal_maker.analize_currency_data_controller, args=(currency, interval,)).start()
+            pd = PriceData(currency[0], currency[1], interval)
+            prices_data.append(pd)
+            multiprocessing.Process(target=signal_maker.analize_currency_data_controller, args=(pd,)).start()
 
-    multiprocessing.Process(target=signals_message_sender_controller, args=(currencies, intervals,)).start()
+    multiprocessing.Process(target=signals_message_sender_controller, args=(prices_data,)).start()
 
     executor.start_polling(dp, skip_updates=True)

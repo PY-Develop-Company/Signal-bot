@@ -1,0 +1,26 @@
+,datetime,is_profit,signal,open_signal_price,close_signal_price,SuperOrderBlock,Volume,UMA,NW,ScalpPro
+0,2023-10-05 14:15:00,False,long,0.87356,0.87262,long,neutral,long,long,long
+1,2023-10-04 19:00:00,False,long,0.87021,0.86957,long,neutral,long,long,long
+2,2023-10-04 16:00:00,False,long,0.86951,0.86916,long,long,long,short,long
+3,2023-10-03 04:15:00,True,short,0.86972,0.86922,short,neutral,short,short,short
+4,2023-10-03 03:15:00,True,short,0.86966,0.86964,short,neutral,short,short,short
+5,2023-10-03 02:00:00,False,short,0.87004,0.87006,short,neutral,short,short,short
+6,2023-10-02 23:15:00,True,short,0.87044,0.87002,short,neutral,short,short,short
+7,2023-10-02 21:45:00,True,short,0.87028,0.8702,short,neutral,short,short,short
+8,2023-10-02 16:15:00,False,short,0.87065,0.87163,short,neutral,short,short,short
+9,2023-10-02 14:45:00,False,short,0.87024,0.8706,short,neutral,short,short,short
+10,2023-10-02 14:15:00,True,short,0.87064,0.87026,short,neutral,short,short,short
+11,2023-10-02 11:00:00,True,short,0.87088,0.87075,short,neutral,short,short,short
+12,2023-09-29 10:00:00,True,long,0.87092,0.87127,long,neutral,long,long,long
+13,2023-09-29 00:30:00,True,long,0.86678,0.86698,long,neutral,long,long,long
+14,2023-09-28 12:00:00,True,long,0.86058,0.86148,long,neutral,long,long,long
+15,2023-09-28 10:30:00,True,long,0.85998,0.86003,long,neutral,long,long,long
+16,2023-09-28 08:30:00,False,long,0.86005,0.85998,long,neutral,long,long,long
+17,2023-09-28 01:00:00,False,short,0.85712,0.85714,short,short,short,long,short
+18,2023-09-27 04:30:00,False,long,0.86442,0.86394,long,neutral,long,long,long
+19,2023-09-26 18:45:00,True,long,0.8651,0.86544,long,neutral,long,long,long
+20,2023-09-26 13:15:00,False,long,0.86446,0.86418,long,neutral,long,long,long
+21,2023-09-26 12:45:00,False,long,0.86492,0.86435,long,long,long,long,long
+22,2023-09-25 20:00:00,False,short,0.86496,0.86514,short,neutral,short,short,short
+23,2023-09-25 09:15:00,False,short,0.8656,0.86616,short,neutral,short,short,short
+24,2023-09-25 00:30:00,False,short,0.86794,0.86816,short,neutral,short,short,short

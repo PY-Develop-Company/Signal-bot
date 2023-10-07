@@ -6,7 +6,7 @@ import json
 import os
 from pandas import DataFrame, read_csv
 
-trade_pause_wait_time = 60 # 1 hour
+trade_pause_wait_time = 60*5
 
 currencies_path = "users/currencies.txt"
 currencies_data_path = "currencies_data/"
@@ -14,6 +14,13 @@ currencies_data_path = "currencies_data/"
 currencies_requests_last_check_date = {}
 tv = TvDatafeed()
 tvl = TvDatafeedLive()
+
+
+class PriceData:
+    def __init__(self, symbol: str, exchange: str, interval: Interval):
+        self.symbol = symbol
+        self.exchange = exchange
+        self.interval = interval
 
 
 def create_save_currencies_files(currencies, intervals):
@@ -59,8 +66,8 @@ def is_currency_file_changed(currency, interval: Interval):
     return True, df
 
 
-def reset_currency_file(currency, interval):
-    path = currencies_data_path + currency[0] + str(interval).replace(".", "") + ".csv"
+def reset_currency_file(symbol, interval):
+    path = currencies_data_path + symbol + str(interval).replace(".", "") + ".csv"
     if os.path.exists(path):
         os.remove(path)
 
@@ -125,7 +132,3 @@ def create_parce_currencies_with_intervals_callbacks(currencies, intervals: [Int
             print("Error", e)
             time.sleep(trade_pause_wait_time)
             print("waited")
-
-
-if __name__ == "__main__":
-    print(tv.search_symbol("BTCUSD", "COINBASE"))

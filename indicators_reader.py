@@ -1,10 +1,80 @@
 import numpy as np
 import pandas
 import math
+from tvDatafeed import Interval
 from datetime import timedelta
 from pandas import Series
 import plotly.graph_objects as go
 from signals import *
+import price_parser
+import asyncio
+from interval_convertor import datetime_to_interval
+
+sob_dict = {
+    "EURUSD": {
+        Interval.in_1_minute: 0.0015,
+        Interval.in_3_minute: 0.0025,
+        Interval.in_5_minute: 0.0033,
+        Interval.in_15_minute: 0.0045,
+        Interval.in_30_minute: 0.006
+    },
+    "AUDUSD": {
+        Interval.in_1_minute: 0.0015,
+        Interval.in_3_minute: 0.0024,
+        Interval.in_5_minute: 0.0032,
+        Interval.in_15_minute: 0.0042,
+        Interval.in_30_minute: 0.0053
+    },
+    "AUDCAD": {
+        Interval.in_1_minute: 0.0019,
+        Interval.in_3_minute: 0.0031,
+        Interval.in_5_minute: 0.0042,
+        Interval.in_15_minute: 0.0056,
+        Interval.in_30_minute: 0.0064
+    },
+    "EURJPY": {
+        Interval.in_1_minute: 0.0026,
+        Interval.in_3_minute: 0.0034,
+        Interval.in_5_minute: 0.0049,
+        Interval.in_15_minute: 0.0065,
+        Interval.in_30_minute: 0.0083
+    },
+    "EURCAD": {
+        Interval.in_1_minute: 0.0039,
+        Interval.in_3_minute: 0.0058,
+        Interval.in_5_minute: 0.0065,
+        Interval.in_15_minute: 0.0079,
+        Interval.in_30_minute: 0.0091
+    },
+    "AUDCHF": {
+        Interval.in_1_minute: 0.001,
+        Interval.in_3_minute: 0.0018,
+        Interval.in_5_minute: 0.0026,
+        Interval.in_15_minute: 0.0037,
+        Interval.in_30_minute: 0.0047
+    },
+    "GBPUSD": {
+        Interval.in_1_minute: 0.0021,
+        Interval.in_3_minute: 0.0033,
+        Interval.in_5_minute: 0.0041,
+        Interval.in_15_minute: 0.0053,
+        Interval.in_30_minute: 0.0065
+    },
+    "AUDJPY": {
+        Interval.in_1_minute: 0.0025,
+        Interval.in_3_minute: 0.0037,
+        Interval.in_5_minute: 0.0046,
+        Interval.in_15_minute: 0.0056,
+        Interval.in_30_minute: 0.0068
+    },
+    "GBPAUD": {
+        Interval.in_1_minute: 0.0045,
+        Interval.in_3_minute: 0.0067,
+        Interval.in_5_minute: 0.0088,
+        Interval.in_15_minute: 0.0102,
+        Interval.in_30_minute: 0.0121
+    }
+}
 
 
 class Indicator:
@@ -25,13 +95,15 @@ class Indicator:
 
 
 class SuperOrderBlockIndicator(Indicator):
-    def __init__(self, src, open, close, high, low, interval: timedelta, obMaxBoxSet=10, fvgMaxBoxSet=10):
+    def __init__(self, src, open, close, high, low, interval: timedelta, analize_block_delta, obMaxBoxSet=10,
+                 fvgMaxBoxSet=10):
         super().__init__(src, open, close, high, low)
         self.interval = interval
         obMaxBoxSet = clamp(obMaxBoxSet, 1, 100)
         fvgMaxBoxSet = clamp(fvgMaxBoxSet, 1, 100)
         self.obMaxBoxSet = obMaxBoxSet
         self.fvgMaxBoxSet = fvgMaxBoxSet
+        self.analize_block_delta = analize_block_delta
         self.name = "SuperOrderBlock"
 
     def is_up_bar(self, index):
@@ -95,6 +167,28 @@ class SuperOrderBlockIndicator(Indicator):
             is_price_in_box = (high > boxes[i].bottom > low) or (high > boxes[i].top > low)
             if self.src.datetime[box_index] == boxes[i].right and not is_price_in_box:
                 boxes[i].right = self.src.datetime[box_index] + self.interval
+
+    def is_block_in_range(self, block, low_price, high_price):
+        return (block.top >= low_price) and (high_price >= block.bottom)
+
+    def is_closing_block_nearby(self, signal, unclosed_blocks):
+        if signal.type == NeutralSignal().type:
+            return False
+        elif signal.type == LongSignal().type:
+            analize_range = self.close[0] + self.analize_block_delta
+            for block in unclosed_blocks:
+                if not (block.signal.type == ShortSignal().type):
+                    continue
+                if self.is_block_in_range(block, self.close[0], analize_range):
+                    return True
+        elif signal.type == ShortSignal().type:
+            analize_range = self.close[0] - self.analize_block_delta
+            for block in unclosed_blocks:
+                if not (block.signal.type == LongSignal().type):
+                    continue
+                if self.is_block_in_range(block, analize_range, self.close[0]):
+                    return True
+        return False
 
     def get_signal(self):
         self.src.datetime = pandas.to_datetime(self.src.datetime)
@@ -166,6 +260,7 @@ class SuperOrderBlockIndicator(Indicator):
 
         date_time = self.src.datetime[0]
 
+        not_closed_boxes = []
         boxes = _bullBoxesOB + _bearBoxesOB + _bullBoxesFVG + _bearBoxesFVG
         return_signal = NeutralSignal()
         signal_boxes = []
@@ -173,6 +268,10 @@ class SuperOrderBlockIndicator(Indicator):
             signal = box.check_signal(self.low[0], self.high[0], date_time)
             if not (signal.type == NeutralSignal.type):
                 signal_boxes.append(box)
+
+        for box in boxes:
+            if box.right == self.src["datetime"][0]:
+                not_closed_boxes.append(box)
 
         if len(signal_boxes) > 0:
             biggest_box = signal_boxes[0]
@@ -188,31 +287,42 @@ class SuperOrderBlockIndicator(Indicator):
                         biggest_box_height = biggest_box.top - biggest_box.bottom
             return_signal = biggest_box.signal
 
-        # self.graph(_bullBoxesOB, _bearBoxesOB, _bullBoxesFVG, _bearBoxesFVG)
+        # self.graph(not_closed_boxes)
+
+        # if self.is_closing_block_nearby(return_signal, not_closed_boxes):
+        #     print("catched vlosing block", self.src["datetime"][0])
+        #     return NeutralSignal(), self.name
 
         return return_signal, self.name
 
-    def graph(self, _bullBoxesOB, _bearBoxesOB, _bullBoxesFVG, _bearBoxesFVG):
-        scatters1 = []
-        scatters2 = []
-        scatters3 = []
-        scatters4 = []
-        for box in _bullBoxesOB:
-            scatters1.append(go.Scatter(x=[box.left, box.left, box.right, box.right, box.left],
-                                        y=[box.bottom, box.top, box.top, box.bottom, box.bottom],
-                                        fill="toself", fillcolor='rgba(0, 255, 0,0.1)'))
-        for box in _bearBoxesOB:
-            scatters2.append(go.Scatter(x=[box.left, box.left, box.right, box.right, box.left],
-                                        y=[box.bottom, box.top, box.top, box.bottom, box.bottom],
-                                        fill="toself", fillcolor='rgba(255, 0, 0,0.1)'))
-        for box in _bullBoxesFVG:
-            scatters3.append(go.Scatter(x=[box.left, box.left, box.right, box.right, box.left],
-                                        y=[box.bottom, box.top, box.top, box.bottom, box.bottom],
-                                        fill="toself", fillcolor='rgba(0, 255, 0,0.1)'))
-        for box in _bearBoxesFVG:
-            scatters4.append(go.Scatter(x=[box.left, box.left, box.right, box.right, box.left],
-                                        y=[box.bottom, box.top, box.top, box.bottom, box.bottom],
-                                        fill="toself", fillcolor='rgba(255, 0, 0,0.1)'))
+    # """_bullBoxesOB, _bearBoxesOB, _bullBoxesFVG, _bearBoxesFVG):"""
+
+    def graph(self, boxes):
+        unclosed_boxes_scatter = []
+        for box in boxes:
+            unclosed_boxes_scatter.append(go.Scatter(x=[box.left, box.left, box.right, box.right, box.left],
+                                                     y=[box.bottom, box.top, box.top, box.bottom, box.bottom],
+                                                     fill="toself", fillcolor='rgba(0, 255, 0,0.1)'))
+        # scatters1 = []
+        # scatters2 = []
+        # scatters3 = []
+        # scatters4 = []
+        # for box in _bullBoxesOB:
+        #     scatters1.append(go.Scatter(x=[box.left, box.left, box.right, box.right, box.left],
+        #                                 y=[box.bottom, box.top, box.top, box.bottom, box.bottom],
+        #                                 fill="toself", fillcolor='rgba(0, 255, 0,0.1)'))
+        # for box in _bearBoxesOB:
+        #     scatters2.append(go.Scatter(x=[box.left, box.left, box.right, box.right, box.left],
+        #                                 y=[box.bottom, box.top, box.top, box.bottom, box.bottom],
+        #                                 fill="toself", fillcolor='rgba(255, 0, 0,0.1)'))
+        # for box in _bullBoxesFVG:
+        #     scatters3.append(go.Scatter(x=[box.left, box.left, box.right, box.right, box.left],
+        #                                 y=[box.bottom, box.top, box.top, box.bottom, box.bottom],
+        #                                 fill="toself", fillcolor='rgba(0, 255, 0,0.1)'))
+        # for box in _bearBoxesFVG:
+        #     scatters4.append(go.Scatter(x=[box.left, box.left, box.right, box.right, box.left],
+        #                                 y=[box.bottom, box.top, box.top, box.bottom, box.bottom],
+        #                                 fill="toself", fillcolor='rgba(255, 0, 0,0.1)'))
         fig = go.Figure(
             data=[
                 go.Candlestick(
@@ -222,10 +332,11 @@ class SuperOrderBlockIndicator(Indicator):
                     low=self.src["low"],
                     close=self.src["close"]
                 ),
-                *scatters1,
-                *scatters2,
-                *scatters3,
-                *scatters4,
+                *unclosed_boxes_scatter,
+                # *scatters1,
+                # *scatters2,
+                # *scatters3,
+                # *scatters4,
                 go.Candlestick(
                     x=self.src["datetime"],
                     open=self.src["open"],
@@ -423,7 +534,7 @@ class NadarayaWatsonIndicator(Indicator):
         self.name = "NadarayaWatson"
 
     def gauss(self, x, k):
-        return math.exp(-(pow(x, 2)/(k * k * 2)))
+        return math.exp(-(pow(x, 2) / (k * k * 2)))
 
     def get_signal(self):
         price_count = len(self.close)
@@ -529,7 +640,39 @@ def clamp(value, min_value, max_value):
     return max(min(value, max_value), min_value)
 
 
-# if __name__ == "__main__":
-#     df = price_parser.get_price_data("EURUSD", "OANDA", Interval.in_1_minute, bars_count=1000)
-#     interval = df.datetime[0] - df.datetime[1]
-#     data = get_super_order_block_signal(df, df.open, df.close, df.high, df.low, interval)
+async def signal_message_check_function_child(symbol, deal_time, check_df, full_df, interval):
+    interval_dt = check_df.datetime[0] - check_df.datetime[1]
+    symbol = symbol.split(":")[1]
+    analize_block_delta = sob_dict.get(symbol).get(interval)
+    sob_ind = SuperOrderBlockIndicator(check_df, check_df.open, check_df.close, check_df.high, check_df.low, interval_dt,
+                                       analize_block_delta)
+    sob_ind.get_signal()
+
+
+def signal_message_check_controller(price_data_frame, bars_to_analyse=200, deal_time=3):
+    async def signal_message_check_function(price_data_frame, bars_to_analyse=200, deal_time=3):
+        if len(price_data_frame) < bars_to_analyse:
+            return
+
+        interval = datetime_to_interval(price_data_frame["datetime"][0] - price_data_frame["datetime"][1])
+        symbol = price_data_frame["symbol"][0]
+
+        loop_count = len(price_data_frame) - bars_to_analyse
+        full_df = price_data_frame
+        tasks = []
+        for i in range(loop_count):
+            check_df = full_df.iloc[deal_time:].reset_index(drop=True)
+            t = asyncio.create_task(
+                coro=signal_message_check_function_child(symbol, deal_time, check_df, full_df, interval))
+            tasks.append(t)
+            full_df = price_data_frame[i + 1:i + bars_to_analyse + deal_time + 1].reset_index(drop=True)
+            full_df = full_df.iloc[1:].reset_index(drop=True)
+
+        await asyncio.gather(*tasks)
+
+    asyncio.run(signal_message_check_function(price_data_frame, bars_to_analyse, deal_time))
+
+
+if __name__ == "__main__":
+    df = price_parser.get_price_data("EURUSD", "OANDA", Interval.in_1_minute, bars_count=1000)
+    signal_message_check_controller(df, 500, 3)
