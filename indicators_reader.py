@@ -88,7 +88,7 @@ class Indicator:
 
     def get_signal(self) -> Signal:
         print("no get_signal implemented")
-        return NeutralSignal(), self.name
+        return NeutralSignal()
 
     def graph(self):
         print("no graph implemented")
@@ -289,11 +289,11 @@ class SuperOrderBlockIndicator(Indicator):
 
         # self.graph(not_closed_boxes)
 
-        # if self.is_closing_block_nearby(return_signal, not_closed_boxes):
-        #     print("catched vlosing block", self.src["datetime"][0])
-        #     return NeutralSignal(), self.name
+        if self.is_closing_block_nearby(return_signal, not_closed_boxes):
+            print("catched vlosing block", self.src["datetime"][0])
+            return NeutralSignal()
 
-        return return_signal, self.name
+        return return_signal
 
     # """_bullBoxesOB, _bearBoxesOB, _bullBoxesFVG, _bearBoxesFVG):"""
 
@@ -398,7 +398,7 @@ class ScalpProIndicator(Indicator):
         else:
             res_signal = LongSignal() if macd[0] > smooth3[0] else (
                 ShortSignal() if macd[0] < smooth3[0] else NeutralSignal())
-        return res_signal, self.name
+        return res_signal
 
     def graph(self, smooth3, macd):
         fig = go.Figure(
@@ -457,7 +457,7 @@ class VolumeIndicator(Indicator):
         elif sell_signal_count == self.bars_count:
             signal = ShortSignal()
 
-        return signal, self.name
+        return signal
 
 
 class UMAIndicator(Indicator):
@@ -488,7 +488,7 @@ class UMAIndicator(Indicator):
             signals.append(NeutralSignal())
 
         # self.graph(avg_short, avg_long)
-        return signals[0], self.name
+        return signals[0]
 
     def graph(self, avg_short, avg_long):
         fig = go.Figure(
@@ -584,7 +584,7 @@ class NadarayaWatsonIndicator(Indicator):
         #     buy_sig.append(buy_append_val)
         #     sell_sig.append(sell_append_val)
         # self.graph(buy_sig, sell_sig, upsae, downsae)
-        return signals[0][1], self.name
+        return signals[0][1]
 
     def graph(self, buy_sig, sell_sig, upsae, downsae):
         fig = go.Figure(
@@ -638,41 +638,3 @@ class NadarayaWatsonIndicator(Indicator):
 
 def clamp(value, min_value, max_value):
     return max(min(value, max_value), min_value)
-
-
-async def signal_message_check_function_child(symbol, deal_time, check_df, full_df, interval):
-    interval_dt = check_df.datetime[0] - check_df.datetime[1]
-    symbol = symbol.split(":")[1]
-    analize_block_delta = sob_dict.get(symbol).get(interval)
-    sob_ind = SuperOrderBlockIndicator(check_df, check_df.open, check_df.close, check_df.high, check_df.low, interval_dt,
-                                       analize_block_delta)
-    sob_ind.get_signal()
-
-
-def signal_message_check_controller(price_data_frame, bars_to_analyse=200, deal_time=3):
-    async def signal_message_check_function(price_data_frame, bars_to_analyse=200, deal_time=3):
-        if len(price_data_frame) < bars_to_analyse:
-            return
-
-        interval = datetime_to_interval(price_data_frame["datetime"][0] - price_data_frame["datetime"][1])
-        symbol = price_data_frame["symbol"][0]
-
-        loop_count = len(price_data_frame) - bars_to_analyse
-        full_df = price_data_frame
-        tasks = []
-        for i in range(loop_count):
-            check_df = full_df.iloc[deal_time:].reset_index(drop=True)
-            t = asyncio.create_task(
-                coro=signal_message_check_function_child(symbol, deal_time, check_df, full_df, interval))
-            tasks.append(t)
-            full_df = price_data_frame[i + 1:i + bars_to_analyse + deal_time + 1].reset_index(drop=True)
-            full_df = full_df.iloc[1:].reset_index(drop=True)
-
-        await asyncio.gather(*tasks)
-
-    asyncio.run(signal_message_check_function(price_data_frame, bars_to_analyse, deal_time))
-
-
-if __name__ == "__main__":
-    df = price_parser.get_price_data("EURUSD", "OANDA", Interval.in_1_minute, bars_count=1000)
-    signal_message_check_controller(df, 500, 3)

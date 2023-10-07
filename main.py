@@ -4,6 +4,7 @@ from aiogram import Bot, Dispatcher, types
 import logging
 
 import indicators_reader
+import interval_convertor
 import price_parser
 from price_parser import PriceData
 import signal_maker
@@ -218,20 +219,21 @@ async def handle_media(message: types.Message):
                 await open_menu(message, not_vip_markup)
 
 
-def handle_signal_msg_controller(signal, msg, symbol, exchange, interval, open_position_price):
+def handle_signal_msg_controller(signal, msg, pd: PriceData, open_position_price):
     try:
-        asyncio.run(handle_signal_msg(signal, msg, symbol, exchange, interval, open_position_price))
+        asyncio.run(handle_signal_msg(signal, msg, pd, open_position_price))
     except Exception as e:
         print("aaa", e)
 
 
-async def handle_signal_msg(signal, msg, symbol, exchange, interval, open_position_price):
+async def handle_signal_msg(signal, msg, pd: PriceData, open_position_price):
     try:
         deposit_users_ids = get_deposit_users_ids()
         await send_photo_text_message_to_users(deposit_users_ids, signal.photo_path, msg)
-        print("signal mgs:", signal, msg, symbol, exchange, interval, open_position_price)
+        print("signal mgs:", signal, msg, pd.symbol, pd.exchange, pd.interval, open_position_price)
 
-        close_signal_message, is_profit = await signal_maker.close_position(open_position_price, signal, symbol, exchange, interval, bars_count=3)
+        close_signal_message, is_profit = await signal_maker.close_position(open_position_price, signal, pd,
+                                                                            bars_count=3)
         img_path = "./img/profit.jpg" if is_profit else "./img/loss.jpg"
         await send_photo_text_message_to_users(deposit_users_ids, img_path, close_signal_message)
     except Exception as e:
@@ -252,14 +254,14 @@ def signals_message_sender_controller(prices_data):
             dfs = []
             is_1min_created, _1 = signal_maker.is_signals_analized(min1_prices_data)
             is_all_signals_created = is_1min_created
-            if is_1min_created and not(_1 is None):
+            if is_1min_created and not (_1 is None):
                 print("is_1min_created:", is_1min_created)
                 print(_1)
-                if (_1.minute+1) % 5 == 0:
+                if (_1.minute + 1) % 5 == 0:
                     is_5min_created, _5 = signal_maker.is_signals_analized(min5_prices_data)
                     is_all_signals_created = is_all_signals_created and is_5min_created
                     print("is_5min_created:", is_5min_created)
-                    if (_1.minute+1) % 15 == 0:
+                    if (_1.minute + 1) % 15 == 0:
                         is_15min_created, _15 = signal_maker.is_signals_analized(min15_prices_data)
                         is_all_signals_created = is_all_signals_created and is_15min_created
                         print("is_15min_created:", is_15min_created)
@@ -293,7 +295,10 @@ def signals_message_sender_controller(prices_data):
                     time_str = df.interval[0].split()[-1]
                     hours, minutes, seconds = map(int, time_str.split(':'))
                     time_duration = timedelta(hours=hours, minutes=minutes, seconds=seconds)
-                    multiprocessing.Process(target=handle_signal_msg_controller, args=(signal, df.msg[0], df.symbol[0], df.exchange[0], time_duration, df.open_price[0], ), daemon=True).start()
+                    pd = PriceData(df.symbol[0], df.exchange[0], interval_convertor.datetime_to_interval(time_duration))
+                    print("Error with pd", pd.interval)
+                    multiprocessing.Process(target=handle_signal_msg_controller,
+                                            args=(signal, df.msg[0], pd, df.open_price[0],), daemon=True).start()
                     await signal_msg_send_delay()
                 signal_maker.reset_signals_files(prices_data)
             await asyncio.sleep(1)
@@ -305,16 +310,24 @@ if __name__ == '__main__':
     from aiogram import executor
 
     currencies = price_parser.get_currencies()
-    intervals = [Interval.in_15_minute] #[Interval.in_1_minute, Interval.in_5_minute, Interval.in_15_minute]
+    intervals = [Interval.in_1_minute, Interval.in_3_minute, Interval.in_5_minute, Interval.in_15_minute,
+                 Interval.in_30_minute]
     price_parser.create_parce_currencies_with_intervals_callbacks(currencies, intervals)
 
     prices_data = []
+    prices_data_dict = {}
 
     for interval in intervals:
         for currency in currencies:
             pd = PriceData(currency[0], currency[1], interval)
+
+            pds = prices_data_dict.get(currency[0])
+            pds.append(pd)
+            prices_data_dict.update({currency[0]: pds})
             prices_data.append(pd)
-            multiprocessing.Process(target=signal_maker.analize_currency_data_controller, args=(pd,)).start()
+
+    for pds in prices_data_dict.values():
+        multiprocessing.Process(target=signal_maker.analize_currency_data_controller, args=(pds,)).start()
 
     multiprocessing.Process(target=signals_message_sender_controller, args=(prices_data,)).start()
 

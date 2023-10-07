@@ -1,4 +1,4 @@
-from interval_convertor import timedelta_to_string
+from interval_convertor import timedelta_to_close_string
 
 
 photo_long_path = "img/long.jpg"
@@ -25,7 +25,7 @@ class Signal:
         self.text = None
 
     def get_open_msg_text(self, symbol, interval):
-        return self.smile + symbol + " " + self.text + " " + timedelta_to_string(interval)
+        return self.smile + symbol + " " + self.text + " " + timedelta_to_close_string(interval)
 
     def get_photo_path(self):
         return self.photo_path

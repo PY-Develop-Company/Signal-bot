@@ -4,15 +4,16 @@ import math
 from datetime import timedelta
 
 
-def timedelta_to_string(interval):
-    delay_days = interval / Timedelta(days=1)
-    delay_hours = interval / Timedelta(hours=1)
-    delay_minutes = interval / Timedelta(minutes=1)
+def timedelta_to_close_string(interval, bars_count=3):
+    delay_days = int(interval / Timedelta(days=1) * bars_count)
+    delay_hours = int(interval / Timedelta(hours=1) * bars_count - delay_days*24)
+    delay_minutes = int(interval / Timedelta(minutes=1) * bars_count - delay_days*24*60 - delay_hours*60)
+
     if delay_days > 0:
-        str(int(delay_days * 3)) + "Д"
+        str(delay_days) + "Д"
     elif delay_hours > 0:
-        return str(int(delay_hours * 3)) + "ч"
-    return str(int(delay_minutes * 3)) + "мин"
+        return str(delay_hours) + "ч" + str(delay_minutes) + "м"
+    return str(delay_minutes) + "мин"
 
 
 def interval_to_datetime(interval: Interval):
@@ -50,3 +51,4 @@ def datetime_to_interval(datetime):
 
 def interval_to_string(interval):
     return str(interval).replace(".", "")
+

@@ -22,6 +22,14 @@ class PriceData:
         self.exchange = exchange
         self.interval = interval
 
+    def get_price_data(self, bars_count=500):
+        try:
+            priceData = tvl.get_hist(symbol=self.symbol, exchange=self.exchange, interval=self.interval, n_bars=bars_count)
+            priceData = priceData.reindex(index=priceData.index[::-1]).reset_index()
+            return priceData
+        except Exception as e:
+            print(e)
+
 
 def create_save_currencies_files(currencies, intervals):
     for cur in currencies:
@@ -95,15 +103,6 @@ def get_price_data_seis(seis, bars_count=500):
     return priceData
 
 
-def get_price_data(symbol, exchange, interval, bars_count=500):
-    try:
-        priceData = tvl.get_hist(symbol=symbol, exchange=exchange, interval=interval, n_bars=bars_count)
-        priceData = priceData.reindex(index=priceData.index[::-1]).reset_index()
-        return priceData
-    except Exception as e:
-        print("cccc", e)
-
-
 def update_currency_file_consumer(seis: Seis, data):
     try:
         # print("update:", seis.symbol, seis.interval, datetime.now())
@@ -126,9 +125,7 @@ def create_parce_currencies_with_intervals_callbacks(currencies, intervals: [Int
                     seis = tvl.new_seis(currency[0], currency[1], interval)
                     print("seis", seis)
                     consumer = tvl.new_consumer(seis, update_currency_file_consumer)
-                    tvl.session
             break
         except ValueError as e:
             print("Error", e)
             time.sleep(trade_pause_wait_time)
-            print("waited")
