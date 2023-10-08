@@ -5,32 +5,20 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c8e52443-fb39-41fa-9e09-4877251a22f1" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/analizer.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/debug_save/old/AUDCADIntervalin_15_minute_indicators_count_4deal_time3.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/debug_save/old/AUDCADIntervalin_1_minute_indicators_count_4deal_time3.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/debug_save/old/AUDCADIntervalin_5_minute_indicators_count_4deal_time3.csv" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/AUDCADIntervalin_15_minute_indicators_count_3deal_time3.csv" beforeDir="false" afterPath="$PROJECT_DIR$/debug_save/AUDCADIntervalin_15_minute_indicators_count_3deal_time3.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/AUDCADIntervalin_15_minute_indicators_count_4deal_time3.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/AUDCADIntervalin_1_minute_indicators_count_3deal_time3.csv" beforeDir="false" afterPath="$PROJECT_DIR$/debug_save/AUDCADIntervalin_1_minute_indicators_count_3deal_time3.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/AUDCADIntervalin_1_minute_indicators_count_4deal_time3.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/AUDCADIntervalin_5_minute_indicators_count_3deal_time3.csv" beforeDir="false" afterPath="$PROJECT_DIR$/debug_save/AUDCADIntervalin_5_minute_indicators_count_3deal_time3.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/AUDCADIntervalin_5_minute_indicators_count_4deal_time3.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/EURUSDIntervalin_15_minute_indicators_count_4deal_time3.csv" beforeDir="false" afterPath="$PROJECT_DIR$/debug_save/old/EURUSDIntervalin_15_minute_indicators_count_4deal_time3.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/EURUSDIntervalin_1_minute_indicators_count_4deal_time3.csv" beforeDir="false" afterPath="$PROJECT_DIR$/debug_save/old/EURUSDIntervalin_1_minute_indicators_count_4deal_time3.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/EURUSDIntervalin_5_minute_indicators_count_4deal_time3.csv" beforeDir="false" afterPath="$PROJECT_DIR$/debug_save/old/EURUSDIntervalin_5_minute_indicators_count_4deal_time3.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/newAUDCADIntervalin_15_minute_indicators_count_4deal_time3.csv" beforeDir="false" afterPath="$PROJECT_DIR$/debug_save/newAUDCADIntervalin_15_minute_indicators_count_4deal_time3.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/newAUDCADIntervalin_1_minute_indicators_count_4deal_time3.csv" beforeDir="false" afterPath="$PROJECT_DIR$/debug_save/newAUDCADIntervalin_1_minute_indicators_count_4deal_time3.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/newAUDCADIntervalin_5_minute_indicators_count_4deal_time3.csv" beforeDir="false" afterPath="$PROJECT_DIR$/debug_save/newAUDCADIntervalin_5_minute_indicators_count_4deal_time3.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug_save/AUDCADIntervalin_15_minute_indicators_count_4deal_time3.csv" beforeDir="false" afterPath="$PROJECT_DIR$/debug_save/AUDCADIntervalin_15_minute_indicators_count_4deal_time3.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug_save/AUDCADIntervalin_1_minute_indicators_count_4deal_time3.csv" beforeDir="false" afterPath="$PROJECT_DIR$/debug_save/AUDCADIntervalin_1_minute_indicators_count_4deal_time3.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug_save/AUDCADIntervalin_5_minute_indicators_count_4deal_time3.csv" beforeDir="false" afterPath="$PROJECT_DIR$/debug_save/AUDCADIntervalin_5_minute_indicators_count_4deal_time3.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/analizer.py" beforeDir="false" afterPath="$PROJECT_DIR$/analizer.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/currencies_data/EURUSDIntervalin_1_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/EURUSDIntervalin_1_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/debug/EURUSDIntervalin_15_minute_indicators_count_4.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/debug/EURUSDIntervalin_1_minute_indicators_count_4.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/debug/EURUSDIntervalin_5_minute_indicators_count_4.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/debug_save/old/EURUSDIntervalin_15_minute_indicators_count_4deal_time3.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/debug_save/old/EURUSDIntervalin_1_minute_indicators_count_4deal_time3.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/debug_save/old/EURUSDIntervalin_5_minute_indicators_count_4deal_time3.csv" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/indicators_reader.py" beforeDir="false" afterPath="$PROJECT_DIR$/indicators_reader.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/interval_convertor.py" beforeDir="false" afterPath="$PROJECT_DIR$/interval_convertor.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/price_parser.py" beforeDir="false" afterPath="$PROJECT_DIR$/price_parser.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/signal_maker.py" beforeDir="false" afterPath="$PROJECT_DIR$/signal_maker.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals.py" beforeDir="false" afterPath="$PROJECT_DIR$/signals.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ta_test.py" beforeDir="false" afterPath="$PROJECT_DIR$/ta_test.py" afterDir="false" />
     </list>
     <list id="cbe571c8-b52a-4250-a9e3-ad1313cd5330" name="Changes by Alex" comment="" />
@@ -72,17 +60,17 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "ShowUsagesActions.previewPropertyKey": "true",
-    "codeWithMe.voiceChat.enabledByDefault": "false",
-    "git-widget-placeholder": "stream",
-    "last_opened_file_path": "C:/Users/Alex/Projects/Programming/Vilors/Signal-bot",
-    "settings.editor.selected.configurable": "preferences.editor"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;ShowUsagesActions.previewPropertyKey&quot;: &quot;true&quot;,
+    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;stream&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/Alex/Projects/Programming/Vilors/MetaBot&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.editor&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\Alex\Projects\Programming\Vilors\Signal-bot\img" />
@@ -94,7 +82,7 @@
       <recent name="C:\Users\Alex\Projects\Programming\Vilors\Signal-bot\img" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.ta_test">
+  <component name="RunManager" selected="Python.signal_maker">
     <configuration name="indicators_reader" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="Signal-bot" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -223,8 +211,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.ta_test" />
         <item itemvalue="Python.signal_maker" />
+        <item itemvalue="Python.ta_test" />
         <item itemvalue="Python.interval_convertor" />
         <item itemvalue="Python.indicators_reader" />
         <item itemvalue="Python.signals" />

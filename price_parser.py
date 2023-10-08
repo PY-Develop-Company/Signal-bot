@@ -111,6 +111,7 @@ def update_currency_file_consumer(seis: Seis, data):
         interval = seis.interval
         symbol = seis.symbol
         save_currency_file(price_data, symbol, interval)
+        print("updated price data:", seis.symbol, seis.interval)
     except Exception as e:
         print("bbb", e)
 

@@ -24,7 +24,7 @@ signal_last_update = datetime.now()
 def is_profit(open_price, close_price, signal):
     profit = (True if close_price >= open_price else False) if (signal.type == LongSignal.type) else (
         True if (close_price <= open_price) else False)
-    print("profit", profit, signal, open_price, close_price)
+    # print("profit", profit, signal, open_price, close_price)
     return profit
 
 
@@ -100,61 +100,81 @@ def reset_signals_files(prices_data: []):
             os.remove(path)
 
 
-def analize_currency_data_controller(prices_data):
-    def analize_currency_data_function(prices_data: PriceData):
+def analize_currency_data_controller(prices_data, main_pd: PriceData):
+    def analize_currency_data_function(prices_data, main_pd: PriceData):
         try:
-            for pd in prices_data:
-                is_file_changed, price_df = price_parser.is_currency_file_changed(pd.symbol, pd.interval)
+            main_is_file_changed, main_price_df = price_parser.is_currency_file_changed(main_pd.symbol, main_pd.interval)
+            if main_is_file_changed:
+                is_files_changed = {}
+                prices_df = {}
+                for pd in prices_data:
+                    is_file_changed, price_df = price_parser.is_currency_file_changed(pd.symbol, pd.interval)
+                    is_files_changed.update({pd.interval: is_file_changed})
+                    if is_file_changed:
+                        prices_df.update({pd.interval: price_df})
 
-                if is_file_changed:
-                    symbol = pd.symbol[:3] + pd.symbol[3:]
+                symbol = pd.symbol[:3] + pd.symbol[3:]
 
-                    interval_td = price_df.datetime[0] - price_df.datetime[1]
-                    analizer = MainAnalizer(5)
-                    has_signal, signal, indicators_count, debug_text = analizer.analize(price_df)
+                interval_td = main_price_df.datetime[0] - main_price_df.datetime[1]
+                analizer = MainAnalizer(4)
+                has_signal = False
+                signal = NeutralSignal()
+                main_has_signal, main_signal, main_indicators_count, main_debug_text = analizer.analize(main_price_df, main_pd.interval)
 
-                    open_position_price = price_df.close[0]
-                    msg = signal.get_open_msg_text(symbol, interval_td)
-                    data = [[has_signal, signal.type, msg + debug_text, price_df.datetime[0], open_position_price,
-                             interval_td, indicators_count, pd.symbol, pd.exchange]]
-                    df = DataFrame(data, columns=["has_signal", "signal_type", "msg", "date", "open_price", "interval",
-                                                  "indicators_count", "symbol", "exchange"])
-                    save_signal_data(df, pd.symbol, pd.interval)
+                sob_signals_count = 0
+                if main_has_signal:
+                    for p_df in prices_df.items():
+                        sob_analizer = SOBAnalizer()
+                        sob_has_signal, sob_signal, _ = sob_analizer.analize(p_df[1], p_df[0].interval)
+                        if sob_has_signal and sob_signal.type == main_signal.type:
+                            sob_signals_count += 1
+                    if sob_signals_count >= 2:
+                        has_signal = True
+                        signal = main_signal
+                    print("sob_signals_count", sob_signals_count)
 
-                    with open(f"{currency_check_ended}{pd.symbol}{str(pd.interval).replace('.', '')}.txt", "w") as file:
-                        pass
+                open_position_price = main_price_df.close[0]
+                msg = signal.get_open_msg_text(symbol, interval_td)
+                data = [[has_signal, signal.type, msg + main_debug_text, main_price_df.datetime[0], open_position_price,
+                         interval_td, main_indicators_count, sob_signals_count, pd.symbol, pd.exchange]]
+                df = DataFrame(data, columns=["has_signal", "signal_type", "msg", "date", "open_price", "interval",
+                                              "indicators_count", "sob_signals_count", "symbol", "exchange"])
+                save_signal_data(df, pd.symbol, pd.interval)
+
+                with open(f"{currency_check_ended}{pd.symbol}{str(pd.interval).replace('.', '')}.txt", "w") as file:
+                    pass
         except Exception as e:
             print(e)
 
-    async def analize_currency_data_loop(prices_data):
+    async def analize_currency_data_loop(prices_data, main_pd: PriceData):
         for pd in prices_data:
             price_parser.reset_currency_file(pd.symbol, pd.interval)
         while True:
-            analize_currency_data_function(prices_data)
+            analize_currency_data_function(prices_data, main_pd)
             await asyncio.sleep(1)
 
-    asyncio.run(analize_currency_data_loop(prices_data))
+    asyncio.run(analize_currency_data_loop(prices_data, main_pd))
 
 
 # test
 
 
-async def signal_message_check_function_child(full_df, deal_times):
+async def signal_message_check_function_child(pd, full_df, deal_times):
     check_df = full_df.iloc[deal_times[-1]:].reset_index(drop=True)
 
-    sob_is_signal, sob_signal, sob_debug_text = SOBAnalizer().analize(check_df)
+    sob_is_signal, sob_signal, sob_debug_text = SOBAnalizer().analize(check_df, pd.interval)
     sp_is_signal, sp_signal, sp_debug_text = SPAnalizer().analize(check_df)
     nw_is_signal, nw_signal, nw_debug_text = NWAnalizer().analize(check_df)
     uma_is_signal, uma_signal, uma_debug_text = UMAAnalizer().analize(check_df)
     volume_is_signal, volume_signal, volume_debug_text = VolumeAnalizer().analize(check_df)
 
     open_position_price = check_df.close[0]
-    data_el = [check_df["datetime"][0],
-               sob_signal.type, volume_signal.type, uma_signal.type, nw_signal.type, sp_signal.type]
+    data_el = [check_df["datetime"][0], sob_signal.type, volume_signal.type, uma_signal.type, nw_signal.type, sp_signal.type]
     deal_results = []
+    print(f"analize {check_df['datetime'][0]}: \n\t", "open:", open_position_price)
+
     for deal_time in deal_times:
         close_position_price = full_df.close[0+deal_times[-1]-deal_time]
-        print(f"analize {check_df['datetime'][0]} dealtime {deal_time}: \n\t", "open:", open_position_price, "close:", close_position_price)
         has_profit_long = is_profit(open_position_price, close_position_price, LongSignal())
         deal_results.append(has_profit_long)
 
@@ -164,22 +184,21 @@ async def signal_message_check_function_child(full_df, deal_times):
     return data_el
 
 
-def signal_message_check_controller(price_data_frame: DataFrame, bars_to_analyse, successful_indicators_count,
+def signal_message_check_controller(pd, price_data_frame: DataFrame, bars_to_analyse, successful_indicators_count,
                                     deal_times):
-    async def signal_message_check_function(price_data_frame: DataFrame, bars_to_analyse,
+    async def signal_message_check_function(pd, price_data_frame: DataFrame, bars_to_analyse,
                                             successful_indicators_count, deal_times):
         if len(price_data_frame) < bars_to_analyse:
             return
         df_data = []
-        interval = price_data_frame["datetime"][0] - price_data_frame["datetime"][1]
         symbol = price_data_frame["symbol"][0]
 
-        loop_count = len(price_data_frame) - bars_to_analyse
+        loop_count = len(price_data_frame) - bars_to_analyse - deal_times[-1]
         full_df = price_data_frame
         tasks = []
         for i in range(loop_count):
             t = asyncio.create_task(
-                coro=signal_message_check_function_child(full_df, deal_times))
+                coro=signal_message_check_function_child(pd, full_df, deal_times))
             tasks.append(t)
             full_df = price_data_frame[i + 1:i + bars_to_analyse + deal_times[-1] + 1].reset_index(drop=True)
             full_df = full_df.iloc[1:].reset_index(drop=True)
@@ -190,28 +209,26 @@ def signal_message_check_controller(price_data_frame: DataFrame, bars_to_analyse
                 continue
             df_data.append([*d])
         if len(df_data) > 0:
-            path = "debug/" + price_data_frame.symbol[0].split(":")[1] + str(datetime_to_interval(interval)).replace(
+            path = "debug/" + price_data_frame.symbol[0].split(":")[1] + str(pd.interval).replace(
                 ".", "") + "_indicators_count_" + str(successful_indicators_count) + ".csv"
 
             deal_time_profit_column_names = []
             for deal_time in deal_times:
                 deal_time_profit_column_names.append("is_profit_after_bars_" + str(deal_time))
             df = DataFrame(df_data, columns=[*deal_time_profit_column_names, "datetime", "SuperOrderBlock", "Volume", "UMA", "NW", "ScalpPro"])
+            print("save data with path:", path)
             df.to_csv(path)
         else:
             print("No signals")
 
     asyncio.run(
-        signal_message_check_function(price_data_frame, bars_to_analyse, successful_indicators_count, deal_times))
+        signal_message_check_function(pd, price_data_frame, bars_to_analyse, successful_indicators_count, deal_times))
 
 
 if __name__ == "__main__":
-    currencies = [price_parser.get_currencies()[1]]  # [("BTCUSD", "COINBASE"), ("ETHUSD", "COINBASE")]  #
-    intervals = [Interval.in_1_minute]  # , Interval.in_5_minute, Interval.in_15_minute]
+    currencies = [price_parser.get_currencies()[0]]  # [("BTCUSD", "COINBASE"), ("ETHUSD", "COINBASE")]
+    intervals = [Interval.in_1_minute, Interval.in_5_minute, Interval.in_15_minute]
 
-    # profit_dict = Array('i', [0, 0])
-
-    # print("Profit data", profit_dict[:])
     prices_data = []
 
     for interval in intervals:
@@ -223,7 +240,4 @@ if __name__ == "__main__":
     for pd in prices_data:
         df = pd.get_price_data(5000)
         for ind_count in [4]:  # range(3, 5):
-            Process(target=signal_message_check_controller, args=(df, 500, ind_count, deal_times,)).start()
-            # signal_message_check_function(df, profit_dict)
-
-    # print("Profit data:", "\n\tprofit ---> ", profit_dict[1], "\n\tloss ---> ", profit_dict[0])
+            Process(target=signal_message_check_controller, args=(pd, df, 500, ind_count, deal_times,)).start()

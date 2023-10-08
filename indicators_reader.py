@@ -73,6 +73,21 @@ sob_dict = {
         Interval.in_5_minute: 0.0088,
         Interval.in_15_minute: 0.0102,
         Interval.in_30_minute: 0.0121
+    },
+
+    "BTCUSD": {
+        Interval.in_1_minute: 0,
+        Interval.in_3_minute: 0,
+        Interval.in_5_minute: 0,
+        Interval.in_15_minute: 0,
+        Interval.in_30_minute: 0
+    },
+    "ETHUSD": {
+        Interval.in_1_minute: 0,
+        Interval.in_3_minute: 0,
+        Interval.in_5_minute: 0,
+        Interval.in_15_minute: 0,
+        Interval.in_30_minute: 0
     }
 }
 
@@ -175,6 +190,8 @@ class SuperOrderBlockIndicator(Indicator):
         if signal.type == NeutralSignal().type:
             return False
         elif signal.type == LongSignal().type:
+            print("self.close[0]", self.close[0])
+            print("self.analize_block_delta", self.analize_block_delta)
             analize_range = self.close[0] + self.analize_block_delta
             for block in unclosed_blocks:
                 if not (block.signal.type == ShortSignal().type):
@@ -182,6 +199,8 @@ class SuperOrderBlockIndicator(Indicator):
                 if self.is_block_in_range(block, self.close[0], analize_range):
                     return True
         elif signal.type == ShortSignal().type:
+            print("self.close[0]", self.close[0])
+            print("self.analize_block_delta", self.analize_block_delta)
             analize_range = self.close[0] - self.analize_block_delta
             for block in unclosed_blocks:
                 if not (block.signal.type == LongSignal().type):

@@ -248,8 +248,8 @@ def signals_message_sender_controller(prices_data):
     async def signals_message_sender_function(prices_data):
         signal_maker.reset_signals_files(prices_data)
         min1_prices_data = [pd for pd in prices_data if pd.interval == Interval.in_1_minute]
-        min5_prices_data = [pd for pd in prices_data if pd.interval == Interval.in_5_minute]
-        min15_prices_data = [pd for pd in prices_data if pd.interval == Interval.in_15_minute]
+        # min5_prices_data = [pd for pd in prices_data if pd.interval == Interval.in_5_minute]
+        # min15_prices_data = [pd for pd in prices_data if pd.interval == Interval.in_15_minute]
         while True:
             dfs = []
             is_1min_created, _1 = signal_maker.is_signals_analized(min1_prices_data)
@@ -257,14 +257,14 @@ def signals_message_sender_controller(prices_data):
             if is_1min_created and not (_1 is None):
                 print("is_1min_created:", is_1min_created)
                 print(_1)
-                if (_1.minute + 1) % 5 == 0:
-                    is_5min_created, _5 = signal_maker.is_signals_analized(min5_prices_data)
-                    is_all_signals_created = is_all_signals_created and is_5min_created
-                    print("is_5min_created:", is_5min_created)
-                    if (_1.minute + 1) % 15 == 0:
-                        is_15min_created, _15 = signal_maker.is_signals_analized(min15_prices_data)
-                        is_all_signals_created = is_all_signals_created and is_15min_created
-                        print("is_15min_created:", is_15min_created)
+                # if (_1.minute + 1) % 5 == 0:
+                #     is_5min_created, _5 = signal_maker.is_signals_analized(min5_prices_data)
+                #     is_all_signals_created = is_all_signals_created and is_5min_created
+                #     print("is_5min_created:", is_5min_created)
+                #     if (_1.minute + 1) % 15 == 0:
+                #         is_15min_created, _15 = signal_maker.is_signals_analized(min15_prices_data)
+                #         is_all_signals_created = is_all_signals_created and is_15min_created
+                #         print("is_15min_created:", is_15min_created)
 
             if is_all_signals_created:
                 print("all created")
@@ -309,16 +309,16 @@ def signals_message_sender_controller(prices_data):
 if __name__ == '__main__':
     from aiogram import executor
 
-    currencies = price_parser.get_currencies()
+    currencies = [("BTCUSD", "COINBASE"), ("ETHUSD", "COINBASE")] # price_parser.get_currencies()
     intervals = [Interval.in_1_minute, Interval.in_3_minute, Interval.in_5_minute, Interval.in_15_minute,
                  Interval.in_30_minute]
     price_parser.create_parce_currencies_with_intervals_callbacks(currencies, intervals)
 
     prices_data = []
     prices_data_dict = {}
-
-    for interval in intervals:
-        for currency in currencies:
+    for currency in currencies:
+        prices_data_dict.update({currency[0]: []})
+        for interval in intervals:
             pd = PriceData(currency[0], currency[1], interval)
 
             pds = prices_data_dict.get(currency[0])
@@ -326,8 +326,8 @@ if __name__ == '__main__':
             prices_data_dict.update({currency[0]: pds})
             prices_data.append(pd)
 
-    for pds in prices_data_dict.values():
-        multiprocessing.Process(target=signal_maker.analize_currency_data_controller, args=(pds,)).start()
+    for pds in list(prices_data_dict.values())[1:]:
+        multiprocessing.Process(target=signal_maker.analize_currency_data_controller, args=(pds, prices_data[0], )).start()
 
     multiprocessing.Process(target=signals_message_sender_controller, args=(prices_data,)).start()
 
