@@ -24,8 +24,8 @@ class PriceData:
 
     def get_price_data(self, bars_count=500):
         try:
-            priceData = tvl.get_hist(symbol=self.symbol, exchange=self.exchange, interval=self.interval, n_bars=bars_count)
-            priceData = priceData.reindex(index=priceData.index[::-1]).reset_index()
+            priceData = tvl.get_hist(symbol=self.symbol, exchange=self.exchange, interval=self.interval, n_bars=bars_count+1)
+            priceData = priceData.reindex(index=priceData.index[::-1]).iloc[1:].reset_index()
             return priceData
         except Exception as e:
             print(e)
@@ -74,10 +74,13 @@ def is_currency_file_changed(currency, interval: Interval):
     return True, df
 
 
-def reset_currency_file(symbol, interval):
-    path = currencies_data_path + symbol + str(interval).replace(".", "") + ".csv"
+def reset_currency_file(pd: PriceData):
+    path = currencies_data_path + pd.symbol + str(pd.interval).replace(".", "") + ".csv"
     if os.path.exists(path):
         os.remove(path)
+    df = pd.get_price_data(500)
+    save_currency_file(df, pd.symbol, pd.interval)
+
 
 
 def read_currencies_file():

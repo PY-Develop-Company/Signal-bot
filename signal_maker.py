@@ -128,7 +128,7 @@ def analize_currency_data_controller(prices_data, main_pd: PriceData):
                         sob_has_signal, sob_signal, _ = sob_analizer.analize(p_df[1], p_df[0].interval)
                         if sob_has_signal and sob_signal.type == main_signal.type:
                             sob_signals_count += 1
-                    if sob_signals_count >= 2:
+                    if sob_signals_count >= 1:
                         has_signal = True
                         signal = main_signal
                     print("sob_signals_count", sob_signals_count)
@@ -148,7 +148,7 @@ def analize_currency_data_controller(prices_data, main_pd: PriceData):
 
     async def analize_currency_data_loop(prices_data, main_pd: PriceData):
         for pd in prices_data:
-            price_parser.reset_currency_file(pd.symbol, pd.interval)
+            price_parser.reset_currency_file(pd)
         while True:
             analize_currency_data_function(prices_data, main_pd)
             await asyncio.sleep(1)
@@ -238,6 +238,6 @@ if __name__ == "__main__":
             deal_times = range(1, 11)
 
     for pd in prices_data:
-        df = pd.get_price_data(2000)
+        df = pd.get_price_data(5000)
         for ind_count in [4]:  # range(3, 5):
             Process(target=signal_message_check_controller, args=(pd, df, 500, ind_count, deal_times,)).start()

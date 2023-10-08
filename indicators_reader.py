@@ -308,9 +308,9 @@ class SuperOrderBlockIndicator(Indicator):
 
         # self.graph(not_closed_boxes)
 
-        # if self.is_closing_block_nearby(return_signal, not_closed_boxes):
-        #     print("catched vlosing block", self.src["datetime"][0])
-        #     return NeutralSignal()
+        if self.is_closing_block_nearby(return_signal, not_closed_boxes):
+            print("catched vlosing block", self.src["datetime"][0])
+            return NeutralSignal()
 
         return return_signal
 
