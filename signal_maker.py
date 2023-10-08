@@ -209,8 +209,8 @@ def signal_message_check_controller(pd, price_data_frame: DataFrame, bars_to_ana
                 continue
             df_data.append([*d])
         if len(df_data) > 0:
-            path = "debug/" + price_data_frame.symbol[0].split(":")[1] + str(pd.interval).replace(
-                ".", "") + "_indicators_count_" + str(successful_indicators_count) + ".csv"
+            path = "debug/" + price_data_frame.symbol[0].split(":")[1] + "_" + str(pd.interval).replace(
+                ".", "") + ".csv"
 
             deal_time_profit_column_names = []
             for deal_time in deal_times:
@@ -226,7 +226,7 @@ def signal_message_check_controller(pd, price_data_frame: DataFrame, bars_to_ana
 
 
 if __name__ == "__main__":
-    currencies = [price_parser.get_currencies()[0]]  # [("BTCUSD", "COINBASE"), ("ETHUSD", "COINBASE")]
+    currencies = price_parser.get_currencies()[1:2]  # [("BTCUSD", "COINBASE"), ("ETHUSD", "COINBASE")]
     intervals = [Interval.in_1_minute, Interval.in_5_minute, Interval.in_15_minute]
 
     prices_data = []
@@ -238,6 +238,6 @@ if __name__ == "__main__":
             deal_times = range(1, 11)
 
     for pd in prices_data:
-        df = pd.get_price_data(5000)
+        df = pd.get_price_data(2000)
         for ind_count in [4]:  # range(3, 5):
             Process(target=signal_message_check_controller, args=(pd, df, 500, ind_count, deal_times,)).start()

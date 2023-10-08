@@ -75,7 +75,6 @@ class MainAnalizer(Analizer):
 
 
 class SOBAnalizer(Analizer):
-
     def analize_func(self, df, interval) -> (bool, Signal, str):
         interval_td = interval_convertor.interval_to_datetime(interval)
         analize_block_delta = sob_dict.get(df["symbol"][0].split(":")[1]).get(interval)
@@ -91,7 +90,7 @@ class SOBAnalizer(Analizer):
 
 class VolumeAnalizer(Analizer):
     def analize_func(self, df) -> (bool, Signal, str):
-        volume_ind = VolumeIndicator(df, df.open, df.close, df.high, df.low)
+        volume_ind = VolumeIndicator(df, df.open, df.close, df.high, df.low, bars_count=2)
         signal = volume_ind.get_signal()
         has_signal = not(signal.type == NeutralSignal())
         return has_signal, signal, "no debug"
@@ -99,7 +98,7 @@ class VolumeAnalizer(Analizer):
 
 class SPAnalizer(Analizer):
     def analize_func(self, df) -> (bool, Signal, str):
-        sp_ind = ScalpProIndicator(df, df.open, df.close, df.high, df.low)
+        sp_ind = ScalpProIndicator(df, df.open, df.close, df.high, df.low, 16, 12, 16)
         signal = sp_ind.get_signal()
         has_signal = not(signal.type == NeutralSignal())
         return has_signal, signal, "no debug"
@@ -107,7 +106,7 @@ class SPAnalizer(Analizer):
 
 class UMAAnalizer(Analizer):
     def analize_func(self, df) -> (bool, Signal, str):
-        uma_ind = UMAIndicator(df, df.open, df.close, df.high, df.low)
+        uma_ind = UMAIndicator(df, df.open, df.close, df.high, df.low, rolling=5)
         signal = uma_ind.get_signal()
         has_signal = not(signal.type == NeutralSignal())
         return has_signal, signal, "no debug"
@@ -115,7 +114,7 @@ class UMAAnalizer(Analizer):
 
 class NWAnalizer(Analizer):
     def analize_func(self, df) -> (bool, Signal, str):
-        nw_ind = NadarayaWatsonIndicator(df, df.open, df.close, df.high, df.low)
+        nw_ind = NadarayaWatsonIndicator(df, df.open, df.close, df.high, df.low, mult=1)
         signal = nw_ind.get_signal()
         has_signal = not(signal.type == NeutralSignal())
         return has_signal, signal, "no debug"
