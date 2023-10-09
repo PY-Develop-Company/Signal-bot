@@ -204,7 +204,7 @@ def signal_message_check_controller(pd, price_data_frame: DataFrame, bars_to_ana
 
 
 if __name__ == "__main__":
-    currencies = price_parser.get_currencies()[1:2]
+    currencies = price_parser.get_currencies()[1:4]
     intervals = [Interval.in_1_minute, Interval.in_3_minute, Interval.in_5_minute, Interval.in_15_minute, Interval.in_30_minute]
 
     prices_data = []

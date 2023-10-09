@@ -6,23 +6,12 @@
   <component name="ChangeListManager">
     <list default="true" id="c8e52443-fb39-41fa-9e09-4877251a22f1" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/analizer.py" beforeDir="false" afterPath="$PROJECT_DIR$/analizer.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/AUDCAD_Intervalin_15_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/debug/AUDCAD_Intervalin_15_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/AUDCAD_Intervalin_1_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/debug/AUDCAD_Intervalin_1_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/AUDCAD_Intervalin_30_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/debug/AUDCAD_Intervalin_30_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/AUDCAD_Intervalin_3_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/debug/AUDCAD_Intervalin_3_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/AUDCAD_Intervalin_5_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/debug/AUDCAD_Intervalin_5_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/AUDUSD_Intervalin_15_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/AUDUSD_Intervalin_1_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/AUDUSD_Intervalin_30_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/AUDUSD_Intervalin_3_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/AUDUSD_Intervalin_5_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/EURJPY_Intervalin_15_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/EURJPY_Intervalin_1_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/EURJPY_Intervalin_30_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/EURJPY_Intervalin_3_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/EURJPY_Intervalin_5_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/interval_convertor.py" beforeDir="false" afterPath="$PROJECT_DIR$/interval_convertor.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/debug/AUDCAD_Intervalin_15_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/debug/new_extra/AUDCAD_Intervalin_15_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/debug/AUDCAD_Intervalin_1_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/debug/new_extra/AUDCAD_Intervalin_1_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/debug/AUDCAD_Intervalin_30_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/debug/new_extra/AUDCAD_Intervalin_30_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/debug/AUDCAD_Intervalin_3_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/debug/new_extra/AUDCAD_Intervalin_3_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/debug/AUDCAD_Intervalin_5_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/debug/new_extra/AUDCAD_Intervalin_5_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/indicators_reader.py" beforeDir="false" afterPath="$PROJECT_DIR$/indicators_reader.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/signal_maker.py" beforeDir="false" afterPath="$PROJECT_DIR$/signal_maker.py" afterDir="false" />
     </list>
     <list id="cbe571c8-b52a-4250-a9e3-ad1313cd5330" name="Changes by Alex" comment="" />
@@ -80,11 +69,11 @@
       <recent name="C:\Users\Alex\Projects\Programming\Vilors\Signal-bot\img" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\Alex\Projects\Programming\Vilors\Signal-bot\debug\new_extra" />
       <recent name="C:\Users\Alex\Projects\Programming\Vilors\Signal-bot\debug\clasic" />
       <recent name="C:\Users\Alex\Projects\Programming\Vilors\Signal-bot\currencies_data" />
       <recent name="C:\Users\Alex\Projects\Programming\Vilors\Signal-bot\debug\5000extra" />
       <recent name="C:\Users\Alex\Projects\Programming\Vilors\Signal-bot\debug_save\old" />
-      <recent name="C:\Users\Alex\Projects\Programming\Vilors\Signal-bot\debug_save" />
     </key>
   </component>
   <component name="RunManager" selected="Python.signal_maker">

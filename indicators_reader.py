@@ -124,8 +124,8 @@ class Indicator:
 
 
 class SuperOrderBlockIndicator(Indicator):
-    def __init__(self, src, open, close, high, low, interval: timedelta, analize_block_delta, includeDelta=True, obMaxBoxSet=10,
-                 fvgMaxBoxSet=10):
+    def __init__(self, src, open, close, high, low, interval: timedelta, analize_block_delta, includeDelta=True, obMaxBoxSet=100,
+                 fvgMaxBoxSet=100):
         super().__init__(src, open, close, high, low)
         self.interval = interval
         obMaxBoxSet = clamp(obMaxBoxSet, 1, 100)
@@ -308,11 +308,10 @@ class SuperOrderBlockIndicator(Indicator):
                         biggest_box_height = biggest_box.top - biggest_box.bottom
             return_signal = biggest_box.signal
 
-        if self.includeDelta and self.is_closing_block_nearby(return_signal, not_closed_boxes):
-            return NeutralSignal()
+        # if self.includeDelta and self.is_closing_block_nearby(return_signal, not_closed_boxes):
+        #     return NeutralSignal()
 
         return return_signal
-
 
     def graph(self, boxes):
         unclosed_boxes_scatter = []
@@ -374,7 +373,7 @@ class SuperOrderBlockIndicator(Indicator):
 
 
 class ScalpProIndicator(Indicator):
-    def __init__(self, src, open, close, high, low, fast_line=8, slow_line=10, smoothness=8):
+    def __init__(self, src, open, close, high, low, fast_line=8, slow_line=20, smoothness=10):
         super().__init__(src, open, close, high, low)
         self.fast_line = fast_line
         self.slow_line = slow_line
@@ -454,7 +453,7 @@ class ScalpProIndicator(Indicator):
 
 
 class VolumeIndicator(Indicator):
-    def __init__(self, src, open, close, high, low, bars_count=3):
+    def __init__(self, src, open, close, high, low, bars_count=4):
         super().__init__(src, open, close, high, low)
         self.bars_count = bars_count
         self.name = "Volume"
@@ -478,7 +477,7 @@ class VolumeIndicator(Indicator):
 
 
 class UMAIndicator(Indicator):
-    def __init__(self, src, open, close, high, low, rolling=20, smooth=2):
+    def __init__(self, src, open, close, high, low, rolling=10, smooth=2):
         super().__init__(src, open, close, high, low)
         self.rolling = rolling
         self.smooth = smooth
@@ -544,7 +543,7 @@ class UMAIndicator(Indicator):
 
 
 class NadarayaWatsonIndicator(Indicator):
-    def __init__(self, src, open, close, high, low, h=8.0, mult=3.0):
+    def __init__(self, src, open, close, high, low, h=8.0, mult=1.0):
         super().__init__(src, open, close, high, low)
         self.h = h
         self.mult = mult
