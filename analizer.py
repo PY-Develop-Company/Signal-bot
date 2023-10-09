@@ -20,6 +20,40 @@ class Analizer:
         return has_signal, signal, debug_text
 
 
+class MultitimeframeAnalizer(Analizer):
+    def __init__(self, successful_indicators_count, successful_sob_signals_count):
+        self.successful_sob_signals_count = successful_sob_signals_count
+        self.main = MainAnalizer(successful_indicators_count)
+        self.sob = NoDeltaSOBAnalizer()
+
+    def analize_func(self, df, interval, parent_pd_dfs_dict) -> (bool, Signal, str, int, int):
+        has_signal = False
+        signal = NeutralSignal()
+
+        main_has_signal, main_signal, main_ind_count, main_debug_text = self.main.analize(df, interval)
+
+        sob_signals_count = 0
+        if main_has_signal:
+            for parent_df in parent_pd_dfs_dict.items():
+                sob_has_signal, sob_signal, _ = self.sob.analize(parent_df[1], parent_df[0].interval)
+
+                if sob_has_signal and sob_signal.type == main_signal.type:
+                    sob_signals_count += 1
+                    print("catched sob", parent_df[0].interval)
+
+            if sob_signals_count >= self.successful_sob_signals_count:
+                has_signal = True
+                signal = main_signal
+
+        return has_signal, signal, main_debug_text + "\n sob_count: " + str(sob_signals_count), main_ind_count, sob_signals_count
+
+    def analize(self, df, interval, parent_pd_dfs_dict) -> (bool, Signal, str, int, int):
+        has_signal, signal, debug, main_ind_count, sob_signals_count = self.analize_func(df, interval, parent_pd_dfs_dict)
+        print(debug)
+        return has_signal, signal, debug, main_ind_count, sob_signals_count
+
+
+
 class MainAnalizer(Analizer):
     def __init__(self, successful_indicators_count):
         self.successful_indicators_count = successful_indicators_count
@@ -70,8 +104,22 @@ class MainAnalizer(Analizer):
 
     def analize(self, df, interval) -> (bool, Signal, int, str):
         has_signal, signal, ind_count, debug_text = self.analize_func(df, interval)
-        print("debug:", debug_text)
+        # print("debug:", debug_text)
         return has_signal, signal, ind_count, debug_text
+
+
+class NoDeltaSOBAnalizer(Analizer):
+    def analize_func(self, df, interval) -> (bool, Signal, str):
+        interval_td = interval_convertor.interval_to_datetime(interval)
+        analize_block_delta = sob_dict.get(df["symbol"][0].split(":")[1]).get(interval)
+        sob_ind = SuperOrderBlockIndicator(df, df.open, df.close, df.high, df.low, interval_td, analize_block_delta, includeDelta=False)
+
+        signal = sob_ind.get_signal()
+        has_signal = not(signal.type == NeutralSignal())
+        return has_signal, signal, "no debug"
+
+    def analize(self, df, interval) -> (bool, Signal, str):
+        return self.analize_func(df, interval)
 
 
 class SOBAnalizer(Analizer):
@@ -91,7 +139,7 @@ class SOBAnalizer(Analizer):
 class VolumeAnalizer(Analizer):
     def analize_func(self, df) -> (bool, Signal, str):
         # 2
-        volume_ind = VolumeIndicator(df, df.open, df.close, df.high, df.low, bars_count=2)
+        volume_ind = VolumeIndicator(df, df.open, df.close, df.high, df.low, 2)
         signal = volume_ind.get_signal()
         has_signal = not(signal.type == NeutralSignal())
         return has_signal, signal, "no debug"

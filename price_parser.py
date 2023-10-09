@@ -1,17 +1,18 @@
 import time
-from datetime import datetime
+from datetime import datetime, timedelta
 from tvDatafeed import TvDatafeed, TvDatafeedLive, Interval
 from tvDatafeed.seis import Seis
-import json
-import os
 from pandas import DataFrame, read_csv
+import file_manager
+import interval_convertor
 
 trade_pause_wait_time = 60*5
 
 currencies_path = "users/currencies.txt"
 currencies_data_path = "currencies_data/"
+currency_check_ended = "currencies_data/check_ended/"
 
-currencies_requests_last_check_date = {}
+currencies_last_analize_date = {}
 tv = TvDatafeed()
 tvl = TvDatafeedLive()
 
@@ -22,6 +23,54 @@ class PriceData:
         self.exchange = exchange
         self.interval = interval
 
+    def print(self):
+        print("\t", self.symbol, self.interval)
+
+    def save_chart_data(self, df: DataFrame):
+        interval = str(self.interval).replace(".", "")
+        df.to_csv(currencies_data_path + self.symbol + interval + ".csv")
+        with open(f"{currency_check_ended}{self.symbol}{str(self.interval).replace('.', '')}.txt", "w") as file:
+            pass
+
+    def get_chart_data_if_exists(self):
+        interval = str(self.interval).replace(".", "")
+        path = currency_check_ended + self.symbol + interval + ".txt"
+        if not file_manager.is_file_exists(path):
+            return None
+        path = currencies_data_path + self.symbol + interval + ".csv"
+        if not file_manager.is_file_exists(path):
+            return None
+
+        try:
+            df = read_csv(path)
+        except Exception as e:
+            print("Error", path)
+            return None
+        return df
+
+    def get_chart_data_if_exists_if_can_analize(self):
+        interval = str(self.interval).replace(".", "")
+        df = self.get_chart_data_if_exists()
+
+        last_check_date = currencies_last_analize_date.get(self.symbol + interval)
+        if not(df is None):
+            df["datetime"] = df.apply(lambda row: datetime.strptime(row["datetime"], '%Y-%m-%d %H:%M:%S'), axis=1)
+            current_check_date = df.datetime[0]
+            if current_check_date == last_check_date:
+                return None
+            currencies_last_analize_date.update({self.symbol + interval: current_check_date})
+        return df
+
+    def reset_chart_data(self):
+        interval = str(self.interval).replace(".", "")
+        path = currency_check_ended + self.symbol + interval + ".txt"
+        file_manager.delete_file_if_exists(path)
+        path = currencies_data_path + self.symbol + interval + ".csv"
+        file_manager.delete_file_if_exists(path)
+
+        df = self.get_price_data(500)
+        self.save_chart_data(df)
+
     def get_price_data(self, bars_count=500):
         try:
             priceData = tvl.get_hist(symbol=self.symbol, exchange=self.exchange, interval=self.interval, n_bars=bars_count+1)
@@ -30,105 +79,49 @@ class PriceData:
         except Exception as e:
             print(e)
 
+    def is_analize_time(self, update_date: datetime, debug=False):
+        minutes = interval_convertor.interval_to_datetime(self.interval) / timedelta(minutes=1)
+        if debug:
+            print("is_analize_time", (update_date.minute + 1), minutes, (update_date.minute + 1) % minutes)
 
-def create_save_currencies_files(currencies, intervals):
-    for cur in currencies:
-        for interval in intervals:
-            path = currencies_data_path+cur[0]+str(interval).replace(".", "")+".csv"
-            with open(path, "a", encoding="utf-8") as file:
-                file.write(" ")
-
-
-def save_currency_file(df: DataFrame, currency, interval: Interval):
-    interval = str(interval).replace(".", "")
-    df.to_csv(currencies_data_path + currency + interval + ".csv")
-
-
-def update_last_check_date(currency, interval: Interval):
-    interval = str(interval).replace(".", "")
-    path = currencies_data_path + currency + interval + ".csv"
-    if not os.path.exists(path):
-        return False, None
-
-    df = read_csv(path)
-    current_check_date = df.datetime[0]
-    currencies_requests_last_check_date.update({currency+interval: current_check_date})
-
-
-def is_currency_file_changed(currency, interval: Interval):
-    interval = str(interval).replace(".", "")
-    path = currencies_data_path + currency + interval + ".csv"
-    if not os.path.exists(path):
-        return False, None
-
-    last_check_date = currencies_requests_last_check_date.get(currency+interval)
-    # print(path)
-    df = read_csv(path)
-    df["datetime"] = df.apply(lambda row: datetime.strptime(row["datetime"], '%Y-%m-%d %H:%M:%S'), axis=1)
-    current_check_date = df.datetime[0]
-    # print("currency", currency, "interval", interval, "current date:", current_check_date, "last date:", last_check_date)
-    if current_check_date == last_check_date:
-        return False, df
-
-    currencies_requests_last_check_date.update({currency+interval: current_check_date})
-    return True, df
-
-
-def reset_currency_file(pd: PriceData):
-    path = currencies_data_path + pd.symbol + str(pd.interval).replace(".", "") + ".csv"
-    if os.path.exists(path):
-        os.remove(path)
-    df = pd.get_price_data(500)
-    save_currency_file(df, pd.symbol, pd.interval)
-
-
-
-def read_currencies_file():
-    with open(currencies_path, 'r', encoding="utf-8") as file:
-        data = json.loads(file.read())
-
-    return data
+        return (update_date.minute + 1) % minutes == 0
 
 
 def get_currencies():
     currencies = []
-    for currency in read_currencies_file():
+    currencies_file_content = file_manager.read_file(currencies_path)
+    for currency in currencies_file_content:
         symbol = currency['symbol']
         exchange = currency['exchange']
         currencies.append((symbol, exchange))
     return currencies
 
 
-def get_price_data_seis(seis, bars_count=500):
-    priceData = seis.get_hist(n_bars=bars_count)
-    priceData = priceData.drop(priceData.index[len(priceData) - 1])
-    priceData = priceData.reindex(index=priceData.index[::-1]).reset_index()
-    return priceData
+def get_price_data_frame_seis(seis, bars_count=500):
+    price_df = seis.get_hist(n_bars=bars_count)
+    price_df = price_df.drop(price_df.index[len(price_df) - 1])
+    price_df = price_df.reindex(index=price_df.index[::-1]).reset_index()
+    return price_df
 
 
-def update_currency_file_consumer(seis: Seis, data):
-    try:
-        # print("update:", seis.symbol, seis.interval, datetime.now())
-        price_data = get_price_data_seis(seis)
+def create_parce_currencies_with_intervals_callbacks(pds: [PriceData]):
+    def update_currency_file_consumer(seis: Seis, data):
+        try:
+            price_df = get_price_data_frame_seis(seis)
 
-        interval = seis.interval
-        symbol = seis.symbol
-        save_currency_file(price_data, symbol, interval)
-        print("updated price data:", seis.symbol, seis.interval)
-    except Exception as e:
-        print("bbb", e)
+            pd = PriceData(seis.symbol, seis.exchange, seis.interval)
+            pd.save_chart_data(price_df)
+        except Exception as e:
+            print("bbb", e)
 
-
-def create_parce_currencies_with_intervals_callbacks(currencies, intervals: [Interval]):
     while True:
         tvl = TvDatafeedLive()
         tv = TvDatafeed()
         try:
-            for currency in currencies:
-                for interval in intervals:
-                    seis = tvl.new_seis(currency[0], currency[1], interval)
-                    print("seis", seis)
-                    consumer = tvl.new_consumer(seis, update_currency_file_consumer)
+            for pd in pds:
+                seis = tvl.new_seis(pd.symbol, pd.exchange, pd.interval)
+                print("seis", seis)
+                consumer = tvl.new_consumer(seis, update_currency_file_consumer)
             break
         except ValueError as e:
             print("Error", e)

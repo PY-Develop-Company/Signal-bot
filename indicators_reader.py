@@ -88,6 +88,20 @@ sob_dict = {
         Interval.in_5_minute: 0,
         Interval.in_15_minute: 0,
         Interval.in_30_minute: 0
+    },
+    "DOGEUSD": {
+        Interval.in_1_minute: 0,
+        Interval.in_3_minute: 0,
+        Interval.in_5_minute: 0,
+        Interval.in_15_minute: 0,
+        Interval.in_30_minute: 0,
+    },
+    "SOLUSD": {
+        Interval.in_1_minute: 0,
+        Interval.in_3_minute: 0,
+        Interval.in_5_minute: 0,
+        Interval.in_15_minute: 0,
+        Interval.in_30_minute: 0
     }
 }
 
@@ -95,10 +109,10 @@ sob_dict = {
 class Indicator:
     def __init__(self, src, open, close, high, low):
         self.src = src
-        self.open = open
+        self.open = np.array(open)
         self.close = close
-        self.high = high
-        self.low = low
+        self.high = np.array(high)
+        self.low = np.array(low)
         self.name = "indicator"
 
     def get_signal(self) -> Signal:
@@ -110,7 +124,7 @@ class Indicator:
 
 
 class SuperOrderBlockIndicator(Indicator):
-    def __init__(self, src, open, close, high, low, interval: timedelta, analize_block_delta, obMaxBoxSet=10,
+    def __init__(self, src, open, close, high, low, interval: timedelta, analize_block_delta, includeDelta=True, obMaxBoxSet=10,
                  fvgMaxBoxSet=10):
         super().__init__(src, open, close, high, low)
         self.interval = interval
@@ -120,6 +134,7 @@ class SuperOrderBlockIndicator(Indicator):
         self.fvgMaxBoxSet = fvgMaxBoxSet
         self.analize_block_delta = analize_block_delta
         self.name = "SuperOrderBlock"
+        self.includeDelta = includeDelta
 
     def is_up_bar(self, index):
         return self.close[index] > self.open[index]
@@ -148,6 +163,7 @@ class SuperOrderBlockIndicator(Indicator):
             self.signal = signal
 
         def print_info(self):
+            print("Created box: ", self.left, self.top, self.right, self.bottom)
             print("Created box: ", self.left, self.top, self.right, self.bottom)
 
         def check_signal(self, bar_low, bar_high, bar_date):
@@ -179,9 +195,10 @@ class SuperOrderBlockIndicator(Indicator):
 
     def control_box(self, boxes, high, low, box_index):
         for i in range(len(boxes) - 1, 0, -1):
+            dt = self.src.datetime[box_index]
             is_price_in_box = (high > boxes[i].bottom > low) or (high > boxes[i].top > low)
-            if self.src.datetime[box_index] == boxes[i].right and not is_price_in_box:
-                boxes[i].right = self.src.datetime[box_index] + self.interval
+            if dt == boxes[i].right and not is_price_in_box:
+                boxes[i].right = dt + self.interval
 
     def is_block_in_range(self, block, low_price, high_price):
         return (block.top >= low_price) and (high_price >= block.bottom)
@@ -190,8 +207,6 @@ class SuperOrderBlockIndicator(Indicator):
         if signal.type == NeutralSignal().type:
             return False
         elif signal.type == LongSignal().type:
-            print("self.close[0]", self.close[0])
-            print("self.analize_block_delta", self.analize_block_delta)
             analize_range = self.close[0] + self.analize_block_delta
             for block in unclosed_blocks:
                 if not (block.signal.type == ShortSignal().type):
@@ -199,8 +214,6 @@ class SuperOrderBlockIndicator(Indicator):
                 if self.is_block_in_range(block, self.close[0], analize_range):
                     return True
         elif signal.type == ShortSignal().type:
-            print("self.close[0]", self.close[0])
-            print("self.analize_block_delta", self.analize_block_delta)
             analize_range = self.close[0] - self.analize_block_delta
             for block in unclosed_blocks:
                 if not (block.signal.type == LongSignal().type):
@@ -217,23 +230,22 @@ class SuperOrderBlockIndicator(Indicator):
         _bearBoxesFVG = []
         _bullBoxesFVG = []
 
-        top = self.pivot_high(self.high)
-        bottom = self.pivot_low(self.low)
-
-        prices_count = len(self.src)
+        prices_count = len(self.src)-3
         # # # # # # # # # # # Order Block # # # # # # # # #
-        for i in range(prices_count - 3, -1, -1):
-            date_time = self.src.datetime[i]
+        for i in range(prices_count, -1, -1):
+            right = self.src.datetime[i]
+            left = right - self.interval * 2
+            h2 = self.high[i + 2]
+            l2 = self.low[i + 2]
+
             if self.is_ob_box_up(i + 1):
-                _bullboxOB = self.Box(left=date_time - self.interval * 2, top=self.high[i + 2], right=date_time,
-                                      bottom=min(self.low[i + 2], self.low[i + 1]), signal=LongSignal())
+                _bullboxOB = self.Box(left=left, top=h2, right=right, bottom=min(l2, self.low[i + 1]), signal=LongSignal())
                 if len(_bullBoxesOB) > self.obMaxBoxSet:
                     _bullBoxesOB.remove(_bullBoxesOB[0])
                 _bullBoxesOB.append(_bullboxOB)
 
             if self.is_ob_box_down(i + 1):
-                _bearboxOB = self.Box(left=date_time - self.interval * 2, top=max(self.high[i + 2], self.high[i + 1]),
-                                      right=date_time, bottom=self.low[i + 2], signal=ShortSignal())
+                _bearboxOB = self.Box(left=left, top=max(h2, self.high[i + 1]), right=right, bottom=l2, signal=ShortSignal())
                 if len(_bearBoxesOB) > self.obMaxBoxSet:
                     _bearBoxesOB.remove(_bearBoxesOB[0])
                 _bearBoxesOB.append(_bearboxOB)
@@ -243,48 +255,38 @@ class SuperOrderBlockIndicator(Indicator):
                 self.control_box(_bullBoxesOB, self.high[i], self.low[i], i)
 
         # # # # # # # # # Fair Value Gap # # # # # # # # #
-        for i in range(prices_count - 3, -1, -1):
-            date_time = self.src.datetime[i]
+        for i in range(prices_count, -1, -1):
+            right = self.src.datetime[i]
+            left = right - self.interval * 2
+            h = self.high[i]
+            l = self.low[i]
+
             if self.is_fvg_box_up(i):
-                _bullboxFVG = None
-                if (self.close[i + 1] > top[i]) and (self.low[i + 1] < top[i]) and (
-                        self.high[i + 2] < top[i]) and (self.low[i] > top[i]):
-                    _bullboxFVG = self.Box(left=date_time - self.interval * 2, top=self.low[i], right=date_time,
-                                           bottom=self.high[i + 2], signal=LongSignal())
-                else:
-                    _bullboxFVG = self.Box(left=date_time - self.interval * 2, top=self.low[i], right=date_time,
-                                           bottom=self.high[i + 2], signal=LongSignal())
+                _bullboxFVG = self.Box(left=left, top=l, right=right, bottom=self.high[i + 2], signal=LongSignal())
 
                 if len(_bullBoxesFVG) > self.fvgMaxBoxSet:
                     _bullBoxesFVG.remove(_bullBoxesFVG[0])
                 _bullBoxesFVG.append(_bullboxFVG)
 
             if self.is_fvg_box_down(i):
-                _bearboxFVG = None
-                if (self.close[i + 1] < bottom[i]) and (self.high[i + 1] > bottom[i]) and (
-                        self.low[i + 2] > bottom[i]) and (self.high[i] < bottom[i]):
-                    _bearboxFVG = self.Box(left=date_time - self.interval * 2, top=self.low[i + 2], right=date_time,
-                                           bottom=self.high[i], signal=ShortSignal())
-                else:
-                    _bearboxFVG = self.Box(left=date_time - self.interval * 2, top=self.low[i + 2], right=date_time,
-                                           bottom=self.high[i], signal=ShortSignal())
+                _bearboxFVG = self.Box(left=left, top=self.low[i + 2], right=right, bottom=h, signal=ShortSignal())
 
                 if len(_bearBoxesFVG) > self.fvgMaxBoxSet:
                     _bearBoxesFVG.remove(_bearBoxesFVG[0])
                 _bearBoxesFVG.append(_bearboxFVG)
 
             if i > 0:
-                self.control_box(_bearBoxesFVG, self.high[i], self.low[i], i)
-                self.control_box(_bullBoxesFVG, self.high[i], self.low[i], i)
+                self.control_box(_bearBoxesFVG, h, l, i)
+                self.control_box(_bullBoxesFVG, h, l, i)
 
-        date_time = self.src.datetime[0]
+        right = self.src.datetime[0]
 
         not_closed_boxes = []
         boxes = _bullBoxesOB + _bearBoxesOB + _bullBoxesFVG + _bearBoxesFVG
         return_signal = NeutralSignal()
         signal_boxes = []
         for box in boxes:
-            signal = box.check_signal(self.low[0], self.high[0], date_time)
+            signal = box.check_signal(self.low[0], self.high[0], right)
             if not (signal.type == NeutralSignal.type):
                 signal_boxes.append(box)
 
@@ -306,15 +308,11 @@ class SuperOrderBlockIndicator(Indicator):
                         biggest_box_height = biggest_box.top - biggest_box.bottom
             return_signal = biggest_box.signal
 
-        # self.graph(not_closed_boxes)
-
-        if self.is_closing_block_nearby(return_signal, not_closed_boxes):
-            print("catched vlosing block", self.src["datetime"][0])
+        if self.includeDelta and self.is_closing_block_nearby(return_signal, not_closed_boxes):
             return NeutralSignal()
 
         return return_signal
 
-    # """_bullBoxesOB, _bearBoxesOB, _bullBoxesFVG, _bearBoxesFVG):"""
 
     def graph(self, boxes):
         unclosed_boxes_scatter = []
@@ -553,27 +551,28 @@ class NadarayaWatsonIndicator(Indicator):
         self.name = "NadarayaWatson"
 
     def gauss(self, x, k):
-        return math.exp(-(pow(x, 2) / (k * k * 2)))
+        return np.exp(-(x*x) / (k * k * 2))
+    def old_gauss(self, x, k):
+        return math.exp(-(x*x) / (k * k * 2))
 
     def get_signal(self):
-        price_count = len(self.close)
-        nwe = []
-        sae = 0.0
-        for i in range(0, min(price_count - 2, 499)):
-            sum = 0.0
-            sumw = 0.0
+        price_count = min(len(self.close)-2, 499)
+        close = np.array(self.close[0:price_count])
+        nwe = np.zeros(price_count)
 
-            for j in range(0, min(price_count - 2, 499)):
-                w = self.gauss(i - j, self.h)
-                sum += self.close[j] * w
-                sumw += w
+        for i in range(0, price_count):
+            x = np.arange(price_count)
+            x = i - x
+            # sumw = np.array([self.gauss(i - j, self.h) for j in range(0, price_count)])  # np.zeros(price_count)
+            sumw = np.array(self.gauss(x, np.array(self.h)))
+            sum_ = np.array([close * sumw])  # np.zeros(price_count)
 
-            y2 = sum / sumw
-            sae += abs(self.close[i] - y2)
-            nwe.append(y2)
-        sae = sae / (min(price_count - 2, 499)) * self.mult
+            nwe[i] = np.sum(sum_) / np.sum(sumw)
+        sae = np.sum(abs(close - nwe)) / price_count * self.mult
+
+
         signals = []
-        for i in range(0, min(price_count - 2, 499)):
+        for i in range(0, price_count):
             if self.close[i] > (nwe[i] + sae) > self.close[i + 1]:
                 signals.append((i, ShortSignal()))
                 break
@@ -584,25 +583,6 @@ class NadarayaWatsonIndicator(Indicator):
             signals.append((0, NeutralSignal()))
             print(f"not enough data warning {self.name} envelope")
 
-        # buy_sig = []
-        # sell_sig = []
-        # j = 0
-        # curr_signal = signals[0]
-        # for i in range(0, min(price_count - 2, 499)):
-        #     buy_append_val = 0
-        #     sell_append_val = 0
-        #     if i == curr_signal[0]:
-        #         if curr_signal[1] == ls:
-        #             buy_append_val = 30000
-        #         elif curr_signal[1] == ss:
-        #             sell_append_val = 30000
-        #
-        #         j += 1
-        #         if j < len(signals):
-        #             curr_signal = signals[j]
-        #     buy_sig.append(buy_append_val)
-        #     sell_sig.append(sell_append_val)
-        # self.graph(buy_sig, sell_sig, upsae, downsae)
         return signals[0][1]
 
     def graph(self, buy_sig, sell_sig, upsae, downsae):

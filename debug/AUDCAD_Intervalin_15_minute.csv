@@ -1,0 +1,11 @@
+,is_profit_after_bars_1,is_profit_after_bars_2,is_profit_after_bars_3,is_profit_after_bars_4,is_profit_after_bars_5,is_profit_after_bars_6,is_profit_after_bars_7,is_profit_after_bars_8,is_profit_after_bars_9,is_profit_after_bars_10,datetime,SuperOrderBlock,Volume,UMA,NW,ScalpPro
+0,True,True,False,False,False,False,False,False,False,True,2023-10-09 18:00:00,neutral,long,short,short,long
+1,True,True,True,True,False,False,False,False,False,False,2023-10-09 17:30:00,neutral,neutral,short,short,short
+2,True,True,True,True,True,False,False,False,False,False,2023-10-09 17:15:00,neutral,short,short,short,short
+3,False,True,True,True,True,True,False,False,False,False,2023-10-09 17:00:00,neutral,neutral,long,short,short
+4,False,False,False,False,False,False,False,False,False,False,2023-10-09 16:45:00,neutral,long,long,short,short
+5,True,False,False,False,False,False,True,False,False,False,2023-10-09 16:30:00,neutral,long,long,short,short
+6,True,True,False,False,False,False,False,True,False,False,2023-10-09 16:15:00,neutral,long,long,short,short
+7,True,True,True,False,False,False,False,False,True,False,2023-10-09 16:00:00,neutral,long,short,short,long
+8,True,True,True,True,True,False,True,True,True,True,2023-10-09 15:45:00,neutral,neutral,short,short,long
+9,True,True,True,True,True,True,True,True,True,True,2023-10-09 15:30:00,neutral,neutral,short,short,long

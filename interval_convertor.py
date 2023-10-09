@@ -30,7 +30,7 @@ def interval_to_datetime(interval: Interval):
     elif interval == Interval.in_45_minute:
         return timedelta(minutes=45)
     else:
-        return timedelta(days=1)
+        return None
 
 
 def datetime_to_interval(datetime):
@@ -53,4 +53,20 @@ def datetime_to_interval(datetime):
 
 def interval_to_string(interval):
     return str(interval).replace(".", "")
+
+def str_to_interval(interval: str):
+    if interval == str(Interval.in_1_minute):
+        return Interval.in_1_minute
+    elif interval == str(Interval.in_3_minute):
+        return Interval.in_3_minute
+    elif interval == str(Interval.in_5_minute):
+        return Interval.in_5_minute
+    elif interval == str(Interval.in_15_minute):
+        return Interval.in_15_minute
+    elif interval == str(Interval.in_30_minute):
+        return Interval.in_30_minute
+    elif interval == str(Interval.in_45_minute):
+        return Interval.in_45_minute
+    else:
+        return None
 
