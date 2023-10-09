@@ -2,7 +2,7 @@ from pandas import DataFrame, Timedelta, read_csv
 from datetime import datetime
 from tvDatafeed import Interval
 import file_manager
-from analizer import SOBAnalizer, SPAnalizer, NWAnalizer, UMAAnalizer, VolumeAnalizer, MultitimeframeAnalizer
+from analizer import SOBAnalizer, SPAnalizer, NWAnalizer, UMAAnalizer, VolumeAnalizer, MultitimeframeAnalizer, NoDeltaSOBAnalizer
 import interval_convertor
 import price_parser
 from price_parser import PriceData
@@ -127,7 +127,7 @@ async def signal_message_check_function_child(pd, full_df, deal_times):
     check_df = full_df.iloc[deal_times[-1]:].reset_index(drop=True)
 
     sob_start_time = datetime.now()
-    sob_is_signal, sob_signal, sob_debug_text = SOBAnalizer().analize(check_df, pd.interval)
+    sob_is_signal, sob_signal, sob_debug_text = NoDeltaSOBAnalizer().analize(check_df, pd.interval)
     sob_delta_time = datetime.now() - sob_start_time
 
     sp_start_time = datetime.now()

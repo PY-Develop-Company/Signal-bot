@@ -54,6 +54,7 @@ def datetime_to_interval(datetime):
 def interval_to_string(interval):
     return str(interval).replace(".", "")
 
+
 def str_to_interval(interval: str):
     if interval == str(Interval.in_1_minute):
         return Interval.in_1_minute

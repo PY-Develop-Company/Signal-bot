@@ -139,7 +139,7 @@ class SOBAnalizer(Analizer):
 class VolumeAnalizer(Analizer):
     def analize_func(self, df) -> (bool, Signal, str):
         # 2
-        volume_ind = VolumeIndicator(df, df.open, df.close, df.high, df.low, 2)
+        volume_ind = VolumeIndicator(df, df.open, df.close, df.high, df.low)
         signal = volume_ind.get_signal()
         has_signal = not(signal.type == NeutralSignal())
         return has_signal, signal, "no debug"
@@ -148,7 +148,7 @@ class VolumeAnalizer(Analizer):
 class SPAnalizer(Analizer):
     def analize_func(self, df) -> (bool, Signal, str):
         # 16 12 16
-        sp_ind = ScalpProIndicator(df, df.open, df.close, df.high, df.low, 16, 12, 16)
+        sp_ind = ScalpProIndicator(df, df.open, df.close, df.high, df.low)
         signal = sp_ind.get_signal()
         has_signal = not(signal.type == NeutralSignal())
         return has_signal, signal, "no debug"
@@ -157,7 +157,7 @@ class SPAnalizer(Analizer):
 class UMAAnalizer(Analizer):
     def analize_func(self, df) -> (bool, Signal, str):
         # 5
-        uma_ind = UMAIndicator(df, df.open, df.close, df.high, df.low, rolling=5)
+        uma_ind = UMAIndicator(df, df.open, df.close, df.high, df.low)
         signal = uma_ind.get_signal()
         has_signal = not(signal.type == NeutralSignal())
         return has_signal, signal, "no debug"
@@ -165,8 +165,8 @@ class UMAAnalizer(Analizer):
 
 class NWAnalizer(Analizer):
     def analize_func(self, df) -> (bool, Signal, str):
-        # 1
-        nw_ind = NadarayaWatsonIndicator(df, df.open, df.close, df.high, df.low, mult=2)
+        # 2
+        nw_ind = NadarayaWatsonIndicator(df, df.open, df.close, df.high, df.low)
         signal = nw_ind.get_signal()
         has_signal = not(signal.type == NeutralSignal())
         return has_signal, signal, "no debug"
