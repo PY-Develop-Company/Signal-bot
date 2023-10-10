@@ -1,2 +1,2 @@
 ,has_signal,signal_type,msg,date,open_price,interval,indicators_count,sob_signals_count,symbol,exchange
-0,False,neutral,NoneGBP/AUD Нет сигнала 9мин,2023-10-09 18:12:00,1.91479,Interval.in_3_minute,0,0,GBPAUD,OANDA
+0,False,neutral,NoneGBP/AUD Нет сигнала 9мин,2023-10-10 07:36:00,1.90766,Interval.in_3_minute,0,0,GBPAUD,OANDA

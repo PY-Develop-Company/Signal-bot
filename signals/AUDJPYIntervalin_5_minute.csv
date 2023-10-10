@@ -1,2 +1,2 @@
 ,has_signal,signal_type,msg,date,open_price,interval,indicators_count,sob_signals_count,symbol,exchange
-0,False,neutral,NoneAUD/JPY Нет сигнала 15мин,2023-10-09 18:10:00,94.772,Interval.in_5_minute,0,0,AUDJPY,OANDA
+0,False,neutral,NoneAUD/JPY Нет сигнала 15мин,2023-10-10 07:30:00,95.38,Interval.in_5_minute,0,0,AUDJPY,OANDA

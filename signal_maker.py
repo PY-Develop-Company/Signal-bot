@@ -25,12 +25,12 @@ async def close_position_delay(interval: Interval, bars_count=3):
     await asyncio.sleep(delay_seconds)
 
 
-async def close_position(position_open_price, signal: Signal, pd: PriceData, bars_count=3):
+async def close_position(position_open_price, signal: Signal, pd: PriceData, bars_count=6):
     await close_position_delay(pd.interval, bars_count)
 
     price_data = pd.get_price_data(bars_count=2)
 
-    msg, is_profit_position = signal.get_close_position_signal_message(pd, position_open_price, price_data.close[0])
+    msg, is_profit_position = signal.get_close_position_signal_message(pd, position_open_price, price_data.close[0], bars_count)
     return msg, is_profit_position
 
 
@@ -96,7 +96,7 @@ def analize_currency_data_controller(analize_pair):
             if is_price_df_exists:
                 prices_df.update({pd: price_df})
 
-        analizer = MultitimeframeAnalizer(4, 1)
+        analizer = MultitimeframeAnalizer(3, 2)
         has_signal, signal, _, main_indicators_count, sob_signals_count = analizer.analize(main_price_df, main_pd.interval, prices_df)
 
         open_position_price = main_price_df.close[0]
@@ -204,7 +204,7 @@ def signal_message_check_controller(pd, price_data_frame: DataFrame, bars_to_ana
 
 
 if __name__ == "__main__":
-    currencies = price_parser.get_currencies()[1:4]
+    currencies = price_parser.get_currencies()[0:1]
     intervals = [Interval.in_1_minute, Interval.in_3_minute, Interval.in_5_minute, Interval.in_15_minute, Interval.in_30_minute]
 
     prices_data = []
@@ -216,7 +216,8 @@ if __name__ == "__main__":
             deal_times = range(1, 11)
 
     for pd in prices_data:
-        # df = pd.get_price_data(5000)
-        df = read_csv("currencies_data/debug/" + pd.symbol + str(pd.interval).replace(".", "") + ".csv")
-        for ind_count in [4]:  # range(3, 5):
-            Process(target=signal_message_check_controller, args=(pd, df, 500, ind_count, deal_times,)).start()
+        df = pd.get_price_data(10000)
+        df.to_csv("currencies_data/" + pd.symbol + str(pd.interval).replace(".", "") + ".csv")
+        # df = read_csv("currencies_data/debug/" + pd.symbol + str(pd.interval).replace(".", "") + ".csv")
+        # for ind_count in [4]:  # range(3, 5):
+        #     Process(target=signal_message_check_controller, args=(pd, df, 500, ind_count, deal_times,)).start()

@@ -32,12 +32,12 @@ class Signal:
     def is_profit(self, open_price, close_price):
         return False
 
-    def get_close_position_signal_message(self, pd, open, close):
+    def get_close_position_signal_message(self, pd, open, close, bars_count):
         is_profit_position = self.is_profit(open, close)
         prifit_smile_text = profit_smile if is_profit_position else loss_smile
         # debug_text = f"\nЦіна закриття позиції {str(close)} Ціна відкриття позиції: {str(open)}"
 
-        message = f"{self.smile} Сделка в {prifit_smile_text} {pd.symbol[:3]}/{pd.symbol[3:]} {self.text} {timedelta_to_close_string(interval_to_datetime(pd.interval))}"
+        message = f"{self.smile} Сделка в {prifit_smile_text} {pd.symbol[:3]}/{pd.symbol[3:]} {self.text} {timedelta_to_close_string(interval_to_datetime(pd.interval), bars_count)}"
         return message, is_profit_position
 
 

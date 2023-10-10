@@ -234,7 +234,7 @@ def signals_message_sender_controller(prices_data, intervals, unit_pd):
             interval_prices_datas.append(interval_prices_data)
 
         while True:
-            await asyncio.sleep(3)
+            await asyncio.sleep(5)
             created_prices_data = []
             is_all_signals_created = True
             is_unit_min_created, date = signal_maker.is_signals_analized([unit_pd])
@@ -354,6 +354,6 @@ if __name__ == '__main__':
         analize_pair = (i_main_pd, i_parent_pds, unit_pd)
         multiprocessing.Process(target=signal_maker.analize_currency_data_controller, args=(analize_pair,)).start()
 
-    multiprocessing.Process(target=signals_message_sender_controller, args=(main_pds[len(currencies):], main_intervals[1:], unit_pd, )).start()
+    multiprocessing.Process(target=signals_message_sender_controller, args=(main_pds, main_intervals, unit_pd)).start()
 
     executor.start_polling(dp, skip_updates=True)

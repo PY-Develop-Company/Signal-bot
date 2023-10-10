@@ -63,16 +63,14 @@ class MainAnalizer(Analizer):
         analize_block_delta = sob_dict.get(df["symbol"][0].split(":")[1]).get(interval)
 
         volume_ind = VolumeIndicator(df, df.open, df.close, df.high, df.low)
-        sp_ind = ScalpProIndicator(df, df.open, df.close, df.high, df.low)
-        uma_ind = UMAIndicator(df, df.open, df.close, df.high, df.low)
+        sp_ind = ScalpProIndicator(df, df.open, df.close, df.high, df.low, 16, 12, 16)
+        uma_ind = UMAIndicator(df, df.open, df.close, df.high, df.low, 5)
         sob_ind = SuperOrderBlockIndicator(df, df.open, df.close, df.high, df.low, interval_td, analize_block_delta)
-        nw_ind = NadarayaWatsonIndicator(df, df.open, df.close, df.high, df.low)
 
         indicators_signals = {
             "sob": sob_ind.get_signal(),
             "volume": volume_ind.get_signal(),
             "uma": uma_ind.get_signal(),
-            "nw": nw_ind.get_signal(),
             "sp": sp_ind.get_signal()
         }
 
@@ -148,7 +146,7 @@ class VolumeAnalizer(Analizer):
 class SPAnalizer(Analizer):
     def analize_func(self, df) -> (bool, Signal, str):
         # 16 12 16
-        sp_ind = ScalpProIndicator(df, df.open, df.close, df.high, df.low)
+        sp_ind = ScalpProIndicator(df, df.open, df.close, df.high, df.low, 16, 12, 16)
         signal = sp_ind.get_signal()
         has_signal = not(signal.type == NeutralSignal())
         return has_signal, signal, "no debug"
@@ -157,7 +155,7 @@ class SPAnalizer(Analizer):
 class UMAAnalizer(Analizer):
     def analize_func(self, df) -> (bool, Signal, str):
         # 5
-        uma_ind = UMAIndicator(df, df.open, df.close, df.high, df.low)
+        uma_ind = UMAIndicator(df, df.open, df.close, df.high, df.low, 5)
         signal = uma_ind.get_signal()
         has_signal = not(signal.type == NeutralSignal())
         return has_signal, signal, "no debug"

@@ -373,7 +373,7 @@ class SuperOrderBlockIndicator(Indicator):
 
 
 class ScalpProIndicator(Indicator):
-    def __init__(self, src, open, close, high, low, fast_line=8, slow_line=20, smoothness=10):
+    def __init__(self, src, open, close, high, low, fast_line=8, slow_line=10, smoothness=8):
         super().__init__(src, open, close, high, low)
         self.fast_line = fast_line
         self.slow_line = slow_line
@@ -453,7 +453,7 @@ class ScalpProIndicator(Indicator):
 
 
 class VolumeIndicator(Indicator):
-    def __init__(self, src, open, close, high, low, bars_count=4):
+    def __init__(self, src, open, close, high, low, bars_count=3):
         super().__init__(src, open, close, high, low)
         self.bars_count = bars_count
         self.name = "Volume"
