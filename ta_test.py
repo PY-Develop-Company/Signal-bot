@@ -120,7 +120,7 @@ def get_analzied_df(df):
     df_short_old = reverse_results(df_short_old)
     df = pd.concat([df_long_old, df_short_old])
 
-    df = test(df)
+    # df = test(df)
 
     return df.reset_index(drop=True)
 
@@ -363,7 +363,7 @@ for i in range(len(paths_clasic)):
             dfs.append(import_dfs(path[k:k+1]))
 
         # df["SuperOrderBlock"] = df_new["SuperOrderBlock"]
-        df["Volume"] = df_new["Volume"]
+        # df["Volume"] = df_new["Volume"]
         df = get_analzied_df(df)
         base_dfs = pd.concat([base_dfs, df]).reset_index(drop=True)
         df_sob = get_analzied_df_multitimeframe(df, dfs, 2)

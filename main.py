@@ -234,37 +234,42 @@ def signals_message_sender_controller(prices_data, intervals, unit_pd):
             interval_prices_datas.append(interval_prices_data)
 
         while True:
-            await asyncio.sleep(5)
+            await asyncio.sleep(10)
             created_prices_data = []
-            is_all_signals_created = True
-            is_unit_min_created, date = signal_maker.is_signals_analized([unit_pd])
-            if not is_unit_min_created or (date is None):
+            # is_all_signals_created = True
+            # is_unit_min_created, date = signal_maker.is_signals_analized([unit_pd])
+            # if not is_unit_min_created or (date is None):
+            #     continue
+
+            for pd in prices_data:
+                if signal_maker.is_signal_analized(pd):
+                    created_prices_data.append(pd)
+            if len(created_prices_data) == 0:
                 continue
+            # for i in range(len(intervals)):
+            #     is_min_created, _ = signal_maker.is_signals_analized(interval_prices_datas[i])
+            #
+            #     if _ is None:
+            #         is_all_signals_created = False
+            #         break
+            #     if not (interval_prices_datas[i][0].is_analize_time(date, debug=True)):
+            #         break
+            #
+            #     # print("\ncheck creation of interval: ", intervals[i], dates[0])
+            #     # for pd in interval_prices_datas[i]:
+            #     #     pd.print()
+            #     # print()
+            #
+            #     is_all_signals_created = is_all_signals_created and is_min_created
+            #     if not is_all_signals_created:
+            #         break
+            #     else:
+            #         for pd in interval_prices_datas[i]:
+            #             created_prices_data.append(pd)
 
-            for i in range(len(intervals)):
-                is_min_created, _ = signal_maker.is_signals_analized(interval_prices_datas[i])
-
-                if _ is None:
-                    is_all_signals_created = False
-                    break
-                if not (interval_prices_datas[i][0].is_analize_time(date, debug=True)):
-                    break
-
-                # print("\ncheck creation of interval: ", intervals[i], dates[0])
-                # for pd in interval_prices_datas[i]:
-                #     pd.print()
-                # print()
-
-                is_all_signals_created = is_all_signals_created and is_min_created
-                if not is_all_signals_created:
-                    break
-                else:
-                    for pd in interval_prices_datas[i]:
-                        created_prices_data.append(pd)
-
-            if not is_all_signals_created:
-                # print("not all created", datetime.now())
-                continue
+            # if not is_all_signals_created:
+            #     # print("not all created", datetime.now())
+            #     continue
             # print("all created", datetime.now())
             dfs_with_signals = []
             for pd in created_prices_data:
@@ -279,18 +284,18 @@ def signals_message_sender_controller(prices_data, intervals, unit_pd):
                 signal_maker.reset_signals_files(created_prices_data)
                 continue
 
-            max_sob_count = 0
-            for df in dfs_with_signals:
-                sob_count = int(df.sob_signals_count[0])
-                if sob_count > max_sob_count:
-                    max_sob_count = sob_count
+            # max_sob_count = 0
+            # for df in dfs_with_signals:
+            #     sob_count = int(df.sob_signals_count[0])
+            #     if sob_count > max_sob_count:
+            #         max_sob_count = sob_count
+            #
+            # max_sob_dfs = []
+            # for df in dfs_with_signals:
+            #     if int(df.sob_signals_count[0]) == max_sob_count:
+            #         max_sob_dfs.append(df)
 
-            max_sob_dfs = []
-            for df in dfs_with_signals:
-                if int(df.sob_signals_count[0]) == max_sob_count:
-                    max_sob_dfs.append(df)
-
-            df = random.choice(max_sob_dfs)
+            df = random.choice(dfs_with_signals)
             signal = get_signal_by_type(df.signal_type[0])
 
             pd = PriceData(df.symbol[0], df.exchange[0], interval_convertor.str_to_interval(df.interval[0]))

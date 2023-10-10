@@ -308,8 +308,8 @@ class SuperOrderBlockIndicator(Indicator):
                         biggest_box_height = biggest_box.top - biggest_box.bottom
             return_signal = biggest_box.signal
 
-        # if self.includeDelta and self.is_closing_block_nearby(return_signal, not_closed_boxes):
-        #     return NeutralSignal()
+        if self.includeDelta and self.is_closing_block_nearby(return_signal, not_closed_boxes):
+            return NeutralSignal()
 
         return return_signal
 

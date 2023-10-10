@@ -110,6 +110,7 @@ def create_parce_currencies_with_intervals_callbacks(pds: [PriceData]):
             price_df = get_price_data_frame_seis(seis)
 
             pd = PriceData(seis.symbol, seis.exchange, seis.interval)
+            print ("update file", pd.symbol, pd.interval)
             pd.save_chart_data(price_df)
         except Exception as e:
             print("bbb", e)

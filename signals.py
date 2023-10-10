@@ -23,8 +23,8 @@ class Signal:
         self.smile = None
         self.text = None
 
-    def get_open_msg_text(self, pd):
-        return self.smile + pd.symbol[:3] + "/" + pd.symbol[3:] + " " + self.text + " " + timedelta_to_close_string(interval_to_datetime(pd.interval))
+    def get_open_msg_text(self, pd, bars_count):
+        return self.smile + pd.symbol[:3] + "/" + pd.symbol[3:] + " " + self.text + " " + timedelta_to_close_string(interval_to_datetime(pd.interval), bars_count)
 
     def get_photo_path(self):
         return self.photo_path

@@ -42,6 +42,13 @@ def save_signal_file(df, pd: PriceData):
         pass
 
 
+def is_signal_analized(pd):
+    path = signals_check_ended + pd.symbol + str(pd.interval).replace(".", "") + ".txt"
+    if not file_manager.is_file_exists(path):
+        return False
+
+    return True
+
 def is_signals_analized(prices_data):
     prev_pd = None
     for pd in prices_data:
@@ -83,10 +90,12 @@ def analize_currency_data_controller(analize_pair):
     def analize_currency_data_function(main_pd: PriceData, sob_check_pds: [PriceData], unit_pd: PriceData):
         main_price_df = main_pd.get_chart_data_if_exists_if_can_analize()
         if main_price_df is None:
+            # print("main_price_df is None")
             return
 
         dt = main_price_df["datetime"][0]
         if not unit_pd.is_analize_time(dt):
+            # print("main_price_df is None")
             return
 
         prices_df = {}
@@ -96,11 +105,11 @@ def analize_currency_data_controller(analize_pair):
             if is_price_df_exists:
                 prices_df.update({pd: price_df})
 
-        analizer = MultitimeframeAnalizer(3, 2)
+        analizer = MultitimeframeAnalizer(3, 1)
         has_signal, signal, _, main_indicators_count, sob_signals_count = analizer.analize(main_price_df, main_pd.interval, prices_df)
 
         open_position_price = main_price_df.close[0]
-        msg = signal.get_open_msg_text(main_pd)
+        msg = signal.get_open_msg_text(main_pd, 6)
 
         data = [[has_signal, signal.type, msg, main_price_df.datetime[0], open_position_price, main_pd.interval,
                  main_indicators_count, sob_signals_count, main_pd.symbol, main_pd.exchange]]
