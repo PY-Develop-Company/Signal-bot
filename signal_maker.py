@@ -156,7 +156,7 @@ async def signal_message_check_function_child(pd, full_df, deal_times):
     data_el = [check_df["datetime"][0], sob_signal.type, volume_signal.type, uma_signal.type, sp_signal.type]
     deal_results = []
 
-    print(pd.signal, pd.interval, "loop")
+    print("loop")
     for deal_time in deal_times:
         close_position_price = full_df.close[0 + deal_times[-1] - deal_time]
         has_profit_long = LongSignal().is_profit(open_position_price, close_position_price)
@@ -209,7 +209,7 @@ def signal_message_check_controller(pd, price_data_frame: DataFrame, bars_to_ana
 
 
 if __name__ == "__main__":
-    currencies = price_parser.get_currencies()[0:4]
+    currencies = price_parser.get_currencies()[4:]
     intervals = [Interval.in_1_minute, Interval.in_3_minute, Interval.in_5_minute, Interval.in_15_minute, Interval.in_30_minute, Interval.in_45_minute, Interval.in_1_hour, Interval.in_2_hour]
 
     prices_data = []
@@ -221,9 +221,9 @@ if __name__ == "__main__":
             deal_times = range(1, 11)
 
     for pd in prices_data:
-        df = pd.get_price_data(5000)
-        df.to_csv("currencies_data/" + pd.symbol + str(pd.interval).replace(".", "") + ".csv")
-        # df = read_csv("currencies_data/debug/" + pd.symbol + str(pd.interval).replace(".", "") + ".csv")
+        # df = pd.get_price_data(5000)
+        # df.to_csv("currencies_data/" + pd.symbol + str(pd.interval).replace(".", "") + ".csv")
+        df = read_csv("currencies_data/debug/" + pd.symbol + str(pd.interval).replace(".", "") + ".csv")
         Process(target=signal_message_check_controller, args=(pd, df, 500, deal_times)).start()
 
 
