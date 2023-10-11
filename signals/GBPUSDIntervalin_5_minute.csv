@@ -1,2 +1,2 @@
 ,has_signal,signal_type,msg,date,open_price,interval,indicators_count,sob_signals_count,symbol,exchange
-0,False,neutral,NoneGBP/USD Нет сигнала 30мин,2023-10-10 13:35:00,1.22641,Interval.in_5_minute,0,0,GBPUSD,OANDA
+0,False,neutral,NoneGBP/USD Нет сигнала 30мин,2023-10-11 00:55:00,1.22856,Interval.in_5_minute,0,0,GBPUSD,OANDA

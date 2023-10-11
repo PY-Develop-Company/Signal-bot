@@ -311,8 +311,7 @@ if __name__ == '__main__':
     from aiogram import executor
 
     currencies = price_parser.get_currencies()  # [("BTCUSD", "COINBASE"), ("ETHUSD", "COINBASE"), ("DOGEUSD", "COINBASE"),("SOLUSD", "COINBASE")]
-    intervals = [Interval.in_1_minute, Interval.in_3_minute, Interval.in_5_minute, Interval.in_15_minute,
-                 Interval.in_30_minute]
+    intervals = [Interval.in_1_minute, Interval.in_3_minute, Interval.in_5_minute, Interval.in_15_minute, Interval.in_30_minute]
     main_intervals = [Interval.in_1_minute, Interval.in_3_minute, Interval.in_5_minute]
     parent_intervals = [
         [Interval.in_3_minute, Interval.in_5_minute, Interval.in_15_minute, Interval.in_30_minute],

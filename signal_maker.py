@@ -105,7 +105,7 @@ def analize_currency_data_controller(analize_pair):
             if is_price_df_exists:
                 prices_df.update({pd: price_df})
 
-        analizer = MultitimeframeAnalizer(3, 1)
+        analizer = MultitimeframeAnalizer(3, 2)
         has_signal, signal, _, main_indicators_count, sob_signals_count = analizer.analize(main_price_df, main_pd.interval, prices_df)
 
         open_position_price = main_price_df.close[0]
@@ -136,16 +136,12 @@ async def signal_message_check_function_child(pd, full_df, deal_times):
     check_df = full_df.iloc[deal_times[-1]:].reset_index(drop=True)
 
     sob_start_time = datetime.now()
-    sob_is_signal, sob_signal, sob_debug_text = NoDeltaSOBAnalizer().analize(check_df, pd.interval)
+    sob_is_signal, sob_signal, sob_debug_text = SOBAnalizer().analize(check_df, pd.interval)
     sob_delta_time = datetime.now() - sob_start_time
 
     sp_start_time = datetime.now()
     sp_is_signal, sp_signal, sp_debug_text = SPAnalizer().analize(check_df)
     sp_delta_time = datetime.now() - sp_start_time
-
-    nw_start_time = datetime.now()
-    nw_is_signal, nw_signal, nw_debug_text = NWAnalizer().analize(check_df)
-    nw_delta_time = datetime.now() - nw_start_time
 
     uma_start_time = datetime.now()
     uma_is_signal, uma_signal, uma_debug_text = UMAAnalizer().analize(check_df)
@@ -156,7 +152,7 @@ async def signal_message_check_function_child(pd, full_df, deal_times):
     volume_delta_time = datetime.now() - volume_start_time
 
     open_position_price = check_df.close[0]
-    data_el = [check_df["datetime"][0], sob_signal.type, volume_signal.type, uma_signal.type, nw_signal.type,
+    data_el = [check_df["datetime"][0], sob_signal.type, volume_signal.type, uma_signal.type, None,
                sp_signal.type]
     deal_results = []
     print("loop")
@@ -168,7 +164,7 @@ async def signal_message_check_function_child(pd, full_df, deal_times):
     deal_results.reverse()
     for deal_result in deal_results:
         data_el.insert(0, deal_result)
-    return data_el, sob_delta_time, sp_delta_time, nw_delta_time, uma_delta_time, volume_delta_time
+    return data_el, sob_delta_time, sp_delta_time, uma_delta_time, volume_delta_time
 
 
 def signal_message_check_controller(pd, price_data_frame: DataFrame, bars_to_analyse, successful_indicators_count, deal_times):
@@ -190,9 +186,8 @@ def signal_message_check_controller(pd, price_data_frame: DataFrame, bars_to_ana
         data = [data_el[0] for data_el in datas]
         print("sob wait time", sum([data_el[1] / Timedelta(seconds=1) for data_el in datas]))
         print("sp wait time", sum([data_el[2] / Timedelta(seconds=1) for data_el in datas]))
-        print("nw wait time", sum([data_el[3] / Timedelta(seconds=1) for data_el in datas]))
-        print("uma wait time", sum([data_el[4] / Timedelta(seconds=1) for data_el in datas]))
-        print("volume wait time", sum([data_el[5] / Timedelta(seconds=1) for data_el in datas]))
+        print("uma wait time", sum([data_el[3] / Timedelta(seconds=1) for data_el in datas]))
+        print("volume wait time", sum([data_el[4] / Timedelta(seconds=1) for data_el in datas]))
         for d in data:
             if d is None:
                 continue
@@ -213,7 +208,7 @@ def signal_message_check_controller(pd, price_data_frame: DataFrame, bars_to_ana
 
 
 if __name__ == "__main__":
-    currencies = price_parser.get_currencies()[0:1]
+    currencies = price_parser.get_currencies()[4:7]
     intervals = [Interval.in_1_minute, Interval.in_3_minute, Interval.in_5_minute, Interval.in_15_minute, Interval.in_30_minute]
 
     prices_data = []
@@ -225,8 +220,8 @@ if __name__ == "__main__":
             deal_times = range(1, 11)
 
     for pd in prices_data:
-        df = pd.get_price_data(10000)
-        df.to_csv("currencies_data/" + pd.symbol + str(pd.interval).replace(".", "") + ".csv")
-        # df = read_csv("currencies_data/debug/" + pd.symbol + str(pd.interval).replace(".", "") + ".csv")
-        # for ind_count in [4]:  # range(3, 5):
-        #     Process(target=signal_message_check_controller, args=(pd, df, 500, ind_count, deal_times,)).start()
+        # df = pd.get_price_data(10000)
+        # df.to_csv("currencies_data/" + pd.symbol + str(pd.interval).replace(".", "") + ".csv")
+        df = read_csv("currencies_data/debug/" + pd.symbol + str(pd.interval).replace(".", "") + ".csv")
+        for ind_count in [4]:  # range(3, 5):
+            Process(target=signal_message_check_controller, args=(pd, df, 500, ind_count, deal_times,)).start()

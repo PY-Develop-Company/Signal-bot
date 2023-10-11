@@ -2,6 +2,7 @@ import time
 from _operator import index
 
 import tradingview_ta
+from tradingview_ta import TA_Handler, Interval, Exchange
 import pandas as pd
 from pandas import Timedelta
 from signals import *
@@ -120,7 +121,7 @@ def get_analzied_df(df):
     df_short_old = reverse_results(df_short_old)
     df = pd.concat([df_long_old, df_short_old])
 
-    # df = test(df)
+    df = test(df)
 
     return df.reset_index(drop=True)
 
@@ -240,6 +241,14 @@ def compare():
     income_percent_diff(df, df_old)
 
 
+tesla = TA_Handler(
+    symbol="BTCUSD",
+    screener="crypto",
+    exchange="COINBASE",
+    interval=Interval.INTERVAL_1_MINUTE
+)
+print(tesla.get_analysis().indicators)
+
 # paths = [
 #     "debug/clasic_AUDCAD_Intervalin_1_minute.csv",
 #     "debug/clasic_AUDCAD_Intervalin_5_minute.csv",
@@ -269,104 +278,104 @@ def compare():
 # compare()
 
 
-paths_clasic = [
-    # ["debug/clasic/clasic_AUDUSD_Intervalin_1_minute.csv",
-    # "debug/clasic/clasic_AUDUSD_Intervalin_5_minute.csv",
-    # "debug/clasic/clasic_AUDUSD_Intervalin_15_minute.csv"],
-    # ["debug/clasic/clasic_AUDCAD_Intervalin_1_minute.csv",
-    #  "debug/clasic/clasic_AUDCAD_Intervalin_5_minute.csv",
-    #  "debug/clasic/clasic_AUDCAD_Intervalin_15_minute.csv"],
-    # ["debug/clasic/clasic_EURJPY_Intervalin_1_minute.csv",
-    #  "debug/clasic/clasic_EURJPY_Intervalin_5_minute.csv",
-    #  "debug/clasic/clasic_EURJPY_Intervalin_15_minute.csv"]
-
-
-
-    ["debug/new_clasic/AUDUSD_Intervalin_1_minute.csv",
-    "debug/new_clasic/AUDUSD_Intervalin_3_minute.csv",
-    "debug/new_clasic/AUDUSD_Intervalin_5_minute.csv",
-    "debug/new_clasic/AUDUSD_Intervalin_15_minute.csv",
-    "debug/new_clasic/AUDUSD_Intervalin_30_minute.csv"],
-
-    ["debug/new_clasic/AUDCAD_Intervalin_1_minute.csv",
-     "debug/new_clasic/AUDCAD_Intervalin_3_minute.csv",
-     "debug/new_clasic/AUDCAD_Intervalin_5_minute.csv",
-     "debug/new_clasic/AUDCAD_Intervalin_15_minute.csv",
-     "debug/new_clasic/AUDCAD_Intervalin_30_minute.csv"],
-
-    ["debug/new_clasic/EURJPY_Intervalin_1_minute.csv",
-     "debug/new_clasic/EURJPY_Intervalin_3_minute.csv",
-     "debug/new_clasic/EURJPY_Intervalin_5_minute.csv",
-     "debug/new_clasic/EURJPY_Intervalin_15_minute.csv",
-     "debug/new_clasic/EURJPY_Intervalin_30_minute.csv"]
-]
-# print(import_dfs(paths)["SuperOrderBlock"].value_counts())
-paths_extra = [
-    # ["debug/5000extra/AUDUSD_Intervalin_1_minute.csv",
-    # "debug/5000extra/AUDUSD_Intervalin_5_minute.csv",
-    # "debug/5000extra/AUDUSD_Intervalin_15_minute.csv"],
-    # ["debug/5000extra/AUDCAD_Intervalin_1_minute.csv",
-    #  "debug/5000extra/AUDCAD_Intervalin_5_minute.csv",
-    #  "debug/5000extra/AUDCAD_Intervalin_15_minute.csv"],
-    # ["debug/5000extra/EURJPY_Intervalin_1_minute.csv",
-    #  "debug/5000extra/EURJPY_Intervalin_5_minute.csv",
-    #  "debug/5000extra/EURJPY_Intervalin_15_minute.csv"]
-
-
-
-    ["debug/new_extra/AUDUSD_Intervalin_1_minute.csv",
-    "debug/new_extra/AUDUSD_Intervalin_3_minute.csv",
-    "debug/new_extra/AUDUSD_Intervalin_5_minute.csv",
-    "debug/new_extra/AUDUSD_Intervalin_15_minute.csv",
-    "debug/new_extra/AUDUSD_Intervalin_30_minute.csv"],
-
-    ["debug/new_extra/AUDCAD_Intervalin_1_minute.csv",
-    "debug/new_extra/AUDCAD_Intervalin_3_minute.csv",
-    "debug/new_extra/AUDCAD_Intervalin_5_minute.csv",
-    "debug/new_extra/AUDCAD_Intervalin_15_minute.csv",
-    "debug/new_extra/AUDCAD_Intervalin_30_minute.csv"],
-
-    ["debug/new_extra/EURJPY_Intervalin_1_minute.csv",
-    "debug/new_extra/EURJPY_Intervalin_3_minute.csv",
-    "debug/new_extra/EURJPY_Intervalin_5_minute.csv",
-    "debug/new_extra/EURJPY_Intervalin_15_minute.csv",
-    "debug/new_extra/EURJPY_Intervalin_30_minute.csv"]
-]
-# print(import_dfs(paths)["SuperOrderBlock"].value_counts())
-
-# path = paths_extra[0]
+# paths_clasic = [
+#     # ["debug/clasic/clasic_AUDUSD_Intervalin_1_minute.csv",
+#     # "debug/clasic/clasic_AUDUSD_Intervalin_5_minute.csv",
+#     # "debug/clasic/clasic_AUDUSD_Intervalin_15_minute.csv"],
+#     # ["debug/clasic/clasic_AUDCAD_Intervalin_1_minute.csv",
+#     #  "debug/clasic/clasic_AUDCAD_Intervalin_5_minute.csv",
+#     #  "debug/clasic/clasic_AUDCAD_Intervalin_15_minute.csv"],
+#     # ["debug/clasic/clasic_EURJPY_Intervalin_1_minute.csv",
+#     #  "debug/clasic/clasic_EURJPY_Intervalin_5_minute.csv",
+#     #  "debug/clasic/clasic_EURJPY_Intervalin_15_minute.csv"]
 #
-# df_new = import_dfs(paths_clasic[0][0:1])
+#     ["debug/AUDCHF_Intervalin_1_minute.csv",
+#     "debug/AUDCHF_Intervalin_3_minute.csv",
+#     "debug/AUDCHF_Intervalin_5_minute.csv",
+#     "debug/AUDCHF_Intervalin_15_minute.csv",
+#     "debug/AUDCHF_Intervalin_30_minute.csv"],
 #
-# df = import_dfs(path[0:1])
-# dfs = [import_dfs(path[1:2]), import_dfs(path[2:3])]
+#     ["debug/EURCAD_Intervalin_1_minute.csv",
+#      "debug/EURCAD_Intervalin_3_minute.csv",
+#      "debug/EURCAD_Intervalin_5_minute.csv",
+#      "debug/EURCAD_Intervalin_15_minute.csv",
+#      "debug/EURCAD_Intervalin_30_minute.csv"],
 #
-# df["Volume"] = df_new["Volume"]
-# # df["UMA"] = df_new["UMA"]
-# df = get_analzied_df(df)
-# df_sob = get_analzied_df_multitimeframe(df, dfs, 1)
+#     ["debug/GBPUSD_Intervalin_1_minute.csv",
+#      "debug/GBPUSD_Intervalin_3_minute.csv",
+#      "debug/GBPUSD_Intervalin_5_minute.csv",
+#      "debug/GBPUSD_Intervalin_15_minute.csv",
+#      "debug/GBPUSD_Intervalin_30_minute.csv"],
 #
-# income_percent_diff(df, df_sob)
-
-
-base_dfs = pd.DataFrame()
-new_dfs = pd.DataFrame()
-for i in range(len(paths_clasic)):
-    for j in range(len(paths_clasic[i])-2):
-        path = paths_extra[i]
-
-        df_new = import_dfs(paths_clasic[i][j:j+1])
-
-        df = import_dfs(path[j:j + 1])
-        dfs = []
-        for k in range(j+1, len(paths_clasic[i])):
-            dfs.append(import_dfs(path[k:k+1]))
-
-        # df["SuperOrderBlock"] = df_new["SuperOrderBlock"]
-        # df["Volume"] = df_new["Volume"]
-        df = get_analzied_df(df)
-        base_dfs = pd.concat([base_dfs, df]).reset_index(drop=True)
-        df_sob = get_analzied_df_multitimeframe(df, dfs, 2)
-        new_dfs = pd.concat([new_dfs, df_sob]).reset_index(drop=True)
-
-income_percent_diff(new_dfs, base_dfs)
+#     ["debug/new_clasic/AUDUSD_Intervalin_1_minute.csv",
+#     "debug/new_clasic/AUDUSD_Intervalin_3_minute.csv",
+#     "debug/new_clasic/AUDUSD_Intervalin_5_minute.csv",
+#     "debug/new_clasic/AUDUSD_Intervalin_15_minute.csv",
+#     "debug/new_clasic/AUDUSD_Intervalin_30_minute.csv"],
+#
+#     ["debug/new_clasic/AUDCAD_Intervalin_1_minute.csv",
+#      "debug/new_clasic/AUDCAD_Intervalin_3_minute.csv",
+#      "debug/new_clasic/AUDCAD_Intervalin_5_minute.csv",
+#      "debug/new_clasic/AUDCAD_Intervalin_15_minute.csv",
+#      "debug/new_clasic/AUDCAD_Intervalin_30_minute.csv"],
+#
+#     ["debug/new_clasic/EURJPY_Intervalin_1_minute.csv",
+#      "debug/new_clasic/EURJPY_Intervalin_3_minute.csv",
+#      "debug/new_clasic/EURJPY_Intervalin_5_minute.csv",
+#      "debug/new_clasic/EURJPY_Intervalin_15_minute.csv",
+#      "debug/new_clasic/EURJPY_Intervalin_30_minute.csv"]
+# ]
+# paths_extra = [
+#     # ["debug/5000extra/AUDUSD_Intervalin_1_minute.csv",
+#     # "debug/5000extra/AUDUSD_Intervalin_5_minute.csv",
+#     # "debug/5000extra/AUDUSD_Intervalin_15_minute.csv"],
+#     # ["debug/5000extra/AUDCAD_Intervalin_1_minute.csv",
+#     #  "debug/5000extra/AUDCAD_Intervalin_5_minute.csv",
+#     #  "debug/5000extra/AUDCAD_Intervalin_15_minute.csv"],
+#     # ["debug/5000extra/EURJPY_Intervalin_1_minute.csv",
+#     #  "debug/5000extra/EURJPY_Intervalin_5_minute.csv",
+#     #  "debug/5000extra/EURJPY_Intervalin_15_minute.csv"]
+#
+#
+#
+#     ["debug/new_extra/AUDUSD_Intervalin_1_minute.csv",
+#     "debug/new_extra/AUDUSD_Intervalin_3_minute.csv",
+#     "debug/new_extra/AUDUSD_Intervalin_5_minute.csv",
+#     "debug/new_extra/AUDUSD_Intervalin_15_minute.csv",
+#     "debug/new_extra/AUDUSD_Intervalin_30_minute.csv"],
+#
+#     ["debug/new_extra/AUDCAD_Intervalin_1_minute.csv",
+#     "debug/new_extra/AUDCAD_Intervalin_3_minute.csv",
+#     "debug/new_extra/AUDCAD_Intervalin_5_minute.csv",
+#     "debug/new_extra/AUDCAD_Intervalin_15_minute.csv",
+#     "debug/new_extra/AUDCAD_Intervalin_30_minute.csv"],
+#
+#     ["debug/new_extra/EURJPY_Intervalin_1_minute.csv",
+#     "debug/new_extra/EURJPY_Intervalin_3_minute.csv",
+#     "debug/new_extra/EURJPY_Intervalin_5_minute.csv",
+#     "debug/new_extra/EURJPY_Intervalin_15_minute.csv",
+#     "debug/new_extra/EURJPY_Intervalin_30_minute.csv"]
+# ]
+#
+#
+# base_dfs = pd.DataFrame()
+# new_dfs = pd.DataFrame()
+# for i in range(len(paths_extra)):
+#     for j in range(len(paths_extra[i])-2):
+#         path = paths_extra[i]
+#
+#         df = import_dfs(path[j:j + 1])
+#         dfs = []
+#         for k in range(j+1, len(paths_clasic[i])):
+#             dfs.append(import_dfs(path[k:k+1]))
+#
+#         # df["SuperOrderBlock"] = df_new["SuperOrderBlock"]
+#         if (i >= 3):
+#             df_new = import_dfs(paths_clasic[i-3][j:j+1])
+#             df["Volume"] = df_new["Volume"]
+#         df = get_analzied_df(df)
+#         base_dfs = pd.concat([base_dfs, df]).reset_index(drop=True)
+#         df_sob = get_analzied_df_multitimeframe(df, dfs, 2)
+#         new_dfs = pd.concat([new_dfs, df_sob]).reset_index(drop=True)
+# print(new_dfs.sort_values(by=['datetime']).to_string())
+# income_percent_diff(new_dfs, base_dfs)
