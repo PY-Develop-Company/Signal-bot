@@ -124,9 +124,9 @@ class Indicator:
 
 
 class SuperOrderBlockIndicator(Indicator):
-    def __init__(self, src, open, close, high, low, interval: timedelta, analize_block_delta, includeDelta=True, obMaxBoxSet=100,
-                 fvgMaxBoxSet=100):
+    def __init__(self, src, open, close, high, low, interval: timedelta, analize_block_delta, includeDelta=True, obMaxBoxSet=10, fvgMaxBoxSet=10):
         super().__init__(src, open, close, high, low)
+        self.src.datetime = pandas.to_datetime(self.src.datetime)
         self.interval = interval
         obMaxBoxSet = clamp(obMaxBoxSet, 1, 100)
         fvgMaxBoxSet = clamp(fvgMaxBoxSet, 1, 100)
@@ -173,9 +173,9 @@ class SuperOrderBlockIndicator(Indicator):
 
     def pivot_high(self, price):
         highs = {}
-        prices_count = len(price)
-        nearest_high_price = price[prices_count - 1]
-        for i in range(prices_count - 2, 0, -1):
+        prices_count = len(price) - 1
+        nearest_high_price = price[prices_count]
+        for i in range(prices_count - 1, 0, -1):
             if price[i - 1] < price[i] > price[i + 1]:
                 nearest_high_price = price[i]
             highs.update({i: nearest_high_price})
@@ -184,9 +184,9 @@ class SuperOrderBlockIndicator(Indicator):
 
     def pivot_low(self, price):
         lows = {}
-        prices_count = len(price)
-        nearest_low_price = price[prices_count - 1]
-        for i in range(prices_count - 2, 0, -1):
+        prices_count = len(price) - 1
+        nearest_low_price = price[prices_count]
+        for i in range(prices_count - 1, 0, -1):
             if price[i - 1] > price[i] < price[i + 1]:
                 nearest_low_price = price[i]
             lows.update({i: nearest_low_price})
@@ -194,8 +194,8 @@ class SuperOrderBlockIndicator(Indicator):
         return lows
 
     def control_box(self, boxes, high, low, box_index):
+        dt = self.src.datetime[box_index]
         for i in range(len(boxes) - 1, 0, -1):
-            dt = self.src.datetime[box_index]
             is_price_in_box = (high > boxes[i].bottom > low) or (high > boxes[i].top > low)
             if dt == boxes[i].right and not is_price_in_box:
                 boxes[i].right = dt + self.interval
@@ -223,68 +223,67 @@ class SuperOrderBlockIndicator(Indicator):
         return False
 
     def get_signal(self):
-        self.src.datetime = pandas.to_datetime(self.src.datetime)
-
         _bearBoxesOB = []
         _bullBoxesOB = []
         _bearBoxesFVG = []
         _bullBoxesFVG = []
 
         prices_count = len(self.src)-3
-        # # # # # # # # # # # Order Block # # # # # # # # #
-        for i in range(prices_count, -1, -1):
+
+        bear_boxes_index_OB = 0
+        bull_boxes_index_OB = 0
+        bear_boxes_index_FVG = 0
+        bull_boxes_index_FVG = 0
+
+        last_added_box_index = 0
+        for i in range(0, prices_count+1):
+            # # # # # # # # # # # Order Block # # # # # # # # #
             right = self.src.datetime[i]
             left = right - self.interval * 2
             h2 = self.high[i + 2]
             l2 = self.low[i + 2]
 
-            if self.is_ob_box_up(i + 1):
+            if self.is_ob_box_up(i + 1) and bull_boxes_index_OB <= 10:
                 _bullboxOB = self.Box(left=left, top=h2, right=right, bottom=min(l2, self.low[i + 1]), signal=LongSignal())
-                if len(_bullBoxesOB) > self.obMaxBoxSet:
-                    _bullBoxesOB.remove(_bullBoxesOB[0])
                 _bullBoxesOB.append(_bullboxOB)
+                bull_boxes_index_OB += 1
+                last_added_box_index = i
 
-            if self.is_ob_box_down(i + 1):
+            if self.is_ob_box_down(i + 1) and bear_boxes_index_OB <= 10:
                 _bearboxOB = self.Box(left=left, top=max(h2, self.high[i + 1]), right=right, bottom=l2, signal=ShortSignal())
-                if len(_bearBoxesOB) > self.obMaxBoxSet:
-                    _bearBoxesOB.remove(_bearBoxesOB[0])
                 _bearBoxesOB.append(_bearboxOB)
+                bear_boxes_index_OB += 1
+                last_added_box_index = i
 
-            if i > 0:
-                self.control_box(_bearBoxesOB, self.high[i], self.low[i], i)
-                self.control_box(_bullBoxesOB, self.high[i], self.low[i], i)
-
-        # # # # # # # # # Fair Value Gap # # # # # # # # #
-        for i in range(prices_count, -1, -1):
-            right = self.src.datetime[i]
-            left = right - self.interval * 2
+            # # # # # # # # # Fair Value Gap # # # # # # # # #
             h = self.high[i]
             l = self.low[i]
 
-            if self.is_fvg_box_up(i):
+            if self.is_fvg_box_up(i) and bull_boxes_index_FVG <= 10:
                 _bullboxFVG = self.Box(left=left, top=l, right=right, bottom=self.high[i + 2], signal=LongSignal())
-
-                if len(_bullBoxesFVG) > self.fvgMaxBoxSet:
-                    _bullBoxesFVG.remove(_bullBoxesFVG[0])
                 _bullBoxesFVG.append(_bullboxFVG)
+                bull_boxes_index_FVG += 1
+                last_added_box_index = i
 
-            if self.is_fvg_box_down(i):
+            if self.is_fvg_box_down(i) and bear_boxes_index_FVG <= 10:
                 _bearboxFVG = self.Box(left=left, top=self.low[i + 2], right=right, bottom=h, signal=ShortSignal())
-
-                if len(_bearBoxesFVG) > self.fvgMaxBoxSet:
-                    _bearBoxesFVG.remove(_bearBoxesFVG[0])
                 _bearBoxesFVG.append(_bearboxFVG)
+                bear_boxes_index_FVG += 1
+                last_added_box_index = i
 
+        boxes = _bullBoxesOB + _bearBoxesOB + _bullBoxesFVG + _bearBoxesFVG
+        for i in range(last_added_box_index, -1, -1):
+            h = self.high[i]
+            l = self.low[i]
             if i > 0:
-                self.control_box(_bearBoxesFVG, h, l, i)
-                self.control_box(_bullBoxesFVG, h, l, i)
+                self.control_box(boxes, h, l, i)
 
         right = self.src.datetime[0]
 
         not_closed_boxes = []
-        boxes = _bullBoxesOB + _bearBoxesOB + _bullBoxesFVG + _bearBoxesFVG
         return_signal = NeutralSignal()
         signal_boxes = []
+
         for box in boxes:
             signal = box.check_signal(self.low[0], self.high[0], right)
             if not (signal.type == NeutralSignal.type):
@@ -389,15 +388,20 @@ class ScalpProIndicator(Indicator):
         c3 = -a * a
         c1 = 1 - c2 - c3
 
-        for i in range(len(p) - 2, -1, -1):
-            ssm1 = 0
-            ssm2 = 0
-            if i + 1 < len(p):
-                ssm1 = res[i + 1]
-            if i + 2 < len(p):
-                ssm2 = res[i + 2]
-
-            res[i] = c1 * (p[i] + p[i + 1]) * 0.5 + c2 * ssm1 + c3 * ssm2
+        res = np.array([c1 * (p[i] + p[i + 1]) * 0.5 + c2 *
+                        res[i + 1] if (i + 1 < len(p)) else 0 +
+                        c3 *
+                        res[i + 2] if (i + 2 < len(p)) else 0
+                        for i in range(len(p) - 2, -1, -1)])
+        # for i in range(len(p) - 2, -1, -1):
+        #     ssm1 = 0
+        #     ssm2 = 0
+        #     if i + 1 < len(p):
+        #         ssm1 = res[i + 1]
+        #     if i + 2 < len(p):
+        #         ssm2 = res[i + 2]
+        #
+        #     res[i] = c1 * (p[i] + p[i + 1]) * 0.5 + c2 * ssm1 + c3 * ssm2
         return res
 
     def get_signal(self):
