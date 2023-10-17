@@ -26,7 +26,7 @@ async def close_position_delay(interval: Interval, bars_count=3):
     await asyncio.sleep(delay_seconds)
 
 
-async def close_position(position_open_price, signal: Signal, pd: PriceData, bars_count=6):
+async def close_position(position_open_price, signal: Signal, pd: PriceData, bars_count):
     await close_position_delay(pd.interval, bars_count)
 
     price_data = pd.get_price_data(bars_count=2)
@@ -49,6 +49,7 @@ def is_signal_analized(pd):
         return False
 
     return True
+
 
 def is_signals_analized(prices_data):
     prev_pd = None
@@ -91,12 +92,10 @@ def analize_currency_data_controller(analize_pair):
     def analize_currency_data_function(main_pd: PriceData, sob_check_pds: [PriceData], unit_pd: PriceData):
         main_price_df = main_pd.get_chart_data_if_exists_if_can_analize()
         if main_price_df is None:
-            # print("main_price_df is None")
             return
 
         dt = main_price_df["datetime"][0]
         if not unit_pd.is_analize_time(dt):
-            # print("main_price_df is None")
             return
 
         prices_df = {}
@@ -107,15 +106,15 @@ def analize_currency_data_controller(analize_pair):
                 prices_df.update({pd: price_df})
 
         analizer = MultitimeframeAnalizer(3, 2)
-        has_signal, signal, _, main_indicators_count, sob_signals_count = analizer.analize(main_price_df, main_pd.interval, prices_df)
+        has_signal, signal, _, main_indicators_count, sob_signals_count, deal_time = analizer.analize(main_price_df, main_pd.interval, prices_df)
 
         open_position_price = main_price_df.close[0]
-        msg = signal.get_open_msg_text(main_pd, 6)
+        msg = signal.get_open_msg_text(main_pd, deal_time)
 
         data = [[has_signal, signal.type, msg, main_price_df.datetime[0], open_position_price, main_pd.interval,
-                 main_indicators_count, sob_signals_count, main_pd.symbol, main_pd.exchange]]
+                 main_indicators_count, sob_signals_count, main_pd.symbol, main_pd.exchange, deal_time]]
         columns = ["has_signal", "signal_type", "msg", "date", "open_price", "interval",
-                   "indicators_count", "sob_signals_count", "symbol", "exchange"]
+                   "indicators_count", "sob_signals_count", "symbol", "exchange", "deal_time"]
         df = DataFrame(data, columns=columns)
         save_signal_file(df, main_pd)
 
@@ -133,16 +132,24 @@ def analize_currency_data_controller(analize_pair):
 # test
 
 
-async def signal_message_check_function_child(pd, full_df, deal_times):
-    check_df = full_df.iloc[deal_times[-1]:].reset_index(drop=True)
+async def signal_message_check_function_child_dealtime_combined(pd, full_df):
+    check_df = full_df.reset_index(drop=True)
 
     sob_start_time = time.time()
     sob_is_signal, sob_signal, sob_debug_text = SOBAnalizer().analize(check_df, pd.interval)
     sob_delta_time = time.time() - sob_start_time
 
+    nodelta_sob_start_time = time.time()
+    nodelta_sob_is_signal, nodelta_sob_signal, nodelta_sob_debug_text = NoDeltaSOBAnalizer().analize(check_df, pd.interval)
+    nodelta_sob_delta_time = time.time() - sob_start_time
+
     sp_start_time = time.time()
     sp_is_signal, sp_signal, sp_debug_text = SPAnalizer().analize(check_df)
     sp_delta_time = time.time() - sp_start_time
+
+    nw_start_time = time.time()
+    nw_is_signal, nw_signal, nw_debug_text = NWAnalizer().analize(check_df)
+    nw_delta_time = time.time() - sp_start_time
 
     uma_start_time = time.time()
     uma_is_signal, uma_signal, uma_debug_text = UMAAnalizer().analize(check_df)
@@ -152,20 +159,52 @@ async def signal_message_check_function_child(pd, full_df, deal_times):
     volume_is_signal, volume_signal, volume_debug_text = VolumeAnalizer().analize(check_df)
     volume_delta_time = time.time() - volume_start_time
 
-    open_position_price = check_df.close[0]
-    data_el = [check_df["datetime"][0], sob_signal.type, volume_signal.type, uma_signal.type, sp_signal.type]
-    deal_results = []
+    data_el = [check_df["datetime"][0], check_df.close[0], sob_signal.type, nodelta_sob_signal.type, sp_signal.type,
+               nw_signal.type, uma_signal.type, volume_signal.type]
 
-    print("loop")
-    for deal_time in deal_times:
-        close_position_price = full_df.close[0 + deal_times[-1] - deal_time]
-        has_profit_long = LongSignal().is_profit(open_position_price, close_position_price)
-        deal_results.append(has_profit_long)
+    return data_el, sob_delta_time
 
-    deal_results.reverse()
-    for deal_result in deal_results:
-        data_el.insert(0, deal_result)
-    return data_el, sob_delta_time, sp_delta_time, uma_delta_time, volume_delta_time
+
+# async def signal_message_check_function_child(pd, full_df, deal_times):
+#     check_df = full_df.iloc[deal_times[-1]:].reset_index(drop=True)
+#
+#     # sob_start_time = time.time()
+#     # sob_is_signal, sob_signal, sob_debug_text = SOBAnalizer().analize(check_df, pd.interval)
+#     # sob_delta_time = time.time() - sob_start_time
+#
+#     sp_start_time = time.time()
+#     sp_is_signal, sp_signal, sp_debug_text = SPAnalizer().analize(check_df)
+#     sp_delta_time = time.time() - sp_start_time
+#
+#     nw_start_time = time.time()
+#     nw_is_signal, nw_signal, nw_debug_text = NWAnalizer().analize(check_df)
+#     nw_delta_time = time.time() - sp_start_time
+#     #
+#     # uma_start_time = time.time()
+#     # uma_is_signal, uma_signal, uma_debug_text = UMAAnalizer().analize(check_df)
+#     # uma_delta_time = time.time() - uma_start_time
+#     #
+#     # volume_start_time = time.time()
+#     # volume_is_signal, volume_signal, volume_debug_text = VolumeAnalizer().analize(check_df)
+#     # volume_delta_time = time.time() - volume_start_time
+#
+#     open_position_price = check_df.close[0]
+#
+#     data_el = [check_df["datetime"][0], nw_signal.type, sp_signal.type]
+#     # data_el = [check_df["datetime"][0], sob_signal.type, volume_signal.type, uma_signal.type, sp_signal.type]
+#     deal_results = []
+#
+#     print("loop")
+#     for deal_time in deal_times:
+#         close_position_price = full_df.close[0 + deal_times[-1] - deal_time]
+#         has_profit_long = LongSignal().is_profit(open_position_price, close_position_price)
+#         deal_results.append(has_profit_long)
+#
+#     deal_results.reverse()
+#     for deal_result in deal_results:
+#         data_el.insert(0, deal_result)
+#     return [data_el]
+#     # return data_el, sob_delta_time, sp_delta_time, uma_delta_time, volume_delta_time
 
 
 def signal_message_check_controller(pd, price_data_frame: DataFrame, bars_to_analyse, deal_times):
@@ -178,29 +217,25 @@ def signal_message_check_controller(pd, price_data_frame: DataFrame, bars_to_ana
         full_df = price_data_frame
         tasks = []
         for i in range(loop_count):
-            t = asyncio.create_task(coro=signal_message_check_function_child(pd, full_df, deal_times))
+            t = asyncio.create_task(coro=signal_message_check_function_child_dealtime_combined(pd, full_df))
             tasks.append(t)
             full_df = price_data_frame[i + 1:i + bars_to_analyse + deal_times[-1] + 1].reset_index(drop=True)
             full_df = full_df.iloc[1:].reset_index(drop=True)
 
         datas = await asyncio.gather(*tasks)
         data = [data_el[0] for data_el in datas]
-        print("sob wait time", sum([data_el[1] for data_el in datas]))
-        print("sp wait time", sum([data_el[2] for data_el in datas]))
-        print("uma wait time", sum([data_el[3] for data_el in datas]))
-        print("volume wait time", sum([data_el[4] for data_el in datas]))
         for d in data:
             if d is None:
                 continue
-            df_data.append([*d])
+            df_data.append(d)
         if len(df_data) > 0:
-            path = "debug/" + pd.symbol + "_" + str(pd.interval).replace(".", "") + ".csv"
+            path = "debug/updated_" + pd.symbol + "_" + str(pd.interval).replace(".", "") + ".csv"
 
             deal_time_profit_column_names = []
-            for deal_time in deal_times:
-                deal_time_profit_column_names.append("is_profit_after_bars_" + str(deal_time))
+            # for deal_time in deal_times:
+            #     deal_time_profit_column_names.append("is_profit_after_bars_" + str(deal_time))
             df = DataFrame(df_data,
-                           columns=[*deal_time_profit_column_names, "datetime", "SuperOrderBlock", "Volume", "UMA", "ScalpPro"])
+                           columns=["datetime", "close_price", "SuperOrderBlock", "SOB_No_Delta", "ScalpPro", "NW", "UMA", "Volume"])
             df.to_csv(path)
         else:
             print("No signals")
@@ -209,9 +244,8 @@ def signal_message_check_controller(pd, price_data_frame: DataFrame, bars_to_ana
 
 
 if __name__ == "__main__":
-    currencies = price_parser.get_currencies()[4:]
+    currencies = price_parser.get_currencies()[6:]
     intervals = [Interval.in_1_minute, Interval.in_3_minute, Interval.in_5_minute, Interval.in_15_minute, Interval.in_30_minute, Interval.in_45_minute, Interval.in_1_hour, Interval.in_2_hour]
-
     prices_data = []
 
     for interval in intervals:
@@ -222,7 +256,7 @@ if __name__ == "__main__":
 
     for pd in prices_data:
         # df = pd.get_price_data(5000)
-        # df.to_csv("currencies_data/" + pd.symbol + str(pd.interval).replace(".", "") + ".csv")
+        # df.to_csv("currencies_data/debug/" + pd.symbol + str(pd.interval).replace(".", "") + ".csv")
         df = read_csv("currencies_data/debug/" + pd.symbol + str(pd.interval).replace(".", "") + ".csv")
         Process(target=signal_message_check_controller, args=(pd, df, 500, deal_times)).start()
 

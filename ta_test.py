@@ -1,12 +1,16 @@
 import time
 from _operator import index
 
-import tradingview_ta
-from tradingview_ta import TA_Handler, Interval, Exchange
+# import tradingview_ta
+# from tradingview_ta import TA_Handler, Interval, Exchange
 import pandas as pd
 from pandas import Timedelta
 from signals import *
 from datetime import timedelta, datetime
+from tvDatafeed import Interval
+from interval_convertor import interval_to_int, str_to_interval, interval_to_string
+from signals import get_signal_by_type
+import price_parser
 
 
 def income_percent_diff(df1, df2):
@@ -42,14 +46,20 @@ def income_percent_diff(df1, df2):
         print("no data")
 
 
-def income_percent(df):
+def income_percent(df, column):
     if len(df) > 0:
-        for i in range(2, 11):
-            print("Кількість угод в новій стратегії:", len(df.index))
-            profit_data = df["is_profit_after_bars_" + str(i)].value_counts()
-            profit_percent = profit_data[True] / profit_data[False]
-            print(f" Час угоди {i} свічок \n")
-            print(f"Профіт: {i}\n", profit_percent)
+        print("Кількість угод в новій стратегії:", len(df.index), 5000/len(df.index))
+        profit_data = df[column].value_counts()
+        try:
+            los1 = profit_data[False]
+        except Exception:
+            los1 = 1
+        try:
+            prof1 = profit_data[True]
+        except Exception:
+            prof1 = 0
+        profit_percent = prof1 / los1
+        print(f"Профіт: \n", profit_percent)
     else:
         print("no data")
 
@@ -67,75 +77,62 @@ def import_dfs(paths, elements_count=-1):
         df = pd.read_csv(paths[0]).loc[:elements_count]
     else:
         df = pd.read_csv(paths[0])
-    # df = df.reset_index(drop=True)
     df = df.drop(columns=["Unnamed: 0"])
     for path in paths[1:]:
         if elements_count > 0:
-            df = pd.concat([df, pd.read_csv(path).loc[:elements_count]])
+            df = pd.concat([df, pd.read_csv(path).loc[:elements_count]]).reset_index(drop=True)
         else:
             df = pd.concat([df, pd.read_csv(path)]).reset_index(drop=True)
     return df
 
 
 def get_analzied_df(df):
-    def test(df: pd.DataFrame):
-        return_df = pd.DataFrame(columns=df.columns)
-        df = df.reset_index(drop=True)
-        print(len(df))
-        columns = ["SuperOrderBlock"]
-        one_of_columns = ["Volume", "UMA", "ScalpPro"]
-        i = 0
+    def multicolumn_analize(df: pd.DataFrame):
+        return_df = pd.DataFrame()
+
+        main_column = "SuperOrderBlock"
+        one_of_columns = ["Volume", "UMA", "ScalpPro"]  # "Volume", "UMA", "ScalpPro" "ScalpPro8108", "Volume2", "UMA20", "NW"
         for ind in df.index:
-            # print("analize loop", i)
-            i += 1
             columns_long_count = 0
             columns_short_count = 0
             for col in one_of_columns:
-                if (df.loc[ind, col] == LongSignal().type):
+                df_el = df.loc[ind, col]
+                if df_el == LongSignal().type:
                     columns_long_count += 1
-                elif (df.loc[ind, col] == ShortSignal().type):
+                elif df_el == ShortSignal().type:
                     columns_short_count += 1
 
             counts = [columns_long_count, columns_short_count]
             cols_count = max(counts)
             if cols_count >= 2:
                 index = counts.index(cols_count)
-                if len(columns) > 0:
-                    if df.loc[ind, columns[0]] == ShortSignal().type and index == 1 or \
-                            df.loc[ind, columns[0]] == LongSignal().type and index == 0:
-                        return_df = pd.concat([return_df, df.iloc[ind:ind + 1]])
-                else:
-                    return_df = pd.concat([return_df, df.iloc[ind:ind + 1]])
+                df_el = df.loc[ind, main_column]
+                if df_el == ShortSignal().type and index == 1 or df_el == LongSignal().type and index == 0:
+                    return_df = pd.concat([return_df, df.loc[ind:ind]])
 
-        print("проводимо аналіз для індикаторів:", one_of_columns, columns)
+        # print("проводимо аналіз для індикаторів:", one_of_columns, main_column)
         return return_df
 
-    columns = ["SuperOrderBlock"]
-    print("Аналіз для індикаторів: ", columns)
-    df_long_old = df
-    df_short_old = df
-    for col in columns:
-        df_long_old = df_long_old.loc[(df_long_old[col] == LongSignal().type)]
-        df_short_old = df_short_old.loc[(df_short_old[col] == ShortSignal().type)]
+    col = "SuperOrderBlock"
+    df_long_old = df[df[col] == LongSignal().type]
+    df_short_old = df[df[col] == ShortSignal().type]
 
-    df_short_old = reverse_results(df_short_old)
-    df = pd.concat([df_long_old, df_short_old])
+    # reverse_results(df_short_old)
 
-    df = test(df)
+    return_df = pd.concat([df_long_old, df_short_old]).reset_index(drop=True)
 
-    return df.reset_index(drop=True)
+    return_df = multicolumn_analize(return_df).reset_index(drop=True)
+
+    return return_df
 
 
 def get_analzied_df_multitimeframe(df, sob_dfs, successful_sob_counts):
-    # df = get_analzied_df(df)
     indexes_to_delete = []
     for row_index in df.index:
         sob_count = 0
-        # print(df.loc[row_index, "datetime"])
         _date = datetime.strptime(df.loc[row_index, "datetime"], '%Y-%m-%d %H:%M:%S')
         _date = timedelta(days=_date.day, hours=_date.hour, minutes=_date.minute)
         _date = _date / Timedelta(minutes=1)
-        # print(_date)
         for sob_df_index in range(len(sob_dfs)):
             sob_indexes_to_delete = []
             prev_date_date = None
@@ -144,26 +141,20 @@ def get_analzied_df_multitimeframe(df, sob_dfs, successful_sob_counts):
             next_date = False
             for sob_df_row_index in sob_dfs[sob_df_index].index:
                 if next_date:
-                    # print("origin my date:", df.loc[row_index, "datetime"])
-                    # print("my date:", sob_dfs[sob_df_index].loc[sob_df_row_index, "datetime"])
-                    # print("prev date:", prev_date_date)
-                    # print(f"needed date\n")
-                    if sob_dfs[sob_df_index].loc[sob_df_row_index, "SuperOrderBlock"] == df.loc[
-                        row_index, "SuperOrderBlock"]:
+                    if sob_dfs[sob_df_index].loc[sob_df_row_index, "SOB_No_Delta"] == df.loc[row_index, "SOB_No_Delta"]:
                         sob_count += 1
                     break
-                sob_date = datetime.strptime(sob_dfs[sob_df_index].loc[sob_df_row_index, "datetime"], '%Y-%m-%d %H:%M:%S')
+                sob_date = datetime.strptime(sob_dfs[sob_df_index].loc[sob_df_row_index, "datetime"],
+                                             '%Y-%m-%d %H:%M:%S')
                 sob_date = timedelta(days=sob_date.day, hours=sob_date.hour, minutes=sob_date.minute)
                 sob_date = sob_date / Timedelta(minutes=1)
                 if prev_date is None:
-                    # print("set prev_date")
                     prev_date = sob_date
                     prev_date_date = sob_dfs[sob_df_index].loc[sob_df_row_index, "datetime"]
                     prev_index = sob_df_row_index
                     continue
 
                 if _date >= prev_date:
-                    # print("prev_date it too big\n")
                     break
 
                 is_needed_date = sob_date <= _date < prev_date
@@ -178,204 +169,220 @@ def get_analzied_df_multitimeframe(df, sob_dfs, successful_sob_counts):
             if len(sob_indexes_to_delete) > 0:
                 sob_dfs[sob_df_index] = sob_dfs[sob_df_index].drop(index=sob_indexes_to_delete)
 
-        # print(f" {row_index} sob_count", sob_count)
         if sob_count < successful_sob_counts:
             indexes_to_delete.append(row_index)
 
+    print("old ind to del", indexes_to_delete)
     if len(indexes_to_delete) > 0:
         df = df.drop(index=indexes_to_delete)
     return df
 
 
-def compare():
-    paths = [
-        "debug/new_extra/AUDUSD_Intervalin_1_minute.csv",
-        "debug/new_extra/AUDUSD_Intervalin_3_minute.csv",
-        "debug/new_extra/AUDUSD_Intervalin_5_minute.csv",
-        "debug/new_extra/AUDUSD_Intervalin_15_minute.csv",
-        "debug/new_extra/AUDUSD_Intervalin_30_minute.csv",
+def get_analzied_df_multitimeframe_with_dealtime(df, sob_dfs, successful_sob_counts):
+    df["dealtime"] = None
 
-        "debug/new_extra/AUDCAD_Intervalin_1_minute.csv",
-        "debug/new_extra/AUDCAD_Intervalin_3_minute.csv",
-        "debug/new_extra/AUDCAD_Intervalin_5_minute.csv",
-        "debug/new_extra/AUDCAD_Intervalin_15_minute.csv",
-        "debug/new_extra/AUDCAD_Intervalin_30_minute.csv",
+    indexes_to_delete = []
+    # print(df.to_string())
+    for row_index in df.index:
+        sob_count = 0
+        intervals = []
+        _date = datetime.strptime(df.loc[row_index, "datetime"], '%Y-%m-%d %H:%M:%S')
+        _date = timedelta(days=_date.day, hours=_date.hour, minutes=_date.minute)
+        _date = _date / Timedelta(minutes=1)
+        for sob_df_index in range(len(sob_dfs)):
+            sob_indexes_to_delete = []
+            prev_date_date = None
+            prev_date = None
+            prev_index = None
+            next_date = False
+            for sob_df_row_index in sob_dfs[sob_df_index].index:
+                if next_date:
+                    if sob_dfs[sob_df_index].loc[sob_df_row_index, "SOB_No_Delta"] == df.loc[row_index, "SOB_No_Delta"]:
+                        intervals.append(sob_dfs[sob_df_index].loc[sob_df_row_index, "interval"])
+                        sob_count += 1
+                    break
+                sob_date = datetime.strptime(sob_dfs[sob_df_index].loc[sob_df_row_index, "datetime"],
+                                             '%Y-%m-%d %H:%M:%S')
+                sob_date = timedelta(days=sob_date.day, hours=sob_date.hour, minutes=sob_date.minute)
+                sob_date = sob_date / Timedelta(minutes=1)
+                if prev_date is None:
+                    prev_date = sob_date
+                    prev_date_date = sob_dfs[sob_df_index].loc[sob_df_row_index, "datetime"]
+                    prev_index = sob_df_row_index
+                    continue
 
-        "debug/new_extra/EURJPY_Intervalin_1_minute.csv",
-        "debug/new_extra/EURJPY_Intervalin_3_minute.csv",
-        "debug/new_extra/EURJPY_Intervalin_5_minute.csv",
-        "debug/new_extra/EURJPY_Intervalin_15_minute.csv",
-        "debug/new_extra/EURJPY_Intervalin_30_minute.csv"
-    ]
-    df = import_dfs(paths)
+                if _date >= prev_date:
+                    break
 
-    print("==============\n\n\n")
+                is_needed_date = sob_date <= _date < prev_date
+                if is_needed_date:
+                    next_date = True
+                else:
+                    sob_indexes_to_delete.append(prev_index)
+                    prev_index = sob_df_row_index
+                    prev_date_date = sob_dfs[sob_df_index].loc[sob_df_row_index, "datetime"]
+                    prev_date = sob_date
 
-    paths = [
-        "debug/new_clasic/AUDUSD_Intervalin_1_minute.csv",
-        "debug/new_clasic/AUDUSD_Intervalin_3_minute.csv",
-        "debug/new_clasic/AUDUSD_Intervalin_5_minute.csv",
-        "debug/new_clasic/AUDUSD_Intervalin_15_minute.csv",
-        "debug/new_clasic/AUDUSD_Intervalin_30_minute.csv",
+            if len(sob_indexes_to_delete) > 0:
+                sob_dfs[sob_df_index] = sob_dfs[sob_df_index].drop(index=sob_indexes_to_delete)
 
-        "debug/new_clasic/AUDCAD_Intervalin_1_minute.csv",
-        "debug/new_clasic/AUDCAD_Intervalin_3_minute.csv",
-        "debug/new_clasic/AUDCAD_Intervalin_5_minute.csv",
-        "debug/new_clasic/AUDCAD_Intervalin_15_minute.csv",
-        "debug/new_clasic/AUDCAD_Intervalin_30_minute.csv",
+        if sob_count < successful_sob_counts:
+            indexes_to_delete.append(row_index)
+            continue
+        else:
+            # print()
+            # print(df.loc[row_index, "symbol"], df.loc[row_index, "interval"], df.loc[row_index, "datetime"])
+            # print(intervals)
+            interval_minutes = interval_to_int(str_to_interval(df.loc[row_index, "interval"]))
+            sum = interval_minutes
+            for interval in intervals:
+                sum += interval_to_int(str_to_interval(interval))
+            sum /= len(intervals)+1
+            sum = round(sum/interval_minutes, 0)
+            df.loc[row_index, "dealtime"] = int(sum)
 
-        "debug/new_clasic/EURJPY_Intervalin_1_minute.csv",
-        "debug/new_clasic/EURJPY_Intervalin_3_minute.csv",
-        "debug/new_clasic/EURJPY_Intervalin_5_minute.csv",
-        "debug/new_clasic/EURJPY_Intervalin_15_minute.csv",
-        "debug/new_clasic/EURJPY_Intervalin_30_minute.csv"
-    ]
-    df_old = import_dfs(paths)
-    df_old_changed = import_dfs(paths)
-    print(len(df_old_changed))
+    if len(indexes_to_delete) > 0:
+        df = df.drop(index=indexes_to_delete)
 
-    df["Volume"] = df_old["Volume"]
-    df = get_analzied_df(df)
-    df_old = get_analzied_df(df_old)
-
-    income_percent_diff(df, df_old)
-
-
-tesla = TA_Handler(
-    symbol="BTCUSD",
-    screener="crypto",
-    exchange="COINBASE",
-    interval=Interval.INTERVAL_1_MINUTE
-)
-print(tesla.get_analysis().indicators)
-
-# paths = [
-#     "debug/clasic_AUDCAD_Intervalin_1_minute.csv",
-#     "debug/clasic_AUDCAD_Intervalin_5_minute.csv",
-#     "debug/clasic_AUDCAD_Intervalin_15_minute.csv",
-#     "debug/clasic_AUDUSD_Intervalin_1_minute.csv",
-#     "debug/clasic_AUDUSD_Intervalin_5_minute.csv",
-#     "debug/clasic_AUDUSD_Intervalin_15_minute.csv",
-#     "debug/clasic_EURJPY_Intervalin_1_minute.csv",
-#     "debug/clasic_EURJPY_Intervalin_5_minute.csv",
-#     "debug/clasic_EURJPY_Intervalin_15_minute.csv"
-# ]
-#
-# df = import_dfs(paths)
-#
-# columns = ["SuperOrderBlock", "ScalpPro", "Volume", "ScalpPro", "NW"]
-# df_long_old = df
-# df_short_old = df
-# for col in columns:
-#     df_long_old = df_long_old.loc[(df_long_old[col] == LongSignal().type)]
-#     df_short_old = df_short_old.loc[(df_short_old[col] == ShortSignal().type)]
-#
-# df_short_old = reverse_results(df_short_old)
-# df = pd.concat([df_long_old, df_short_old])
-#
-# income_percent(df)
-
-# compare()
+    return df
 
 
-paths_clasic = [
-    # ["debug/clasic/clasic_AUDUSD_Intervalin_1_minute.csv",
-    # "debug/clasic/clasic_AUDUSD_Intervalin_5_minute.csv",
-    # "debug/clasic/clasic_AUDUSD_Intervalin_15_minute.csv"],
-    # ["debug/clasic/clasic_AUDCAD_Intervalin_1_minute.csv",
-    #  "debug/clasic/clasic_AUDCAD_Intervalin_5_minute.csv",
-    #  "debug/clasic/clasic_AUDCAD_Intervalin_15_minute.csv"],
-    # ["debug/clasic/clasic_EURJPY_Intervalin_1_minute.csv",
-    #  "debug/clasic/clasic_EURJPY_Intervalin_5_minute.csv",
-    #  "debug/clasic/clasic_EURJPY_Intervalin_15_minute.csv"]
+paths = [
 
-    ["debug/AUDCHF_Intervalin_1_minute.csv",
-    "debug/AUDCHF_Intervalin_3_minute.csv",
-    "debug/AUDCHF_Intervalin_5_minute.csv",
-    "debug/AUDCHF_Intervalin_15_minute.csv",
-    "debug/AUDCHF_Intervalin_30_minute.csv"],
+    ["debug/updated_EURUSD_Intervalin_1_minute.csv",
+     "debug/updated_EURUSD_Intervalin_3_minute.csv",
+     "debug/updated_EURUSD_Intervalin_5_minute.csv",
+     "debug/updated_EURUSD_Intervalin_15_minute.csv",
+     "debug/updated_EURUSD_Intervalin_30_minute.csv",
+     "debug/updated_EURUSD_Intervalin_45_minute.csv",
+     "debug/updated_EURUSD_Intervalin_1_hour.csv",
+     "debug/updated_EURUSD_Intervalin_2_hour.csv"],
 
-    ["debug/EURCAD_Intervalin_1_minute.csv",
-     "debug/EURCAD_Intervalin_3_minute.csv",
-     "debug/EURCAD_Intervalin_5_minute.csv",
-     "debug/EURCAD_Intervalin_15_minute.csv",
-     "debug/EURCAD_Intervalin_30_minute.csv"],
+    ["debug/updated_AUDCAD_Intervalin_1_minute.csv",
+     "debug/updated_AUDCAD_Intervalin_3_minute.csv",
+     "debug/updated_AUDCAD_Intervalin_5_minute.csv",
+     "debug/updated_AUDCAD_Intervalin_15_minute.csv",
+     "debug/updated_AUDCAD_Intervalin_30_minute.csv",
+     "debug/updated_AUDCAD_Intervalin_45_minute.csv",
+     "debug/updated_AUDCAD_Intervalin_1_hour.csv",
+     "debug/updated_AUDCAD_Intervalin_2_hour.csv"],
 
-    ["debug/GBPUSD_Intervalin_1_minute.csv",
-     "debug/GBPUSD_Intervalin_3_minute.csv",
-     "debug/GBPUSD_Intervalin_5_minute.csv",
-     "debug/GBPUSD_Intervalin_15_minute.csv",
-     "debug/GBPUSD_Intervalin_30_minute.csv"],
+    ["debug/updated_AUDUSD_Intervalin_1_minute.csv",
+     "debug/updated_AUDUSD_Intervalin_3_minute.csv",
+     "debug/updated_AUDUSD_Intervalin_5_minute.csv",
+     "debug/updated_AUDUSD_Intervalin_15_minute.csv",
+     "debug/updated_AUDUSD_Intervalin_30_minute.csv",
+     "debug/updated_AUDUSD_Intervalin_45_minute.csv",
+     "debug/updated_AUDUSD_Intervalin_1_hour.csv",
+     "debug/updated_AUDUSD_Intervalin_2_hour.csv"],
 
-    ["debug/new_clasic/AUDUSD_Intervalin_1_minute.csv",
-    "debug/new_clasic/AUDUSD_Intervalin_3_minute.csv",
-    "debug/new_clasic/AUDUSD_Intervalin_5_minute.csv",
-    "debug/new_clasic/AUDUSD_Intervalin_15_minute.csv",
-    "debug/new_clasic/AUDUSD_Intervalin_30_minute.csv"],
+    ["debug/updated_EURJPY_Intervalin_1_minute.csv",
+     "debug/updated_EURJPY_Intervalin_3_minute.csv",
+     "debug/updated_EURJPY_Intervalin_5_minute.csv",
+     "debug/updated_EURJPY_Intervalin_15_minute.csv",
+     "debug/updated_EURJPY_Intervalin_30_minute.csv",
+     "debug/updated_EURJPY_Intervalin_45_minute.csv",
+     "debug/updated_EURJPY_Intervalin_1_hour.csv",
+     "debug/updated_EURJPY_Intervalin_2_hour.csv"],
 
-    ["debug/new_clasic/AUDCAD_Intervalin_1_minute.csv",
-     "debug/new_clasic/AUDCAD_Intervalin_3_minute.csv",
-     "debug/new_clasic/AUDCAD_Intervalin_5_minute.csv",
-     "debug/new_clasic/AUDCAD_Intervalin_15_minute.csv",
-     "debug/new_clasic/AUDCAD_Intervalin_30_minute.csv"],
+    ["debug/updated_EURCAD_Intervalin_1_minute.csv",
+     "debug/updated_EURCAD_Intervalin_3_minute.csv",
+     "debug/updated_EURCAD_Intervalin_5_minute.csv",
+     "debug/updated_EURCAD_Intervalin_15_minute.csv",
+     "debug/updated_EURCAD_Intervalin_30_minute.csv",
+     "debug/updated_EURCAD_Intervalin_45_minute.csv",
+     "debug/updated_EURCAD_Intervalin_1_hour.csv",
+     "debug/updated_EURCAD_Intervalin_2_hour.csv"],
 
-    ["debug/new_clasic/EURJPY_Intervalin_1_minute.csv",
-     "debug/new_clasic/EURJPY_Intervalin_3_minute.csv",
-     "debug/new_clasic/EURJPY_Intervalin_5_minute.csv",
-     "debug/new_clasic/EURJPY_Intervalin_15_minute.csv",
-     "debug/new_clasic/EURJPY_Intervalin_30_minute.csv"]
+    ["debug/updated_AUDCHF_Intervalin_1_minute.csv",
+     "debug/updated_AUDCHF_Intervalin_3_minute.csv",
+     "debug/updated_AUDCHF_Intervalin_5_minute.csv",
+     "debug/updated_AUDCHF_Intervalin_15_minute.csv",
+     "debug/updated_AUDCHF_Intervalin_30_minute.csv",
+     "debug/updated_AUDCHF_Intervalin_45_minute.csv",
+     "debug/updated_AUDCHF_Intervalin_1_hour.csv",
+     "debug/updated_AUDCHF_Intervalin_2_hour.csv"],
+
+    ["debug/updated_GBPUSD_Intervalin_1_minute.csv",
+     "debug/updated_GBPUSD_Intervalin_3_minute.csv",
+     "debug/updated_GBPUSD_Intervalin_5_minute.csv",
+     "debug/updated_GBPUSD_Intervalin_15_minute.csv",
+     "debug/updated_GBPUSD_Intervalin_30_minute.csv",
+     "debug/updated_GBPUSD_Intervalin_45_minute.csv",
+     "debug/updated_GBPUSD_Intervalin_1_hour.csv",
+     "debug/updated_GBPUSD_Intervalin_2_hour.csv"],
+
+    ["debug/updated_AUDJPY_Intervalin_1_minute.csv",
+     "debug/updated_AUDJPY_Intervalin_3_minute.csv",
+     "debug/updated_AUDJPY_Intervalin_5_minute.csv",
+     "debug/updated_AUDJPY_Intervalin_15_minute.csv",
+     "debug/updated_AUDJPY_Intervalin_30_minute.csv",
+     "debug/updated_AUDJPY_Intervalin_45_minute.csv",
+     "debug/updated_AUDJPY_Intervalin_1_hour.csv",
+     "debug/updated_AUDJPY_Intervalin_2_hour.csv"],
+
+    ["debug/updated_GBPAUD_Intervalin_1_minute.csv",
+     "debug/updated_GBPAUD_Intervalin_3_minute.csv",
+     "debug/updated_GBPAUD_Intervalin_5_minute.csv",
+     "debug/updated_GBPAUD_Intervalin_15_minute.csv",
+     "debug/updated_GBPAUD_Intervalin_30_minute.csv",
+     "debug/updated_GBPAUD_Intervalin_45_minute.csv",
+     "debug/updated_GBPAUD_Intervalin_1_hour.csv",
+     "debug/updated_GBPAUD_Intervalin_2_hour.csv"]
 ]
-paths_extra = [
-    # ["debug/5000extra/AUDUSD_Intervalin_1_minute.csv",
-    # "debug/5000extra/AUDUSD_Intervalin_5_minute.csv",
-    # "debug/5000extra/AUDUSD_Intervalin_15_minute.csv"],
-    # ["debug/5000extra/AUDCAD_Intervalin_1_minute.csv",
-    #  "debug/5000extra/AUDCAD_Intervalin_5_minute.csv",
-    #  "debug/5000extra/AUDCAD_Intervalin_15_minute.csv"],
-    # ["debug/5000extra/EURJPY_Intervalin_1_minute.csv",
-    #  "debug/5000extra/EURJPY_Intervalin_5_minute.csv",
-    #  "debug/5000extra/EURJPY_Intervalin_15_minute.csv"]
+# currencies = price_parser.get_currencies()
+# intervals = [Interval.in_1_minute, Interval.in_3_minute, Interval.in_5_minute, Interval.in_15_minute,
+#              Interval.in_30_minute, Interval.in_45_minute, Interval.in_1_hour, Interval.in_2_hour]
+#
+# for path_arr_ind in range(len(paths)):
+#     curr = currencies[path_arr_ind]
+#     for ind in range(len(paths[path_arr_ind])):
+#         interval = intervals[ind]
+#         path_save = paths[path_arr_ind][ind]
+#         df_save = import_dfs([path_save])
+#
+#         df_save["interval"] = interval
+#         df_save["symbol"] = curr[0]
+#         df_save.to_csv(path_save)
 
 
+result_dfs_old = pd.DataFrame()
+result_dfs_new = []
+for path_arr in paths:
+    for ind in range(len(path_arr)-5):
+        df = import_dfs([path_arr[ind]])
+        sob_dfs = []
+        df_analized = get_analzied_df(df)
+        df_analized = df_analized.sort_values("datetime", ascending=False).reset_index(drop=True)
+        for sob_count in range(5):
+            result_dfs_new.append(pd.DataFrame())
+            for k in range(ind+1, len(path_arr)-3):
+                sob_dfs.append(import_dfs(path_arr[k:k+1]))
+            df_analized_mtf = get_analzied_df_multitimeframe_with_dealtime(df_analized, sob_dfs, sob_count)
+            result_dfs_new[sob_count] = pd.concat([result_dfs_new[sob_count], df_analized_mtf]).reset_index(drop=True)
 
-    ["debug/new_extra/AUDUSD_Intervalin_1_minute.csv",
-    "debug/new_extra/AUDUSD_Intervalin_3_minute.csv",
-    "debug/new_extra/AUDUSD_Intervalin_5_minute.csv",
-    "debug/new_extra/AUDUSD_Intervalin_15_minute.csv",
-    "debug/new_extra/AUDUSD_Intervalin_30_minute.csv"],
+for sob_count in range(5):
+    result_dfs_new[sob_count] = result_dfs_new[sob_count].sort_values("datetime").reset_index(drop=True)
+    result_dfs_new[sob_count]["profit_dealtime"] = None
+    result_dfs_new[sob_count]["profit_dealtime_6"] = None
+    for el_index in result_dfs_new[sob_count].index:
+        path = f"debug/updated_{result_dfs_new[sob_count].loc[el_index, 'symbol']}_{interval_to_string(str_to_interval(result_dfs_new[sob_count].loc[el_index, 'interval']))}.csv"
+        df_new_analize_half = import_dfs([path])
+        deal_time = int(result_dfs_new[sob_count].loc[el_index, "dealtime"])
 
-    ["debug/new_extra/AUDCAD_Intervalin_1_minute.csv",
-    "debug/new_extra/AUDCAD_Intervalin_3_minute.csv",
-    "debug/new_extra/AUDCAD_Intervalin_5_minute.csv",
-    "debug/new_extra/AUDCAD_Intervalin_15_minute.csv",
-    "debug/new_extra/AUDCAD_Intervalin_30_minute.csv"],
+        index = df_new_analize_half.index[result_dfs_new[sob_count].loc[el_index, "datetime"] == df_new_analize_half["datetime"]].values[0] - deal_time
+        index_6 = df_new_analize_half.index[result_dfs_new[sob_count].loc[el_index, "datetime"] == df_new_analize_half["datetime"]].values[0] - 6
 
-    ["debug/new_extra/EURJPY_Intervalin_1_minute.csv",
-    "debug/new_extra/EURJPY_Intervalin_3_minute.csv",
-    "debug/new_extra/EURJPY_Intervalin_5_minute.csv",
-    "debug/new_extra/EURJPY_Intervalin_15_minute.csv",
-    "debug/new_extra/EURJPY_Intervalin_30_minute.csv"]
-]
+        signal = get_signal_by_type(result_dfs_new[sob_count].loc[el_index, "SuperOrderBlock"])
+        open_price = result_dfs_new[sob_count].loc[el_index, "close_price"]
 
+        if index >= 0:
+            close_price = df_new_analize_half.loc[index, "close_price"]
+            result_dfs_new[sob_count].loc[el_index, "profit_dealtime"] = signal.is_profit(open_price, close_price)
+        if index_6 >= 0:
+            close_price_6 = df_new_analize_half.loc[index_6, "close_price"]
+            result_dfs_new[sob_count].loc[el_index, "profit_dealtime_6"] = signal.is_profit(open_price, close_price_6)
 
-base_dfs = pd.DataFrame()
-new_dfs = pd.DataFrame()
-for i in range(len(paths_extra)):
-    for j in range(len(paths_extra[i])-2):
-        path = paths_extra[i]
-
-        df = import_dfs(path[j:j + 1])
-        dfs = []
-        for k in range(j+1, len(paths_clasic[i])):
-            dfs.append(import_dfs(path[k:k+1]))
-
-        # df["SuperOrderBlock"] = df_new["SuperOrderBlock"]
-        if (i >= 3):
-            df_new = import_dfs(paths_clasic[i-3][j:j+1])
-            df["Volume"] = df_new["Volume"]
-        df = get_analzied_df(df)
-        base_dfs = pd.concat([base_dfs, df]).reset_index(drop=True)
-        df_sob = get_analzied_df_multitimeframe(df, dfs, 2)
-        new_dfs = pd.concat([new_dfs, df_sob]).reset_index(drop=True)
-print(new_dfs.sort_values(by=['datetime']).to_string())
-income_percent_diff(new_dfs, base_dfs)
+    print("\nSOB count", sob_count)
+    income_percent(result_dfs_new[sob_count], "profit_dealtime")
+    income_percent(result_dfs_new[sob_count], "profit_dealtime_6")

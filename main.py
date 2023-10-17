@@ -211,12 +211,11 @@ async def handle_media(message: types.Message):
                 await open_menu(message, not_vip_markup)
 
 
-def handle_signal_msg_controller(signal, msg, pd: PriceData, open_position_price):
+def handle_signal_msg_controller(signal, msg, pd: PriceData, open_position_price, deal_time):
     async def handle_signal_msg(signal, msg, pd: PriceData, open_position_price):
         deposit_users_ids = get_deposit_users_ids()
         await send_photo_text_message_to_users(deposit_users_ids, signal.photo_path, msg)
-
-        close_signal_message, is_profit = await signal_maker.close_position(open_position_price, signal, pd)
+        close_signal_message, is_profit = await signal_maker.close_position(open_position_price, signal, pd, bars_count=deal_time)
         img_path = "./img/profit.jpg" if is_profit else "./img/loss.jpg"
         await send_photo_text_message_to_users(deposit_users_ids, img_path, close_signal_message)
     asyncio.run(handle_signal_msg(signal, msg, pd, open_position_price))
@@ -300,8 +299,10 @@ def signals_message_sender_controller(prices_data, intervals, unit_pd):
             signal = get_signal_by_type(df.signal_type[0])
 
             pd = PriceData(df.symbol[0], df.exchange[0], interval_convertor.str_to_interval(df.interval[0]))
+            dealtime = int(df.deal_time[0])
+            print("dealtime before print", dealtime)
             multiprocessing.Process(target=handle_signal_msg_controller,
-                                    args=(signal, df.msg[0], pd, df.open_price[0],), daemon=True).start()
+                                    args=(signal, df.msg[0], pd, df.open_price[0], dealtime, ), daemon=True).start()
             await signal_msg_send_delay()
             signal_maker.reset_signals_files(prices_data)
 
@@ -311,7 +312,7 @@ def signals_message_sender_controller(prices_data, intervals, unit_pd):
 if __name__ == '__main__':
     from aiogram import executor
 
-    currencies = price_parser.get_currencies()  # [("BTCUSD", "COINBASE"), ("ETHUSD", "COINBASE"), ("DOGEUSD", "COINBASE"),("SOLUSD", "COINBASE")]
+    currencies = price_parser.get_currencies()
     intervals = [Interval.in_1_minute, Interval.in_3_minute, Interval.in_5_minute, Interval.in_15_minute, Interval.in_30_minute, Interval.in_45_minute, Interval.in_1_hour, Interval.in_2_hour]
     main_intervals = [Interval.in_1_minute, Interval.in_3_minute, Interval.in_5_minute]
     parent_intervals = [
@@ -343,10 +344,9 @@ if __name__ == '__main__':
             parent_pds.append([])
             ind += 1
             for p_i in parent_intervals[main_interval_index]:
-
                 parent_pds[ind].append(PriceData(currencies[currency_ind][0], currencies[currency_ind][1], p_i))
 
-    price_parser.create_parce_currencies_with_intervals_callbacks(prices_data)
+    multiprocessing.Process(target=price_parser.create_parce_currencies_with_intervals_callbacks, args=(prices_data, )).start()
 
     for pd in prices_data:
         pd.reset_chart_data()

@@ -1,2 +1,2 @@
-,has_signal,signal_type,msg,date,open_price,interval,indicators_count,sob_signals_count,symbol,exchange
-0,False,neutral,NoneAUD/CAD Нет сигнала 30мин,2023-10-11 18:05:00,0.8719,Interval.in_5_minute,0,0,AUDCAD,OANDA
+,has_signal,signal_type,msg,date,open_price,interval,indicators_count,sob_signals_count,symbol,exchange,deal_time
+0,False,neutral,NoneAUD/CAD Нет сигнала 5мин,2023-10-16 23:25:00,0.86341,Interval.in_5_minute,0,0,AUDCAD,OANDA,1.0

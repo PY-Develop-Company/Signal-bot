@@ -1,2 +1,2 @@
-,has_signal,signal_type,msg,date,open_price,interval,indicators_count,sob_signals_count,symbol,exchange
-0,False,neutral,NoneAUD/CHF Нет сигнала 18мин,2023-10-11 18:09:00,0.57865,Interval.in_3_minute,0,0,AUDCHF,OANDA
+,has_signal,signal_type,msg,date,open_price,interval,indicators_count,sob_signals_count,symbol,exchange,deal_time
+0,False,neutral,NoneAUD/CHF Нет сигнала 3мин,2023-10-16 23:30:00,0.57095,Interval.in_3_minute,0,0,AUDCHF,OANDA,1.0

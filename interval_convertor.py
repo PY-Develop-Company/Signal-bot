@@ -12,7 +12,10 @@ def timedelta_to_close_string(interval, bars_count=3):
     if delay_days > 0:
         str(delay_days) + "Д"
     elif delay_hours > 0:
-        return str(delay_hours) + "ч" + str(delay_minutes) + "м"
+        res = str(delay_hours) + "ч"
+        if delay_minutes > 0:
+            res += " " + str(delay_minutes) + "мин"
+        return res
     return str(delay_minutes) + "мин"
 
 
@@ -29,12 +32,20 @@ def interval_to_datetime(interval: Interval):
         return timedelta(minutes=30)
     elif interval == Interval.in_45_minute:
         return timedelta(minutes=45)
+    elif interval == Interval.in_1_hour:
+        return timedelta(hours=1)
+    elif interval == Interval.in_2_hour:
+        return timedelta(hours=2)
     else:
         return None
 
 
 def datetime_to_interval(datetime):
     datetime = math.floor(datetime.total_seconds() / 60)
+    if datetime == 120:
+        return Interval.in_2_hour
+    if datetime == 60:
+        return Interval.in_1_hour
     if datetime == 45:
         return Interval.in_45_minute
     if datetime == 30:
@@ -68,6 +79,31 @@ def str_to_interval(interval: str):
         return Interval.in_30_minute
     elif interval == str(Interval.in_45_minute):
         return Interval.in_45_minute
+    elif interval == str(Interval.in_1_hour):
+        return Interval.in_1_hour
+    elif interval == str(Interval.in_2_hour):
+        return Interval.in_2_hour
+    else:
+        return None
+
+
+def interval_to_int(interval: Interval):
+    if interval == Interval.in_1_minute:
+        return 1
+    elif interval == Interval.in_3_minute:
+        return 3
+    elif interval == Interval.in_5_minute:
+        return 5
+    elif interval == Interval.in_15_minute:
+        return 15
+    elif interval == Interval.in_30_minute:
+        return 30
+    elif interval == Interval.in_45_minute:
+        return 45
+    elif interval == Interval.in_1_hour:
+        return 60
+    elif interval == Interval.in_2_hour:
+        return 120
     else:
         return None
 
