@@ -27,7 +27,7 @@ async def close_position_delay(interval: Interval, bars_count=3):
 
 
 async def close_position(position_open_price, signal: Signal, pd: PriceData, bars_count):
-    await close_position_delay(pd.interval, bars_count)
+    await close_position_delay(Interval.in_1_minute, bars_count)
 
     price_data = pd.get_price_data(bars_count=2)
 
@@ -105,13 +105,13 @@ def analize_currency_data_controller(analize_pair):
             if is_price_df_exists:
                 prices_df.update({pd: price_df})
 
-        analizer = MultitimeframeAnalizer(3, 2)
+        analizer = MultitimeframeAnalizer(2, 1)
         has_signal, signal, _, main_indicators_count, sob_signals_count, deal_time = analizer.analize(main_price_df, main_pd.interval, prices_df)
 
         open_position_price = main_price_df.close[0]
         msg = signal.get_open_msg_text(main_pd, deal_time)
 
-        data = [[has_signal, signal.type, msg, main_price_df.datetime[0], open_position_price, main_pd.interval,
+        data = [[has_signal, signal.type, msg + "\n" + _, main_price_df.datetime[0], open_position_price, main_pd.interval,
                  main_indicators_count, sob_signals_count, main_pd.symbol, main_pd.exchange, deal_time]]
         columns = ["has_signal", "signal_type", "msg", "date", "open_price", "interval",
                    "indicators_count", "sob_signals_count", "symbol", "exchange", "deal_time"]

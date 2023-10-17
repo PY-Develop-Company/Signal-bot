@@ -13,8 +13,7 @@ import interval_convertor
 from signals import get_signal_by_type
 from datetime import datetime
 
-# API_TOKEN = "6340912636:AAHACm2V2hDJUDXng0y0uhBRVRFJgqrok48"
-API_TOKEN = "6538527964:AAHUUHZHYVnNFbYAPoMn4bRUMASKR0h9qfA"
+API_TOKEN = "6340912636:AAHACm2V2hDJUDXng0y0uhBRVRFJgqrok48"
 logging.basicConfig(level=logging.INFO)
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot)
@@ -313,12 +312,12 @@ if __name__ == '__main__':
     from aiogram import executor
 
     currencies = price_parser.get_currencies()
-    intervals = [Interval.in_1_minute, Interval.in_3_minute, Interval.in_5_minute, Interval.in_15_minute, Interval.in_30_minute, Interval.in_45_minute, Interval.in_1_hour, Interval.in_2_hour]
+    intervals = [Interval.in_1_minute, Interval.in_3_minute, Interval.in_5_minute, Interval.in_15_minute, Interval.in_30_minute]
     main_intervals = [Interval.in_1_minute, Interval.in_3_minute, Interval.in_5_minute]
     parent_intervals = [
-        [Interval.in_3_minute, Interval.in_5_minute, Interval.in_15_minute, Interval.in_30_minute, Interval.in_45_minute, Interval.in_1_hour, Interval.in_2_hour],
-        [Interval.in_5_minute, Interval.in_15_minute, Interval.in_30_minute, Interval.in_45_minute, Interval.in_1_hour, Interval.in_2_hour],
-        [Interval.in_15_minute, Interval.in_30_minute, Interval.in_45_minute, Interval.in_1_hour, Interval.in_2_hour]
+        [Interval.in_3_minute, Interval.in_5_minute],
+        [Interval.in_5_minute, Interval.in_15_minute],
+        [Interval.in_15_minute, Interval.in_30_minute]
     ]
     prices_data = []
 

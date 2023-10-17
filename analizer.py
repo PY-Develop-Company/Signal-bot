@@ -20,12 +20,12 @@ class MultitimeframeAnalizer(Analizer):
     def __init__(self, successful_indicators_count, successful_sob_signals_count):
         self.successful_sob_signals_count = successful_sob_signals_count
         self.main = MainAnalizer(successful_indicators_count)
-        self.sob = NoDeltaSOBAnalizer()
+        self.sob = SOBAnalizer()
 
     def analize_func(self, df, interval, parent_pd_dfs_dict) -> (bool, Signal, str, int, int, int):
         has_signal = False
         signal = NeutralSignal()
-        intervals = []
+        intervals = [interval]
 
         main_has_signal, main_signal, main_ind_count, main_debug_text = self.main.analize(df, interval)
 
@@ -47,15 +47,15 @@ class MultitimeframeAnalizer(Analizer):
         interval_minutes = interval_to_int(interval)
         # print("interval_minutes", interval_minutes)
         deal_time = interval_minutes
-        for interval_ in intervals:
-            deal_time += interval_to_int(interval_)
+        for parent_df in parent_pd_dfs_dict.items():
+            deal_time += interval_to_int(parent_df[0].interval)
         # print("deal_time", deal_time)
-        deal_time /= len(intervals) + 1
+        deal_time /= 2
+        deal_time = int(round(deal_time, 0))
         # print("deal_time_avg", deal_time)
-        deal_time = round(deal_time / interval_minutes, 0)
         # print("deal_time_round", deal_time)
 
-        return has_signal, signal, main_debug_text + "\n sob_count: " + str(sob_signals_count), main_ind_count, sob_signals_count, deal_time
+        return has_signal, signal, main_debug_text + f"\n SuperOrderBlock на інших таймфреймах: {intervals}", main_ind_count, sob_signals_count, deal_time
 
     def analize(self, df, interval, parent_pd_dfs_dict) -> (bool, Signal, str, int, int, int):
         has_signal, signal, debug, main_ind_count, sob_signals_count, deal_time = self.analize_func(df, interval, parent_pd_dfs_dict)
@@ -72,18 +72,18 @@ class MainAnalizer(Analizer):
         interval_td = interval_convertor.interval_to_datetime(interval)
         analize_block_delta = sob_dict.get(df["symbol"][0].split(":")[1]).get(interval)
 
-        volume_ind = VolumeIndicator(df, df.open, df.close, df.high, df.low)
-        sp_ind = ScalpProIndicator(df, df.open, df.close, df.high, df.low, 16, 12, 16)
-        uma_ind = UMAIndicator(df, df.open, df.close, df.high, df.low, 5)
+        # volume_ind = VolumeIndicator(df, df.open, df.close, df.high, df.low)
+        # sp_ind = ScalpProIndicator(df, df.open, df.close, df.high, df.low, 16, 12, 16)
+        uma_ind = UMAIndicator(df, df.open, df.close, df.high, df.low)
         sob_ind = SuperOrderBlockIndicator(df, df.open, df.close, df.high, df.low, interval_td, analize_block_delta)
-        # nw_ind = NadarayaWatsonIndicator(df, df.open, df.close, df.high, df.low, mult=2)
+        nw_ind = NadarayaWatsonIndicator(df, df.open, df.close, df.high, df.low)
 
         indicators_signals = {
             "sob": sob_ind.get_signal(),
-            "volume": volume_ind.get_signal(),
+            # "volume": volume_ind.get_signal(),
             "uma": uma_ind.get_signal(),
-            "sp": sp_ind.get_signal()
-            # "sp": sp_ind.get_signal()
+            # "sp": sp_ind.get_signal(),
+            "nw": nw_ind.get_signal()
         }
 
         signal_counts = {LongSignal.type: [0, [], LongSignal()], ShortSignal.type: [0, [], ShortSignal()],
@@ -158,7 +158,7 @@ class VolumeAnalizer(Analizer):
 class SPAnalizer(Analizer):
     def analize_func(self, df) -> (bool, Signal, str):
         # 16 12 16
-        sp_ind = ScalpProIndicator(df, df.open, df.close, df.high, df.low, 16, 12, 16)
+        sp_ind = ScalpProIndicator(df, df.open, df.close, df.high, df.low, 8, 10, 8)
         signal = sp_ind.get_signal()
         has_signal = not(signal.type == NeutralSignal())
         return has_signal, signal, "no debug"
@@ -167,7 +167,7 @@ class SPAnalizer(Analizer):
 class UMAAnalizer(Analizer):
     def analize_func(self, df) -> (bool, Signal, str):
         # 5
-        uma_ind = UMAIndicator(df, df.open, df.close, df.high, df.low, 5)
+        uma_ind = UMAIndicator(df, df.open, df.close, df.high, df.low, 20)
         signal = uma_ind.get_signal()
         has_signal = not(signal.type == NeutralSignal())
         return has_signal, signal, "no debug"
@@ -176,7 +176,7 @@ class UMAAnalizer(Analizer):
 class NWAnalizer(Analizer):
     def analize_func(self, df) -> (bool, Signal, str):
         # 2
-        nw_ind = NadarayaWatsonIndicator(df, df.open, df.close, df.high, df.low, mult=2)
+        nw_ind = NadarayaWatsonIndicator(df, df.open, df.close, df.high, df.low, mult=3)
         signal = nw_ind.get_signal()
         has_signal = not(signal.type == NeutralSignal())
         return has_signal, signal, "no debug"

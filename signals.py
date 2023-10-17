@@ -23,8 +23,8 @@ class Signal:
         self.smile = None
         self.text = None
 
-    def get_open_msg_text(self, pd, bars_count):
-        return self.smile + pd.symbol[:3] + "/" + pd.symbol[3:] + " " + self.text + " " + timedelta_to_close_string(interval_to_datetime(pd.interval), bars_count)
+    def get_open_msg_text(self, pd, minutes):
+        return self.smile + pd.symbol[:3] + "/" + pd.symbol[3:] + " " + self.text + " " + str(minutes) + "мин"
 
     def get_photo_path(self):
         return self.photo_path
@@ -37,7 +37,7 @@ class Signal:
         prifit_smile_text = profit_smile if is_profit_position else loss_smile
         # debug_text = f"\nЦіна закриття позиції {str(close)} Ціна відкриття позиції: {str(open)}"
 
-        message = f"{self.smile} Сделка в {prifit_smile_text} {pd.symbol[:3]}/{pd.symbol[3:]} {self.text} {timedelta_to_close_string(interval_to_datetime(pd.interval), bars_count)}"
+        message = f"{self.smile} Сделка в {prifit_smile_text} {pd.symbol[:3]}/{pd.symbol[3:]} {self.text} {bars_count}мин"
         return message, is_profit_position
 
 
