@@ -11,12 +11,13 @@ from manager_module import *
 from menu_text import *
 import interval_convertor
 from signals import get_signal_by_type
-from datetime import datetime
 
-API_TOKEN = "6340912636:AAHACm2V2hDJUDXng0y0uhBRVRFJgqrok48"
+API_TOKEN = "6538527964:AAHUUHZHYVnNFbYAPoMn4bRUMASKR0h9qfA"  # test API TOKEN
+# API_TOKEN = "6340912636:AAHACm2V2hDJUDXng0y0uhBRVRFJgqrok48"  # main API TOKEN
 logging.basicConfig(level=logging.INFO)
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot)
+signal_delay = 300
 
 manager_markup = types.ReplyKeyboardMarkup(resize_keyboard=True, keyboard=[
     [types.KeyboardButton(search_id_request), types.KeyboardButton(search_deposit_request)]
@@ -211,65 +212,30 @@ async def handle_media(message: types.Message):
 
 
 def handle_signal_msg_controller(signal, msg, pd: PriceData, open_position_price, deal_time):
-    async def handle_signal_msg(signal, msg, pd: PriceData, open_position_price):
+    async def handle_signal_msg(signal, msg, pd: PriceData, open_position_price, deal_time):
         deposit_users_ids = get_deposit_users_ids()
         await send_photo_text_message_to_users(deposit_users_ids, signal.photo_path, msg)
+
         close_signal_message, is_profit = await signal_maker.close_position(open_position_price, signal, pd, bars_count=deal_time)
         img_path = "./img/profit.jpg" if is_profit else "./img/loss.jpg"
         await send_photo_text_message_to_users(deposit_users_ids, img_path, close_signal_message)
-    asyncio.run(handle_signal_msg(signal, msg, pd, open_position_price))
-
-
-async def signal_msg_send_delay():
-    await asyncio.sleep(300)
+    asyncio.run(handle_signal_msg(signal, msg, pd, open_position_price, deal_time))
 
 
 def signals_message_sender_controller(prices_data, intervals, unit_pd):
     async def signals_message_sender_function(prices_data, intervals, unit_pd):
         signal_maker.reset_signals_files(prices_data)
-        interval_prices_datas = []
-        for interval in intervals:
-            interval_prices_data = [pd for pd in prices_data if pd.interval == interval]
-            interval_prices_datas.append(interval_prices_data)
 
         while True:
             await asyncio.sleep(10)
-            created_prices_data = []
-            # is_all_signals_created = True
-            # is_unit_min_created, date = signal_maker.is_signals_analized([unit_pd])
-            # if not is_unit_min_created or (date is None):
-            #     continue
 
+            created_prices_data = []
             for pd in prices_data:
                 if signal_maker.is_signal_analized(pd):
                     created_prices_data.append(pd)
             if len(created_prices_data) == 0:
                 continue
-            # for i in range(len(intervals)):
-            #     is_min_created, _ = signal_maker.is_signals_analized(interval_prices_datas[i])
-            #
-            #     if _ is None:
-            #         is_all_signals_created = False
-            #         break
-            #     if not (interval_prices_datas[i][0].is_analize_time(date, debug=True)):
-            #         break
-            #
-            #     # print("\ncheck creation of interval: ", intervals[i], dates[0])
-            #     # for pd in interval_prices_datas[i]:
-            #     #     pd.print()
-            #     # print()
-            #
-            #     is_all_signals_created = is_all_signals_created and is_min_created
-            #     if not is_all_signals_created:
-            #         break
-            #     else:
-            #         for pd in interval_prices_datas[i]:
-            #             created_prices_data.append(pd)
 
-            # if not is_all_signals_created:
-            #     # print("not all created", datetime.now())
-            #     continue
-            # print("all created", datetime.now())
             dfs_with_signals = []
             for pd in created_prices_data:
                 df = signal_maker.read_signal_data(pd)
@@ -277,32 +243,22 @@ def signals_message_sender_controller(prices_data, intervals, unit_pd):
                     dfs_with_signals.append(df)
 
             if len(dfs_with_signals) == 0:
-                # print("no signals: reseting dfs:")
+                print("No signals detected. Deleting signal files:")
                 for pd in created_prices_data:
                     pd.print()
                 signal_maker.reset_signals_files(created_prices_data)
                 continue
 
-            # max_sob_count = 0
-            # for df in dfs_with_signals:
-            #     sob_count = int(df.sob_signals_count[0])
-            #     if sob_count > max_sob_count:
-            #         max_sob_count = sob_count
-            #
-            # max_sob_dfs = []
-            # for df in dfs_with_signals:
-            #     if int(df.sob_signals_count[0]) == max_sob_count:
-            #         max_sob_dfs.append(df)
-
             df = random.choice(dfs_with_signals)
             signal = get_signal_by_type(df.signal_type[0])
 
             pd = PriceData(df.symbol[0], df.exchange[0], interval_convertor.str_to_interval(df.interval[0]))
-            dealtime = int(df.deal_time[0])
-            print("dealtime before print", dealtime)
+
             multiprocessing.Process(target=handle_signal_msg_controller,
-                                    args=(signal, df.msg[0], pd, df.open_price[0], dealtime, ), daemon=True).start()
-            await signal_msg_send_delay()
+                                    args=(signal, df.msg[0], pd, df.open_price[0], int(df.deal_time[0]), ), daemon=True).start()
+
+            await asyncio.sleep(signal_delay)
+
             signal_maker.reset_signals_files(prices_data)
 
     asyncio.run(signals_message_sender_function(prices_data, intervals, unit_pd))

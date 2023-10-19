@@ -134,4 +134,8 @@ def create_parce_currencies_with_intervals_callbacks(pds: [PriceData]):
 
         time.sleep(300)
         for consumer in consumers:
-            tvl.del_consumer(consumer)
+            try:
+                tvl.del_consumer(consumer)
+            except Exception:
+                pass
+            

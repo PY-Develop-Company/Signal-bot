@@ -1,11 +1,13 @@
-,has_signal,signal_type,msg,date,open_price,interval,indicators_count,sob_signals_count,symbol,exchange,deal_time
+,has_signal,signal_type,msg,date,open_price,interval,symbol,exchange,deal_time
 0,False,neutral,"NoneEUR/JPY Нет сигнала 25мин
 
 
 Проверка сигнала:
-            	Валютная пара: OANDA:EURJPY"" таймфрейм: Interval.in_5_minute время свечи: 2023-10-17 20:45:00
-            	Есть ли сигнал: False
-            	Показания индикаторов: {'LONG ⬆': [1, ['nw']], 'SHORT ⬇': [1, ['uma']], 'Нет сигнала': [1, ['sob']]})
+                    	Валютная пара: EURJPY"" таймфрейми: [<Interval.in_5_minute: '5'>, <Interval.in_15_minute: '15'>, <Interval.in_30_minute: '30'>] время свеч: [Timestamp('2023-10-19 23:30:00'), Timestamp('2023-10-19 23:15:00'), Timestamp('2023-10-19 23:00:00')]
+                    	Есть ли сигнал: False
+                    	Показания индикаторов: long_sob_count1 short_sob_count0
+                    		 * SOB -> long [<Interval.in_5_minute: '5'>] short []
+                    		 * NW -> long [<Interval.in_5_minute: '5'>] short [<Interval.in_15_minute: '15'>, <Interval.in_30_minute: '30'>]
+                    		 * UMA -> long [<Interval.in_5_minute: '5'>] short [<Interval.in_15_minute: '15'>, <Interval.in_30_minute: '30'>]
 
-            
- SuperOrderBlock на інших таймфреймах: [<Interval.in_5_minute: '5'>]",2023-10-17 20:45:00,158.364,Interval.in_5_minute,0,0,EURJPY,OANDA,25
+                    ",2023-10-19 23:30:00,158.55,Interval.in_5_minute,EURJPY,OANDA,25

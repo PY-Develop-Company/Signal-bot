@@ -6,9 +6,7 @@ from datetime import timedelta
 from pandas import Series
 import plotly.graph_objects as go
 from signals import *
-import price_parser
-import asyncio
-from interval_convertor import datetime_to_interval
+
 
 sob_dict = {
     "EURUSD": {
@@ -16,131 +14,63 @@ sob_dict = {
         Interval.in_3_minute: 0.0025,
         Interval.in_5_minute: 0.0033,
         Interval.in_15_minute: 0.0045,
-        Interval.in_30_minute: 0.006,
-        Interval.in_45_minute: 0.006,
-        Interval.in_1_hour: 0.006,
-        Interval.in_2_hour: 0.006
+        Interval.in_30_minute: 0.006
     },
     "AUDUSD": {
         Interval.in_1_minute: 0.0015,
         Interval.in_3_minute: 0.0024,
         Interval.in_5_minute: 0.0032,
         Interval.in_15_minute: 0.0042,
-        Interval.in_30_minute: 0.0053,
-        Interval.in_45_minute: 0.0053,
-        Interval.in_1_hour: 0.0053,
-        Interval.in_2_hour: 0.0053
+        Interval.in_30_minute: 0.0053
     },
     "AUDCAD": {
         Interval.in_1_minute: 0.0019,
         Interval.in_3_minute: 0.0031,
         Interval.in_5_minute: 0.0042,
         Interval.in_15_minute: 0.0056,
-        Interval.in_30_minute: 0.0064,
-        Interval.in_45_minute: 0.0064,
-        Interval.in_1_hour: 0.0064,
-        Interval.in_2_hour: 0.0064
+        Interval.in_30_minute: 0.0064
     },
     "EURJPY": {
         Interval.in_1_minute: 0.0026,
         Interval.in_3_minute: 0.0034,
         Interval.in_5_minute: 0.0049,
         Interval.in_15_minute: 0.0065,
-        Interval.in_30_minute: 0.0083,
-        Interval.in_45_minute: 0.0083,
-        Interval.in_1_hour: 0.0083,
-        Interval.in_2_hour: 0.0083
+        Interval.in_30_minute: 0.0083
     },
     "EURCAD": {
         Interval.in_1_minute: 0.0039,
         Interval.in_3_minute: 0.0058,
         Interval.in_5_minute: 0.0065,
         Interval.in_15_minute: 0.0079,
-        Interval.in_30_minute: 0.0091,
-        Interval.in_45_minute: 0.0091,
-        Interval.in_1_hour: 0.0091,
-        Interval.in_2_hour: 0.0091
+        Interval.in_30_minute: 0.0091
     },
     "AUDCHF": {
         Interval.in_1_minute: 0.001,
         Interval.in_3_minute: 0.0018,
         Interval.in_5_minute: 0.0026,
         Interval.in_15_minute: 0.0037,
-        Interval.in_30_minute: 0.0047,
-        Interval.in_45_minute: 0.0047,
-        Interval.in_1_hour: 0.0047,
-        Interval.in_2_hour: 0.0047
+        Interval.in_30_minute: 0.0047
     },
     "GBPUSD": {
         Interval.in_1_minute: 0.0021,
         Interval.in_3_minute: 0.0033,
         Interval.in_5_minute: 0.0041,
         Interval.in_15_minute: 0.0053,
-        Interval.in_30_minute: 0.0065,
-        Interval.in_45_minute: 0.0065,
-        Interval.in_1_hour: 0.0065,
-        Interval.in_2_hour: 0.0065
+        Interval.in_30_minute: 0.0065
     },
     "AUDJPY": {
         Interval.in_1_minute: 0.0025,
         Interval.in_3_minute: 0.0037,
         Interval.in_5_minute: 0.0046,
         Interval.in_15_minute: 0.0056,
-        Interval.in_30_minute: 0.0068,
-        Interval.in_45_minute: 0.0068,
-        Interval.in_1_hour: 0.0068,
-        Interval.in_2_hour: 0.0068
+        Interval.in_30_minute: 0.0068
     },
     "GBPAUD": {
         Interval.in_1_minute: 0.0045,
         Interval.in_3_minute: 0.0067,
         Interval.in_5_minute: 0.0088,
         Interval.in_15_minute: 0.0102,
-        Interval.in_30_minute: 0.0121,
-        Interval.in_45_minute: 0.0121,
-        Interval.in_1_hour: 0.0121,
-        Interval.in_2_hour: 0.0121
-    },
-
-    "BTCUSD": {
-        Interval.in_1_minute: 0,
-        Interval.in_3_minute: 0,
-        Interval.in_5_minute: 0,
-        Interval.in_15_minute: 0,
-        Interval.in_30_minute: 0,
-        Interval.in_45_minute: 0,
-        Interval.in_1_hour: 0,
-        Interval.in_2_hour: 0
-    },
-    "ETHUSD": {
-        Interval.in_1_minute: 0,
-        Interval.in_3_minute: 0,
-        Interval.in_5_minute: 0,
-        Interval.in_15_minute: 0,
-        Interval.in_30_minute: 0,
-        Interval.in_45_minute: 0,
-        Interval.in_1_hour: 0,
-        Interval.in_2_hour: 0
-    },
-    "DOGEUSD": {
-        Interval.in_1_minute: 0,
-        Interval.in_3_minute: 0,
-        Interval.in_5_minute: 0,
-        Interval.in_15_minute: 0,
-        Interval.in_30_minute: 0,
-        Interval.in_45_minute: 0,
-        Interval.in_1_hour: 0,
-        Interval.in_2_hour: 0
-    },
-    "SOLUSD": {
-        Interval.in_1_minute: 0,
-        Interval.in_3_minute: 0,
-        Interval.in_5_minute: 0,
-        Interval.in_15_minute: 0,
-        Interval.in_30_minute: 0,
-        Interval.in_45_minute: 0,
-        Interval.in_1_hour: 0,
-        Interval.in_2_hour: 0
+        Interval.in_30_minute: 0.0121
     }
 }
 
@@ -206,7 +136,7 @@ class SuperOrderBlockIndicator(Indicator):
             print("Created box: ", self.left, self.top, self.right, self.bottom)
 
         def check_signal(self, bar_low, bar_high, bar_date):
-            is_price_in_box = (bar_high > self.top > bar_low) or (bar_high > self.bottom > bar_low)
+            is_price_in_box = (self.top > bar_high > self.bottom) or (self.top > bar_low > self.bottom)
             is_date_range_in_box = self.left <= bar_date <= self.right
             return self.signal if (is_price_in_box and is_date_range_in_box) else NeutralSignal()
 
@@ -520,7 +450,7 @@ class VolumeIndicator(Indicator):
 
 
 class UMAIndicator(Indicator):
-    def __init__(self, src, open, close, high, low, rolling=10, smooth=2):
+    def __init__(self, src, open, close, high, low, rolling=20, smooth=2):
         super().__init__(src, open, close, high, low)
         self.rolling = rolling
         self.smooth = smooth
@@ -586,7 +516,7 @@ class UMAIndicator(Indicator):
 
 
 class NadarayaWatsonIndicator(Indicator):
-    def __init__(self, src, open, close, high, low, h=8.0, mult=1.0):
+    def __init__(self, src, open, close, high, low, h=8.0, mult=3.0):
         super().__init__(src, open, close, high, low)
         self.h = h
         self.mult = mult

@@ -86,3 +86,12 @@ def get_signal_by_type(signal_type):
         return ShortSignal()
 
     return None
+
+
+def get_oposite_by_type(signal_type):
+    if signal_type == NeutralSignal.type:
+        return NeutralSignal()
+    elif signal_type == LongSignal.type:
+        return ShortSignal()
+    elif signal_type == ShortSignal.type:
+        return LongSignal()

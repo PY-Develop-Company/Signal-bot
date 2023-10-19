@@ -1,11 +1,13 @@
-,has_signal,signal_type,msg,date,open_price,interval,indicators_count,sob_signals_count,symbol,exchange,deal_time
+,has_signal,signal_type,msg,date,open_price,interval,symbol,exchange,deal_time
 0,False,neutral,"NoneGBP/USD Нет сигнала 4мин
 
 
 Проверка сигнала:
-            	Валютная пара: OANDA:GBPUSD"" таймфрейм: Interval.in_1_minute время свечи: 2023-10-17 20:53:00
-            	Есть ли сигнал: False
-            	Показания индикаторов: {'LONG ⬆': [1, ['nw']], 'SHORT ⬇': [1, ['uma']], 'Нет сигнала': [1, ['sob']]})
+                    	Валютная пара: GBPUSD"" таймфрейми: [<Interval.in_1_minute: '1'>, <Interval.in_3_minute: '3'>, <Interval.in_5_minute: '5'>] время свеч: [Timestamp('2023-10-19 23:37:00'), Timestamp('2023-10-19 23:33:00'), Timestamp('2023-10-19 23:30:00')]
+                    	Есть ли сигнал: False
+                    	Показания индикаторов: long_sob_count0 short_sob_count0
+                    		 * SOB -> long [] short []
+                    		 * NW -> long [<Interval.in_1_minute: '1'>, <Interval.in_3_minute: '3'>, <Interval.in_5_minute: '5'>] short []
+                    		 * UMA -> long [] short [<Interval.in_1_minute: '1'>, <Interval.in_3_minute: '3'>, <Interval.in_5_minute: '5'>]
 
-            
- SuperOrderBlock на інших таймфреймах: [<Interval.in_1_minute: '1'>]",2023-10-17 20:53:00,1.21728,Interval.in_1_minute,0,0,GBPUSD,OANDA,4
+                    ",2023-10-19 23:37:00,1.21402,Interval.in_1_minute,GBPUSD,OANDA,4
