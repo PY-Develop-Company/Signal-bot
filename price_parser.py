@@ -106,12 +106,13 @@ def get_price_data_frame_seis(seis, bars_count=500):
 
 def create_parce_currencies_with_intervals_callbacks(pds: [PriceData]):
     global tvl, tv
+
     def update_currency_file_consumer(seis: Seis, data):
         try:
             price_df = get_price_data_frame_seis(seis)
 
             pd = PriceData(seis.symbol, seis.exchange, seis.interval)
-            print ("update file", pd.symbol, pd.interval)
+            print("update file", pd.symbol, pd.interval)
             pd.save_chart_data(price_df)
         except Exception as e:
             print("bbb", e)
@@ -119,23 +120,23 @@ def create_parce_currencies_with_intervals_callbacks(pds: [PriceData]):
     while True:
         print("creating new seis")
         consumers = []
-        tvl = TvDatafeedLive()
-        tv = TvDatafeed()
         try:
+            tvl = TvDatafeedLive()
+            tv = TvDatafeed()
             for pd in pds:
                 seis = tvl.new_seis(pd.symbol, pd.exchange, pd.interval)
                 print("seis", seis)
                 consumer = tvl.new_consumer(seis, update_currency_file_consumer)
                 consumers.append(consumer)
-            break
-        except ValueError as e:
-            print("Error", e)
-            time.sleep(trade_pause_wait_time)
 
-        time.sleep(300)
-        for consumer in consumers:
-            try:
-                tvl.del_consumer(consumer)
-            except Exception:
-                pass
+            time.sleep(300)
+            for consumer in consumers:
+                try:
+                    tvl.del_consumer(consumer)
+                except Exception as e:
+                    print("Error", e)
+            break
+        except Exception as e:
+            print("Error", e)
+            time.sleep(300)
             

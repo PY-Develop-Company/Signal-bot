@@ -12,8 +12,8 @@ from menu_text import *
 import interval_convertor
 from signals import get_signal_by_type
 
-API_TOKEN = "6538527964:AAHUUHZHYVnNFbYAPoMn4bRUMASKR0h9qfA"  # test API TOKEN
-# API_TOKEN = "6340912636:AAHACm2V2hDJUDXng0y0uhBRVRFJgqrok48"  # main API TOKEN
+# API_TOKEN = "6538527964:AAHUUHZHYVnNFbYAPoMn4bRUMASKR0h9qfA"  # test API TOKEN
+API_TOKEN = "6340912636:AAHACm2V2hDJUDXng0y0uhBRVRFJgqrok48"  # main API TOKEN
 logging.basicConfig(level=logging.INFO)
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot)
@@ -45,7 +45,10 @@ async def send_message_to_user(user_id, text):
     if await get_chat_id(user_id) == 0:
         return
 
-    await bot.send_message(user_id, text, disable_notification=False)
+    try:
+        await bot.send_message(user_id, text, disable_notification=False)
+    except Exception as e:
+        print("Error: bot is blocked by user")
 
 
 async def send_message_to_users(users_ids: [], text):
@@ -61,8 +64,11 @@ async def send_photo_text_message_to_user(user_id, img_path, text=" "):
     if await get_chat_id(user_id) == 0:
         return
 
-    with open(img_path, "rb") as file:
-        await bot.send_photo(user_id, photo=file, caption=text)
+    try:
+        with open(img_path, "rb") as file:
+            await bot.send_photo(user_id, photo=file, caption=text)
+    except Exception as e:
+        print("Error: bot is blocked by user")
 
 
 async def send_photo_text_message_to_users(users_ids: [], img_path, text=" "):

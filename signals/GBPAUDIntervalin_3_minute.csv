@@ -1,13 +1,2 @@
 ,has_signal,signal_type,msg,date,open_price,interval,symbol,exchange,deal_time
-0,False,neutral,"NoneGBP/AUD Нет сигнала 12мин
-
-
-Проверка сигнала:
-                    	Валютная пара: GBPAUD"" таймфрейми: [<Interval.in_3_minute: '3'>, <Interval.in_5_minute: '5'>, <Interval.in_15_minute: '15'>] время свеч: [Timestamp('2023-10-19 23:33:00'), Timestamp('2023-10-19 23:30:00'), Timestamp('2023-10-19 23:15:00')]
-                    	Есть ли сигнал: False
-                    	Показания индикаторов: long_sob_count0 short_sob_count1
-                    		 * SOB -> long [] short [<Interval.in_3_minute: '3'>]
-                    		 * NW -> long [<Interval.in_3_minute: '3'>, <Interval.in_5_minute: '5'>, <Interval.in_15_minute: '15'>] short []
-                    		 * UMA -> long [<Interval.in_3_minute: '3'>, <Interval.in_5_minute: '5'>] short [<Interval.in_15_minute: '15'>]
-
-                    ",2023-10-19 23:33:00,1.91836,Interval.in_3_minute,GBPAUD,OANDA,12
+0,False,neutral,NoneGBP/AUD Нет сигнала 12мин,2023-10-23 23:00:00,1.93338,Interval.in_3_minute,GBPAUD,OANDA,12

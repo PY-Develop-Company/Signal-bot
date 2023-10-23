@@ -21,8 +21,8 @@ class MultitimeframeAnalizer(Analizer):
     def __init__(self, successful_indicators_count, successful_sob_signals_count):
         self.successful_sob_signals_count = successful_sob_signals_count
         self.successful_indicators_count = successful_indicators_count
-        self.nw = NWAnalizer()
-        self.uma = UMAAnalizer()
+        # self.nw = NWAnalizer()
+        # self.uma = UMAAnalizer()
         self.sob = SOBAnalizer()
 
     def analize_multitimeframe(self, pds_dfs, analizer: Analizer):
@@ -44,11 +44,11 @@ class MultitimeframeAnalizer(Analizer):
 
         return long_signals_count, short_signals_count, long_intervals, short_intervals
 
-    def analize_func(self, parent_dfs, pds) -> (bool, Signal, str, int, int, int):
+    def analize_func(self, parent_dfs, pds) -> (bool, Signal, str, int):
         pds_dfs = dict(zip(pds, parent_dfs))
         sob_long_count, sob_short_count, sob_long_intervals, sob_short_intervals = self.analize_multitimeframe(pds_dfs, self.sob)
-        nw_long_count, nw_short_count, nw_long_intervals, nw_short_intervals = self.analize_multitimeframe(pds_dfs, self.nw)
-        uma_long_count, uma_short_count, uma_long_intervals, uma_short_intervals = self.analize_multitimeframe(pds_dfs, self.uma)
+        # nw_long_count, nw_short_count, nw_long_intervals, nw_short_intervals = self.analize_multitimeframe(pds_dfs, self.nw)
+        # uma_long_count, uma_short_count, uma_long_intervals, uma_short_intervals = self.analize_multitimeframe(pds_dfs, self.uma)
 
         has_signal = False
         signal = NeutralSignal()
@@ -58,14 +58,14 @@ class MultitimeframeAnalizer(Analizer):
             has_signal = True
             signal = LongSignal() if sob_long_count > sob_short_count else ShortSignal()
 
-        if has_signal:
-            if signal.type == LongSignal().type and nw_long_count >= self.successful_indicators_count <= uma_long_count:
-                pass
-            elif signal.type == ShortSignal().type and nw_short_count >= self.successful_indicators_count <= uma_short_count:
-                pass
-            else:
-                has_signal = False
-                signal = NeutralSignal()
+        # if has_signal:
+        #     if signal.type == LongSignal().type and nw_long_count >= self.successful_indicators_count <= uma_long_count:
+        #         pass
+        #     elif signal.type == ShortSignal().type and nw_short_count >= self.successful_indicators_count <= uma_short_count:
+        #         pass
+        #     else:
+        #         has_signal = False
+        #         signal = NeutralSignal()
 
         deal_time = 0
         for pd in pds:
@@ -78,13 +78,13 @@ class MultitimeframeAnalizer(Analizer):
                     \tЕсть ли сигнал: {has_signal}
                     \tПоказания индикаторов: long_sob_count{sob_long_count} short_sob_count{sob_short_count}
                     \t\t * SOB -> long {sob_long_intervals} short {sob_short_intervals}
-                    \t\t * NW -> long {nw_long_intervals} short {nw_short_intervals}
-                    \t\t * UMA -> long {uma_long_intervals} short {uma_short_intervals}\n
                     """
+        # \t\t * NW -> long {nw_long_intervals} short {nw_short_intervals}
+        # \t\t * UMA -> long {uma_long_intervals} short {uma_short_intervals}\n
 
         return has_signal, signal, debug_text, deal_time
 
-    def analize(self, parent_dfs, pds) -> (bool, Signal, str, int, int, int):
+    def analize(self, parent_dfs, pds) -> (bool, Signal, str, int):
         has_signal, signal, debug, deal_time = self.analize_func(parent_dfs, pds)
         print(debug)
         return has_signal, signal, debug, deal_time
