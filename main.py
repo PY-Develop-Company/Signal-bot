@@ -342,7 +342,7 @@ if __name__ == '__main__':
         i_main_pd = main_pds[i]
         i_parent_pds = parent_pds[i]
         analize_pair = (i_main_pd, i_parent_pds, unit_pd)
-    #     multiprocessing.Process(target=signal_maker.analize_currency_data_controller, args=(analize_pair,)).start()
+        multiprocessing.Process(target=signal_maker.analize_currency_data_controller, args=(analize_pair,)).start()
 
     multiprocessing.Process(target=inf_loop_func).start()
     multiprocessing.Process(target=signals_message_sender_controller, args=(main_pds, main_intervals, unit_pd)).start()
