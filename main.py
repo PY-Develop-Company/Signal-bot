@@ -1,4 +1,7 @@
 import random
+import time
+from datetime import datetime
+import pytz
 from aiogram import Bot, Dispatcher, types
 import logging
 import price_parser
@@ -12,12 +15,14 @@ from menu_text import *
 import interval_convertor
 from signals import get_signal_by_type
 
-# API_TOKEN = "6538527964:AAHUUHZHYVnNFbYAPoMn4bRUMASKR0h9qfA"  # test API TOKEN
 API_TOKEN = "6340912636:AAHACm2V2hDJUDXng0y0uhBRVRFJgqrok48"  # main API TOKEN
 logging.basicConfig(level=logging.INFO)
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot)
 signal_delay = 300
+
+min_time_zone_hours = 10
+max_time_zone_hours = 23
 
 manager_markup = types.ReplyKeyboardMarkup(resize_keyboard=True, keyboard=[
     [types.KeyboardButton(search_id_request), types.KeyboardButton(search_deposit_request)]
@@ -228,12 +233,21 @@ def handle_signal_msg_controller(signal, msg, pd: PriceData, open_position_price
     asyncio.run(handle_signal_msg(signal, msg, pd, open_position_price, deal_time))
 
 
+def is_market_working():
+    time_zone = pytz.timezone("Europe/Bucharest")
+    time_now = datetime.now(time_zone)
+
+    return min_time_zone_hours <= time_now.hour <= max_time_zone_hours
+
+
 def signals_message_sender_controller(prices_data, intervals, unit_pd):
     async def signals_message_sender_function(prices_data, intervals, unit_pd):
         signal_maker.reset_signals_files(prices_data)
 
         while True:
             await asyncio.sleep(10)
+            if not is_market_working():
+                continue
 
             created_prices_data = []
             for pd in prices_data:

@@ -1,2 +1,2 @@
 ,has_signal,signal_type,msg,date,open_price,interval,symbol,exchange,deal_time
-0,False,neutral,NoneEUR/USD Нет сигнала 25мин,2023-10-23 22:55:00,1.06655,Interval.in_5_minute,EURUSD,OANDA,25
+0,False,neutral,NoneEUR/USD Нет сигнала 25мин,2023-10-24 21:35:00,1.05861,Interval.in_5_minute,EURUSD,OANDA,25

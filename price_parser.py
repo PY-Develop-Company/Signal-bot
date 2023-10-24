@@ -6,7 +6,7 @@ from pandas import DataFrame, read_csv
 import file_manager
 import interval_convertor
 
-trade_pause_wait_time = 60*5
+trade_pause_wait_time = 600
 
 currencies_path = "users/currencies.txt"
 currencies_data_path = "currencies_data/"
@@ -36,15 +36,17 @@ class PriceData:
         interval = str(self.interval).replace(".", "")
         path = currency_check_ended + self.symbol + interval + ".txt"
         if not file_manager.is_file_exists(path):
+            print("1Error chart not exists")
             return None
         path = currencies_data_path + self.symbol + interval + ".csv"
         if not file_manager.is_file_exists(path):
+            print("2Error chart not exists")
             return None
 
         try:
             df = read_csv(path)
         except Exception as e:
-            print("Error", path)
+            print("3Error chart not exists", path, e)
             return None
         return df
 
@@ -54,7 +56,11 @@ class PriceData:
 
         last_check_date = currencies_last_analize_date.get(self.symbol + interval)
         if not(df is None):
-            df["datetime"] = df.apply(lambda row: datetime.strptime(row["datetime"], '%Y-%m-%d %H:%M:%S'), axis=1)
+            try:
+                df["datetime"] = df.apply(lambda row: datetime.strptime(row["datetime"], '%Y-%m-%d %H:%M:%S'), axis=1)
+            except Exception as e:
+                print("Error date time is wrong formated", e, df.to_string())
+                return None
             current_check_date = df.datetime[0]
             if current_check_date == last_check_date:
                 return None
@@ -63,13 +69,16 @@ class PriceData:
 
     def reset_chart_data(self):
         interval = str(self.interval).replace(".", "")
-        path = currency_check_ended + self.symbol + interval + ".txt"
-        file_manager.delete_file_if_exists(path)
-        path = currencies_data_path + self.symbol + interval + ".csv"
-        file_manager.delete_file_if_exists(path)
 
         df = self.get_price_data(500)
-        self.save_chart_data(df)
+        if df is None:
+            pass
+        else:
+            path = currency_check_ended + self.symbol + interval + ".txt"
+            file_manager.delete_file_if_exists(path)
+            path = currencies_data_path + self.symbol + interval + ".csv"
+            file_manager.delete_file_if_exists(path)
+            self.save_chart_data(df)
 
     def get_price_data(self, bars_count=500):
         try:
@@ -77,7 +86,8 @@ class PriceData:
             priceData = priceData.reindex(index=priceData.index[::-1]).iloc[1:].reset_index()
             return priceData
         except Exception as e:
-            print(e)
+            print("Error cant get price data", e)
+            return None
 
     def is_analize_time(self, update_date: datetime, debug=False):
         minutes = interval_convertor.interval_to_datetime(self.interval) / timedelta(minutes=1)
@@ -118,25 +128,27 @@ def create_parce_currencies_with_intervals_callbacks(pds: [PriceData]):
             print("bbb", e)
 
     while True:
-        print("creating new seis")
+        print(f"creating new seis {datetime.now()}")
         consumers = []
+        tvl = TvDatafeedLive()
+        tv = TvDatafeed()
         try:
-            tvl = TvDatafeedLive()
-            tv = TvDatafeed()
             for pd in pds:
                 seis = tvl.new_seis(pd.symbol, pd.exchange, pd.interval)
                 print("seis", seis)
                 consumer = tvl.new_consumer(seis, update_currency_file_consumer)
                 consumers.append(consumer)
 
-            time.sleep(300)
-            for consumer in consumers:
-                try:
-                    tvl.del_consumer(consumer)
-                except Exception as e:
-                    print("Error", e)
-            break
+            time.sleep(trade_pause_wait_time)
+        except ValueError as e:
+            print("Error1", e)
+            time.sleep(trade_pause_wait_time)
         except Exception as e:
-            print("Error", e)
-            time.sleep(300)
-            
+            print("Error3", e)
+            time.sleep(trade_pause_wait_time)
+
+        for consumer in consumers:
+            try:
+                tvl.del_consumer(consumer)
+            except Exception as e:
+                print("Error2", e)

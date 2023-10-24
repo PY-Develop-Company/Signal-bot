@@ -1,10 +1,7 @@
-import multiprocessing
-
 from pandas import DataFrame, Timedelta, read_csv
 from datetime import datetime
 from tvDatafeed import Interval, TvDatafeed
 import file_manager
-import price_parser
 from analizer import MultitimeframeAnalizer
 import interval_convertor
 from price_parser import PriceData
@@ -29,8 +26,10 @@ async def close_position(position_open_price, signal: Signal, pd: PriceData, bar
     await close_position_delay(Interval.in_1_minute, bars_count)
 
     price_data = pd.get_price_data(bars_count=2)
-
-    msg, is_profit_position = signal.get_close_position_signal_message(pd, position_open_price, price_data.close[0], bars_count)
+    if price_data is None:
+        msg, is_profit_position = signal.get_close_position_signal_message(pd, position_open_price, 99999, bars_count)
+    else:
+        msg, is_profit_position = signal.get_close_position_signal_message(pd, position_open_price, price_data.close[0], bars_count)
     return msg, is_profit_position
 
 
@@ -98,7 +97,12 @@ def analize_currency_data_controller(analize_pair):
         if not unit_pd.is_analize_time(dt):
             return
 
-        prices_dfs = [pd.get_chart_data_if_exists() for pd in check_pds]
+        prices_dfs = []
+        for pd in check_pds:
+            ch_data = pd.get_chart_data_if_exists()
+            if ch_data is None:
+                continue
+            prices_dfs.append(ch_data)
 
         analizer = MultitimeframeAnalizer(2, 2)
         has_signal, signal, debug, deal_time = analizer.analize(prices_dfs, check_pds)
