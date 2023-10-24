@@ -288,6 +288,12 @@ def signals_message_sender_controller(prices_data, intervals, unit_pd):
     asyncio.run(signals_message_sender_function(prices_data, intervals, unit_pd))
 
 
+def inf_loop_func():
+    while True:
+        time.sleep(5)
+        print("sleeped")
+
+
 if __name__ == '__main__':
     from aiogram import executor
 
@@ -332,12 +338,13 @@ if __name__ == '__main__':
 
     unit_pd = main_pds[0]
     unit_pd.print()
-    # for i in range(len(main_pds)):
-    #     i_main_pd = main_pds[i]
-    #     i_parent_pds = parent_pds[i]
-    #     analize_pair = (i_main_pd, i_parent_pds, unit_pd)
+    for i in range(len(main_pds)):
+        i_main_pd = main_pds[i]
+        i_parent_pds = parent_pds[i]
+        analize_pair = (i_main_pd, i_parent_pds, unit_pd)
     #     multiprocessing.Process(target=signal_maker.analize_currency_data_controller, args=(analize_pair,)).start()
-    
+
+    multiprocessing.Process(target=inf_loop_func).start()
     multiprocessing.Process(target=signals_message_sender_controller, args=(main_pds, main_intervals, unit_pd)).start()
 
     executor.start_polling(dp, skip_updates=True)

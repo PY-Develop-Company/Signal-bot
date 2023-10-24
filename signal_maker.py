@@ -86,6 +86,24 @@ def reset_signals_files(prices_data: [PriceData]):
         file_manager.delete_file_if_exists(path)
 
 
+def analize_funcc(main_price_df, prices_dfs, check_pds: [PriceData]):
+    main_pd = check_pds[0]
+
+    analizer = MultitimeframeAnalizer(2, 2)
+    has_signal, signal, debug, deal_time = analizer.analize(prices_dfs, check_pds)
+
+    open_position_price = main_price_df.close[0]
+    msg = signal.get_open_msg_text(main_pd, deal_time)
+
+    data = [[has_signal, signal.type, msg, main_price_df.datetime[0], open_position_price, main_pd.interval,
+             main_pd.symbol, main_pd.exchange, deal_time]]
+    columns = ["has_signal", "signal_type", "msg", "date", "open_price", "interval", "symbol", "exchange", "deal_time"]
+    df = DataFrame(data, columns=columns)
+    save_signal_file(df, main_pd)
+
+    print("Created signal file:", msg, main_price_df.datetime[0])
+
+
 def analize_currency_data_controller(analize_pair):
     def analize_currency_data_function(check_pds: [PriceData], unit_pd: PriceData):
         main_pd = check_pds[0]
