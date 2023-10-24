@@ -327,17 +327,17 @@ if __name__ == '__main__':
 
     multiprocessing.Process(target=price_parser.create_parce_currencies_with_intervals_callbacks, args=(prices_data, )).start()
 
-    for pd in prices_data:
-        pd.reset_chart_data()
-
-    unit_pd = main_pds[0]
-    unit_pd.print()
-    for i in range(len(main_pds)):
-        i_main_pd = main_pds[i]
-        i_parent_pds = parent_pds[i]
-        analize_pair = (i_main_pd, i_parent_pds, unit_pd)
-        multiprocessing.Process(target=signal_maker.analize_currency_data_controller, args=(analize_pair,)).start()
-
-    multiprocessing.Process(target=signals_message_sender_controller, args=(main_pds, main_intervals, unit_pd)).start()
-
-    executor.start_polling(dp, skip_updates=True)
+    # for pd in prices_data:
+    #     pd.reset_chart_data()
+    #
+    # unit_pd = main_pds[0]
+    # unit_pd.print()
+    # for i in range(len(main_pds)):
+    #     i_main_pd = main_pds[i]
+    #     i_parent_pds = parent_pds[i]
+    #     analize_pair = (i_main_pd, i_parent_pds, unit_pd)
+    #     multiprocessing.Process(target=signal_maker.analize_currency_data_controller, args=(analize_pair,)).start()
+    #
+    # multiprocessing.Process(target=signals_message_sender_controller, args=(main_pds, main_intervals, unit_pd)).start()
+    #
+    # executor.start_polling(dp, skip_updates=True)
