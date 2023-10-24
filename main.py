@@ -237,7 +237,11 @@ def is_market_working():
     time_zone = pytz.timezone("Europe/Bucharest")
     time_now = datetime.now(time_zone)
 
-    return min_time_zone_hours <= time_now.hour <= max_time_zone_hours
+    print(f"time hour {time_now.hour}")
+    print(f"max_time_zone_hours {max_time_zone_hours}")
+    print(f"min_time_zone_hours {min_time_zone_hours}")
+    print(f"bool {min_time_zone_hours <= time_now.hour < max_time_zone_hours}")
+    return min_time_zone_hours <= time_now.hour < max_time_zone_hours
 
 
 def signals_message_sender_controller(prices_data, intervals, unit_pd):

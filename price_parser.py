@@ -148,7 +148,11 @@ def create_parce_currencies_with_intervals_callbacks(pds: [PriceData]):
             time.sleep(trade_pause_wait_time)
 
         for consumer in consumers:
-            try:
-                tvl.del_consumer(consumer)
-            except Exception as e:
-                print("Error2", e)
+            print("try delete consumer")
+            print("tvl", tvl)
+            # try:
+            print("delete consumer")
+            tvl.del_consumer(consumer)
+            # except Exception as e:
+            #     print("Error2", e)
+        print(f"created new seis {datetime.now()}")
