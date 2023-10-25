@@ -104,8 +104,8 @@ def analize_funcc(main_price_df, prices_dfs, check_pds: [PriceData]):
     print("Created signal file:", msg, main_price_df.datetime[0])
 
 
-def analize_currency_data_controller(analize_pair):
-    def analize_currency_data_function(check_pds: [PriceData], unit_pd: PriceData):
+def analize_currency_data_controller(analize_pairs):
+    async def analize_currency_data_function(check_pds: [PriceData], unit_pd: PriceData):
         main_pd = check_pds[0]
         main_price_df = main_pd.get_chart_data_if_exists_if_can_analize()
         if main_price_df is None:
@@ -136,12 +136,54 @@ def analize_currency_data_controller(analize_pair):
 
         print("Created signal file:", msg, main_price_df.datetime[0])
 
-    async def analize_currency_data_loop(analize_pair):
+    async def analize_currency_data_loop(analize_pairs):
         while True:
-            analize_currency_data_function([analize_pair[0], *analize_pair[1]], analize_pair[2])
-            await asyncio.sleep(1)
+            tasks = []
+            for analize_pair in analize_pairs:
+                task = asyncio.create_task(analize_currency_data_function([analize_pair[0], *analize_pair[1]], analize_pair[2]))
+                tasks.append(task)
+            await asyncio.gather(*tasks)
+            await asyncio.sleep(5)
 
-    asyncio.run(analize_currency_data_loop(analize_pair))
+    asyncio.run(analize_currency_data_loop(analize_pairs))
+# def analize_currency_data_controller(analize_pair):
+#     def analize_currency_data_function(check_pds: [PriceData], unit_pd: PriceData):
+#         main_pd = check_pds[0]
+#         main_price_df = main_pd.get_chart_data_if_exists_if_can_analize()
+#         if main_price_df is None:
+#             return
+#
+#         dt = main_price_df["datetime"][0]
+#         if not unit_pd.is_analize_time(dt):
+#             return
+#
+#         prices_dfs = []
+#         for pd in check_pds:
+#             ch_data = pd.get_chart_data_if_exists()
+#             if ch_data is None:
+#                 continue
+#             prices_dfs.append(ch_data)
+#
+#         analizer = MultitimeframeAnalizer(2, 2)
+#         has_signal, signal, debug, deal_time = analizer.analize(prices_dfs, check_pds)
+#
+#         open_position_price = main_price_df.close[0]
+#         msg = signal.get_open_msg_text(main_pd, deal_time)
+#
+#         data = [[has_signal, signal.type, msg, main_price_df.datetime[0], open_position_price, main_pd.interval,
+#                  main_pd.symbol, main_pd.exchange, deal_time]]
+#         columns = ["has_signal", "signal_type", "msg", "date", "open_price", "interval", "symbol", "exchange", "deal_time"]
+#         df = DataFrame(data, columns=columns)
+#         save_signal_file(df, main_pd)
+#
+#         print("Created signal file:", msg, main_price_df.datetime[0])
+#
+#     async def analize_currency_data_loop(analize_pair):
+#         while True:
+#             analize_currency_data_function([analize_pair[0], *analize_pair[1]], analize_pair[2])
+#             await asyncio.sleep(1)
+#
+#     asyncio.run(analize_currency_data_loop(analize_pair))
 
 
 #test

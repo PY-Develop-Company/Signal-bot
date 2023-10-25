@@ -21,6 +21,8 @@ bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot)
 signal_delay = 300
 
+callbacks_wait_time = 60
+
 min_time_zone_hours = 10
 max_time_zone_hours = 23
 
@@ -244,11 +246,18 @@ def is_market_working():
     return min_time_zone_hours <= time_now.hour < max_time_zone_hours
 
 
-def signals_message_sender_controller(prices_data, intervals, unit_pd):
-    async def signals_message_sender_function(prices_data, intervals, unit_pd):
+def signals_message_sender_controller(prices_data, intervals, unit_pd, prices_data_all):
+    async def signals_message_sender_function(prices_data, intervals, unit_pd, prices_data_all):
         signal_maker.reset_signals_files(prices_data)
 
+        last_callback_update_time = time.time()
+
         while True:
+            if time.time() - last_callback_update_time > callbacks_wait_time:
+                price_parser.create_parce_currencies_with_intervals_callbacks(prices_data_all)
+                last_callback_update_time = time.time()
+                continue
+
             await asyncio.sleep(10)
             if not is_market_working():
                 continue
@@ -285,7 +294,7 @@ def signals_message_sender_controller(prices_data, intervals, unit_pd):
 
             signal_maker.reset_signals_files(prices_data)
 
-    asyncio.run(signals_message_sender_function(prices_data, intervals, unit_pd))
+    asyncio.run(signals_message_sender_function(prices_data, intervals, unit_pd, prices_data_all))
 
 
 def inf_loop_func():
@@ -331,20 +340,21 @@ if __name__ == '__main__':
             for p_i in parent_intervals[main_interval_index]:
                 parent_pds[ind].append(PriceData(currencies[currency_ind][0], currencies[currency_ind][1], p_i))
 
-    multiprocessing.Process(target=price_parser.create_parce_currencies_with_intervals_callbacks, args=(prices_data, )).start()
+    price_parser.create_parce_currencies_with_intervals_callbacks(prices_data)
 
     for pd in prices_data:
         pd.reset_chart_data()
 
     unit_pd = main_pds[0]
     unit_pd.print()
+    analize_pairs = []
     for i in range(len(main_pds)):
         i_main_pd = main_pds[i]
         i_parent_pds = parent_pds[i]
         analize_pair = (i_main_pd, i_parent_pds, unit_pd)
-        multiprocessing.Process(target=signal_maker.analize_currency_data_controller, args=(analize_pair,)).start()
+        analize_pairs.append(analize_pair)
+    multiprocessing.Process(target=signal_maker.analize_currency_data_controller, args=(analize_pairs, )).start()
 
-    multiprocessing.Process(target=inf_loop_func).start()
-    multiprocessing.Process(target=signals_message_sender_controller, args=(main_pds, main_intervals, unit_pd)).start()
+    multiprocessing.Process(target=signals_message_sender_controller, args=(main_pds, main_intervals, unit_pd, prices_data)).start()
 
     executor.start_polling(dp, skip_updates=True)

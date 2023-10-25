@@ -127,30 +127,22 @@ def create_parce_currencies_with_intervals_callbacks(pds: [PriceData]):
         except Exception as e:
             print("bbb", e)
 
-    while True:
-        print(f"creating new seis {datetime.now()}")
-        consumers = []
-        seises = []
+    print(f"creating new seis {datetime.now()}")
 
-        try:
-            tvl.del_tvdatafeed()
-        except Exception as e:
-            print("Error tvl", e)
-        tvl = TvDatafeedLive()
-        tv = TvDatafeed()
-        try:
-            for pd in pds:
-                seis = tvl.new_seis(pd.symbol, pd.exchange, pd.interval)
-                seises.append(seis)
-                print("seis", seis)
-                consumer = tvl.new_consumer(seis, update_currency_file_consumer)
-                consumers.append(consumer)
-            time.sleep(trade_pause_wait_time)
-        except ValueError as e:
-            print("Error1", e)
-            time.sleep(trade_pause_wait_time)
-        except Exception as e:
-            print("Error3", e)
-            time.sleep(trade_pause_wait_time)
+    try:
+        tvl.del_tvdatafeed()
+    except Exception as e:
+        print("Error tvl", e)
+    tvl = TvDatafeedLive()
+    tv = TvDatafeed()
+    try:
+        for pd in pds:
+            seis = tvl.new_seis(pd.symbol, pd.exchange, pd.interval)
+            print("seis", seis)
+            consumer = tvl.new_consumer(seis, update_currency_file_consumer)
+    except ValueError as e:
+        print("Error1", e)
+    except Exception as e:
+        print("Error3", e)
 
-        print(f"created new seis {datetime.now()}")
+    print(f"created new seis {datetime.now()}")
