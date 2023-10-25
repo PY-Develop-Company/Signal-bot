@@ -21,7 +21,7 @@ bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot)
 signal_delay = 300
 
-callbacks_wait_time = 300
+callbacks_wait_time = 600
 
 min_time_zone_hours = 10
 max_time_zone_hours = 23
@@ -275,16 +275,18 @@ def signals_message_sender_controller(prices_data, intervals, unit_pd, prices_da
                 last_callback_update_time = time.time()
                 continue
 
-            await asyncio.sleep(10)
-            # with open("users/test.txt", "a+") as file:
-            #     cont = file.read()
-            #     print("cont", file.read())
-            #     if cont.isdigit():
-            #         print("isdigit cont", cont)
-            #         cont = float(cont)
-            #         if cont > time.time():
-            #             print("wait for signal", signals_wait_time, time.time())
-            #             continue
+            await asyncio.sleep(1)
+            try:
+                with open("users/test.txt", "r") as file:
+                    cont = file.read().split(".")[0]
+                    if cont.isdigit():
+                        print("isdigit cont", cont)
+                        cont = float(cont)
+                        if cont > time.time():
+                            print("wait for signal", cont, time.time())
+                            continue
+            except Exception as e:
+                print("Error", e)
             if not is_market_working():
                 continue
 
@@ -321,12 +323,6 @@ def signals_message_sender_controller(prices_data, intervals, unit_pd, prices_da
             signal_maker.reset_signals_files(prices_data)
 
     asyncio.run(signals_message_sender_function(prices_data, intervals, unit_pd, prices_data_all))
-
-
-def inf_loop_func():
-    while True:
-        time.sleep(5)
-        print("sleeped")
 
 
 if __name__ == '__main__':
