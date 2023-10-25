@@ -15,15 +15,16 @@ from menu_text import *
 import interval_convertor
 from signals import get_signal_by_type
 
-API_TOKEN = "6340912636:AAHACm2V2hDJUDXng0y0uhBRVRFJgqrok48"  # main API TOKEN
+API_TOKEN = "6538527964:AAHUUHZHYVnNFbYAPoMn4bRUMASKR0h9qfA"  # test
+# API_TOKEN = "6340912636:AAHACm2V2hDJUDXng0y0uhBRVRFJgqrok48"  # main API TOKEN
 logging.basicConfig(level=logging.INFO)
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot)
 signal_delay = 300
 
-callbacks_wait_time = 60
+callbacks_wait_time = 300
 
-min_time_zone_hours = 10
+min_time_zone_hours = 0
 max_time_zone_hours = 23
 
 manager_markup = types.ReplyKeyboardMarkup(resize_keyboard=True, keyboard=[
