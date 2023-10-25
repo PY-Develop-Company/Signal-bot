@@ -15,8 +15,7 @@ from menu_text import *
 import interval_convertor
 from signals import get_signal_by_type
 
-API_TOKEN = "6538527964:AAHUUHZHYVnNFbYAPoMn4bRUMASKR0h9qfA"  # test
-# API_TOKEN = "6340912636:AAHACm2V2hDJUDXng0y0uhBRVRFJgqrok48"  # main API TOKEN
+API_TOKEN = "6340912636:AAHACm2V2hDJUDXng0y0uhBRVRFJgqrok48"  # main API TOKEN
 logging.basicConfig(level=logging.INFO)
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot)
@@ -24,7 +23,7 @@ signal_delay = 300
 
 callbacks_wait_time = 300
 
-min_time_zone_hours = 0
+min_time_zone_hours = 10
 max_time_zone_hours = 23
 
 manager_markup = types.ReplyKeyboardMarkup(resize_keyboard=True, keyboard=[
@@ -117,6 +116,23 @@ async def start_command(message):
     else:
         add_user(message.from_user.id, message.from_user.first_name, message.from_user.last_name)
         await open_menu(message, not_vip_markup)
+
+
+@dp.message_handler(commands="start_test")
+async def start_test_command(message):
+    if message.from_user.id in tester_ids:
+        if message.from_user.id in tester_ids:
+            msg = message.text.split(" ")[-1]
+            if msg.isdigit():
+                with open("users/test.txt", "w") as file:
+                    file.write(str(float(msg) + time.time()))
+
+
+@dp.message_handler(commands="stop_test")
+async def stop_test_command(message):
+    if message.from_user.id in tester_ids:
+        with open("users/test.txt", "w") as file:
+            file.write("0")
 
 
 @dp.message_handler(commands="checkDeposit")
@@ -251,7 +267,7 @@ def signals_message_sender_controller(prices_data, intervals, unit_pd, prices_da
     async def signals_message_sender_function(prices_data, intervals, unit_pd, prices_data_all):
         signal_maker.reset_signals_files(prices_data)
 
-        last_callback_update_time = time.time()
+        last_callback_update_time = callbacks_wait_time + 1
 
         while True:
             if time.time() - last_callback_update_time > callbacks_wait_time:
@@ -260,6 +276,15 @@ def signals_message_sender_controller(prices_data, intervals, unit_pd, prices_da
                 continue
 
             await asyncio.sleep(10)
+            # with open("users/test.txt", "a+") as file:
+            #     cont = file.read()
+            #     print("cont", file.read())
+            #     if cont.isdigit():
+            #         print("isdigit cont", cont)
+            #         cont = float(cont)
+            #         if cont > time.time():
+            #             print("wait for signal", signals_wait_time, time.time())
+            #             continue
             if not is_market_working():
                 continue
 
@@ -340,8 +365,6 @@ if __name__ == '__main__':
             ind += 1
             for p_i in parent_intervals[main_interval_index]:
                 parent_pds[ind].append(PriceData(currencies[currency_ind][0], currencies[currency_ind][1], p_i))
-
-    price_parser.create_parce_currencies_with_intervals_callbacks(prices_data)
 
     for pd in prices_data:
         pd.reset_chart_data()
