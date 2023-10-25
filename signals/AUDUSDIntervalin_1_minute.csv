@@ -1,0 +1,2 @@
+,has_signal,signal_type,msg,date,open_price,interval,symbol,exchange,deal_time
+0,False,neutral,NoneAUD/USD Нет сигнала 4мин,2023-10-25 12:23:00,0.63425,Interval.in_1_minute,AUDUSD,OANDA,4

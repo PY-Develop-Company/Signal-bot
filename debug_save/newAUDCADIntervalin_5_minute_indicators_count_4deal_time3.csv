@@ -1,0 +1,20 @@
+,datetime,is_profit,signal,open_signal_price,close_signal_price,SuperOrderBlock,Volume,UMA,NW,ScalpPro
+0,2023-10-06 20:10:00,True,long,0.87256,0.87298,long,neutral,long,long,long
+1,2023-10-06 13:25:00,True,short,0.87194,0.87186,short,short,short,short,short
+2,2023-10-06 11:40:00,False,short,0.87236,0.87258,short,neutral,short,short,short
+3,2023-10-06 10:55:00,False,short,0.87202,0.87227,short,short,short,long,short
+4,2023-10-06 06:30:00,False,long,0.87428,0.87402,long,neutral,long,long,long
+5,2023-10-06 05:25:00,True,long,0.8739,0.8741,long,neutral,long,long,long
+6,2023-10-06 04:30:00,True,long,0.87318,0.87346,long,neutral,long,long,long
+7,2023-10-06 03:00:00,True,short,0.87311,0.87289,short,neutral,short,short,short
+8,2023-10-06 00:00:00,True,short,0.8733,0.87286,short,neutral,short,short,short
+9,2023-10-05 18:30:00,True,short,0.8722,0.87188,short,neutral,short,short,short
+10,2023-10-05 18:20:00,True,short,0.87259,0.87204,short,long,short,short,short
+11,2023-10-05 03:05:00,True,long,0.86992,0.87014,long,neutral,long,long,long
+12,2023-10-05 02:55:00,True,long,0.86982,0.87012,long,neutral,long,long,long
+13,2023-10-05 01:45:00,True,long,0.86995,0.87001,long,neutral,long,long,long
+14,2023-10-05 01:40:00,False,long,0.86994,0.86989,long,neutral,long,long,long
+15,2023-10-04 22:15:00,True,long,0.8694,0.86954,long,long,long,short,long
+16,2023-10-04 14:10:00,False,long,0.86762,0.86718,long,long,long,short,long
+17,2023-10-04 06:00:00,False,long,0.86429,0.86406,long,neutral,long,long,long
+18,2023-10-03 19:55:00,False,short,0.86394,0.86436,short,neutral,short,short,short
