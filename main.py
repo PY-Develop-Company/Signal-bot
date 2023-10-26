@@ -15,7 +15,7 @@ from menu_text import *
 import interval_convertor
 from signals import get_signal_by_type
 
-API_TOKEN = "6340912636:AAHACm2V2hDJUDXng0y0uhBRVRFJgqrok48"  # main API TOKEN
+API_TOKEN = "6538527964:AAHUUHZHYVnNFbYAPoMn4bRUMASKR0h9qfA"  # my token
 logging.basicConfig(level=logging.INFO)
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot)
@@ -23,8 +23,8 @@ signal_delay = 300
 
 callbacks_wait_time = 600
 
-min_time_zone_hours = 10
-max_time_zone_hours = 23
+min_time_zone_hours = 0
+max_time_zone_hours = 24
 
 manager_markup = types.ReplyKeyboardMarkup(resize_keyboard=True, keyboard=[
     [types.KeyboardButton(search_id_request), types.KeyboardButton(search_deposit_request)]

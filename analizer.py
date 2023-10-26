@@ -23,6 +23,9 @@ class MultitimeframeAnalizer(Analizer):
         self.successful_indicators_count = successful_indicators_count
         # self.nw = NWAnalizer()
         # self.uma = UMAAnalizer()
+        # self.volume = VolumeAnalizer()
+        # self.sp = SPAnalizer()
+        self.ma = MainAnalizer(2)
         self.sob = SOBAnalizer()
 
     def analize_multitimeframe(self, pds_dfs, analizer: Analizer):
@@ -47,6 +50,7 @@ class MultitimeframeAnalizer(Analizer):
     def analize_func(self, parent_dfs, pds) -> (bool, Signal, str, int):
         pds_dfs = dict(zip(pds, parent_dfs))
         sob_long_count, sob_short_count, sob_long_intervals, sob_short_intervals = self.analize_multitimeframe(pds_dfs, self.sob)
+        # has_signal_ma, signal_ma, debug_text_ma = self.ma.analize_func(parent_dfs[0], pds[0])
         # nw_long_count, nw_short_count, nw_long_intervals, nw_short_intervals = self.analize_multitimeframe(pds_dfs, self.nw)
         # uma_long_count, uma_short_count, uma_long_intervals, uma_short_intervals = self.analize_multitimeframe(pds_dfs, self.uma)
 
@@ -59,13 +63,30 @@ class MultitimeframeAnalizer(Analizer):
             signal = LongSignal() if sob_long_count > sob_short_count else ShortSignal()
 
         # if has_signal:
-        #     if signal.type == LongSignal().type and nw_long_count >= self.successful_indicators_count <= uma_long_count:
-        #         pass
-        #     elif signal.type == ShortSignal().type and nw_short_count >= self.successful_indicators_count <= uma_short_count:
+        #     if has_signal_ma and signal_ma.type == signal.type:
         #         pass
         #     else:
         #         has_signal = False
         #         signal = NeutralSignal()
+        #     # if signal.type == LongSignal().type and nw_long_count >= self.successful_indicators_count <= uma_long_count:
+        #     #     pass
+        #     # elif signal.type == ShortSignal().type and nw_short_count >= self.successful_indicators_count <= uma_short_count:
+        #     #     pass
+        #     # else:
+        #     #     has_signal = False
+        #     #     signal = if has_signal:
+        #     if has_signal_ma and signal_ma.type == signal.type:
+        #         pass
+        #     else:
+        #         has_signal = False
+        #         signal = NeutralSignal()
+        #     # if signal.type == LongSignal().type and nw_long_count >= self.successful_indicators_count <= uma_long_count:
+        #     #     pass
+        #     # elif signal.type == ShortSignal().type and nw_short_count >= self.successful_indicators_count <= uma_short_count:
+        #     #     pass
+        #     # else:
+        #     #     has_signal = False
+        #     #     signal = NeutralSignal()
 
         deal_time = 0
         for pd in pds:
@@ -84,9 +105,9 @@ class MultitimeframeAnalizer(Analizer):
 
         return has_signal, signal, debug_text, deal_time
 
-    def analize(self, parent_dfs, pds) -> (bool, Signal, str, int):
+    async def analize(self, parent_dfs, pds) -> (bool, Signal, str, int):
         has_signal, signal, debug, deal_time = self.analize_func(parent_dfs, pds)
-        print(debug)
+        # print(debug)
         return has_signal, signal, debug, deal_time
 
 
@@ -99,17 +120,17 @@ class MainAnalizer(Analizer):
         analize_block_delta = sob_dict.get(df["symbol"][0].split(":")[1]).get(pd.interval)
 
         volume_ind = VolumeIndicator(df, df.open, df.close, df.high, df.low)
-        sp_ind = ScalpProIndicator(df, df.open, df.close, df.high, df.low)
-        uma_ind = UMAIndicator(df, df.open, df.close, df.high, df.low)
-        sob_ind = SuperOrderBlockIndicator(df, df.open, df.close, df.high, df.low, interval_td, analize_block_delta)
-        nw_ind = NadarayaWatsonIndicator(df, df.open, df.close, df.high, df.low)
+        sp_ind = ScalpProIndicator(df, df.open, df.close, df.high, df.low, 16, 12, 16)
+        uma_ind = UMAIndicator(df, df.open, df.close, df.high, df.low, rolling=5)
+        # sob_ind = SuperOrderBlockIndicator(df, df.open, df.close, df.high, df.low, interval_td, analize_block_delta)
+        # nw_ind = NadarayaWatsonIndicator(df, df.open, df.close, df.high, df.low)
 
         indicators_signals = {
-            "sob": sob_ind.get_signal(),
+            # "sob": sob_ind.get_signal(),
             "volume": volume_ind.get_signal(),
             "uma": uma_ind.get_signal(),
             "sp": sp_ind.get_signal(),
-            "nw": nw_ind.get_signal()
+            # "nw": nw_ind.get_signal()
         }
 
         signal_counts = {LongSignal.type: [0, [], LongSignal()], ShortSignal.type: [0, [], ShortSignal()],
@@ -123,8 +144,7 @@ class MainAnalizer(Analizer):
             if signal_count[1][0] > main_signal[1][0] and not (signal_count[0] == NeutralSignal.type):
                 main_signal = signal_count
 
-        has_signal = main_signal[1][0] >= self.successful_indicators_count and indicators_signals.get("sob").type == \
-                     main_signal[0]
+        has_signal = main_signal[1][0] >= self.successful_indicators_count # and indicators_signals.get("sob").type == main_signal[0]
 
         debug_dict = {}
         for sig in signal_counts.items():

@@ -1,2 +1,2 @@
 ,has_signal,signal_type,msg,date,open_price,interval,symbol,exchange,deal_time
-0,False,neutral,NoneAUD/JPY Нет сигнала 12мин,2023-10-25 12:21:00,95.091,Interval.in_3_minute,AUDJPY,OANDA,12
+0,True,short,🔴AUD/JPY SHORT ⬇ 12мин,2023-10-26 23:24:00,95.112,Interval.in_3_minute,AUDJPY,OANDA,12
