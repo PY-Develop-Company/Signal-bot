@@ -22,14 +22,15 @@ async def close_position_delay(interval: Interval, bars_count=3):
     await asyncio.sleep(delay_seconds)
 
 
-async def close_position(position_open_price, signal: Signal, pd: PriceData, bars_count):
+async def close_position(position_open_price_original, signal: Signal, pd: PriceData, bars_count):
+    position_open_price = pd.get_price_data(bars_count=2)
     await close_position_delay(Interval.in_1_minute, bars_count)
 
     price_data = pd.get_price_data(bars_count=2)
-    if price_data is None:
-        msg, is_profit_position = signal.get_close_position_signal_message(pd, position_open_price, 99999, bars_count)
+    if (price_data is None) or (position_open_price is None):
+        msg, is_profit_position = signal.get_close_position_signal_message(pd, position_open_price_original, position_open_price_original, bars_count)
     else:
-        msg, is_profit_position = signal.get_close_position_signal_message(pd, position_open_price, price_data.close[0], bars_count)
+        msg, is_profit_position = signal.get_close_position_signal_message(pd, position_open_price.close[0], price_data.close[0], bars_count)
     return msg, is_profit_position
 
 

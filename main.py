@@ -273,6 +273,7 @@ def signals_message_sender_controller(prices_data, intervals, unit_pd, prices_da
             if time.time() - last_callback_update_time > callbacks_wait_time:
                 price_parser.create_parce_currencies_with_intervals_callbacks(prices_data_all)
                 last_callback_update_time = time.time()
+                signal_maker.reset_signals_files(prices_data)
                 continue
 
             await asyncio.sleep(1)
@@ -327,7 +328,7 @@ def signals_message_sender_controller(prices_data, intervals, unit_pd, prices_da
 
 if __name__ == '__main__':
     from aiogram import executor
-
+    multiprocessing.freeze_support()
     currencies = price_parser.get_currencies()
     intervals = [Interval.in_1_minute, Interval.in_3_minute, Interval.in_5_minute, Interval.in_15_minute, Interval.in_30_minute]
     main_intervals = [Interval.in_1_minute, Interval.in_3_minute, Interval.in_5_minute]
@@ -373,8 +374,7 @@ if __name__ == '__main__':
         i_parent_pds = parent_pds[i]
         analize_pair = (i_main_pd, i_parent_pds, unit_pd)
         analize_pairs.append(analize_pair)
-    multiprocessing.Process(target=signal_maker.analize_currency_data_controller, args=(analize_pairs, )).start()
+        multiprocessing.Process(target=signal_maker.analize_currency_data_controller, args=([analize_pair], )).start()
 
     multiprocessing.Process(target=signals_message_sender_controller, args=(main_pds, main_intervals, unit_pd, prices_data)).start()
-
     executor.start_polling(dp, skip_updates=True)
