@@ -5,376 +5,587 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c8e52443-fb39-41fa-9e09-4877251a22f1" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/AUDCADIntervalin_15_minute.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/AUDCADIntervalin_1_minute.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/AUDCADIntervalin_30_minute.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/AUDCADIntervalin_3_minute.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/AUDCADIntervalin_5_minute.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/AUDCHFIntervalin_15_minute.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/AUDCHFIntervalin_1_minute.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/AUDCHFIntervalin_30_minute.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/AUDCHFIntervalin_3_minute.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/AUDCHFIntervalin_5_minute.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/AUDJPYIntervalin_15_minute.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/AUDJPYIntervalin_1_minute.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/AUDJPYIntervalin_30_minute.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/AUDJPYIntervalin_3_minute.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/AUDJPYIntervalin_5_minute.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/AUDUSDIntervalin_15_minute.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/AUDUSDIntervalin_1_minute.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/AUDUSDIntervalin_30_minute.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/AUDUSDIntervalin_3_minute.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/AUDUSDIntervalin_5_minute.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/EURCADIntervalin_15_minute.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/EURCADIntervalin_1_minute.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/EURCADIntervalin_30_minute.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/EURCADIntervalin_3_minute.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/EURCADIntervalin_5_minute.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/EURJPYIntervalin_15_minute.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/EURJPYIntervalin_1_minute.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/EURJPYIntervalin_30_minute.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/EURJPYIntervalin_3_minute.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/EURJPYIntervalin_5_minute.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/EURUSDIntervalin_15_minute.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/EURUSDIntervalin_1_minute.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/EURUSDIntervalin_30_minute.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/EURUSDIntervalin_3_minute.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/EURUSDIntervalin_5_minute.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/GBPAUDIntervalin_15_minute.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/GBPAUDIntervalin_1_minute.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/GBPAUDIntervalin_30_minute.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/GBPAUDIntervalin_3_minute.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/GBPAUDIntervalin_5_minute.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/GBPUSDIntervalin_15_minute.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/GBPUSDIntervalin_1_minute.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/GBPUSDIntervalin_30_minute.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/GBPUSDIntervalin_3_minute.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/GBPUSDIntervalin_5_minute.csv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/users/693562775.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/AUDCADIntervalin_1_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/AUDCADIntervalin_2_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/AUDCADIntervalin_45_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/AUDCHFIntervalin_1_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/AUDCHFIntervalin_2_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/AUDCHFIntervalin_45_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/AUDJPYIntervalin_1_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/AUDJPYIntervalin_2_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/AUDJPYIntervalin_45_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/AUDUSDIntervalin_1_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/AUDUSDIntervalin_2_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/AUDUSDIntervalin_45_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/EURCADIntervalin_1_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/EURCADIntervalin_2_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/EURCADIntervalin_45_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/EURJPYIntervalin_1_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/EURJPYIntervalin_2_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/EURJPYIntervalin_45_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/EURUSDIntervalin_1_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/EURUSDIntervalin_2_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/EURUSDIntervalin_45_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/GBPAUDIntervalin_1_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/GBPAUDIntervalin_2_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/GBPAUDIntervalin_45_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/GBPUSDIntervalin_1_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/GBPUSDIntervalin_2_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/GBPUSDIntervalin_45_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/NW_AUDCADIntervalin_15_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/NW_AUDCADIntervalin_1_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/NW_AUDCADIntervalin_1_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/NW_AUDCADIntervalin_2_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/NW_AUDCADIntervalin_30_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/NW_AUDCADIntervalin_3_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/NW_AUDCADIntervalin_45_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/NW_AUDCADIntervalin_5_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/NW_AUDCHFIntervalin_15_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/NW_AUDCHFIntervalin_1_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/NW_AUDCHFIntervalin_1_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/NW_AUDCHFIntervalin_2_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/NW_AUDCHFIntervalin_30_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/NW_AUDCHFIntervalin_3_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/NW_AUDCHFIntervalin_45_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/NW_AUDCHFIntervalin_5_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/NW_AUDJPYIntervalin_15_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/NW_AUDJPYIntervalin_1_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/NW_AUDJPYIntervalin_1_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/NW_AUDJPYIntervalin_2_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/NW_AUDJPYIntervalin_30_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/NW_AUDJPYIntervalin_3_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/NW_AUDJPYIntervalin_45_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/NW_AUDJPYIntervalin_5_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/NW_AUDUSDIntervalin_15_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/NW_AUDUSDIntervalin_1_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/NW_AUDUSDIntervalin_1_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/NW_AUDUSDIntervalin_2_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/NW_AUDUSDIntervalin_30_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/NW_AUDUSDIntervalin_3_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/NW_AUDUSDIntervalin_45_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/NW_AUDUSDIntervalin_5_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/NW_EURCADIntervalin_15_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/NW_EURCADIntervalin_1_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/NW_EURCADIntervalin_1_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/NW_EURCADIntervalin_2_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/NW_EURCADIntervalin_30_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/NW_EURCADIntervalin_3_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/NW_EURCADIntervalin_45_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/NW_EURCADIntervalin_5_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/NW_EURJPYIntervalin_15_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/NW_EURJPYIntervalin_1_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/NW_EURJPYIntervalin_1_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/NW_EURJPYIntervalin_2_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/NW_EURJPYIntervalin_30_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/NW_EURJPYIntervalin_3_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/NW_EURJPYIntervalin_45_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/NW_EURJPYIntervalin_5_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/NW_EURUSDIntervalin_15_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/NW_EURUSDIntervalin_1_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/NW_EURUSDIntervalin_1_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/NW_EURUSDIntervalin_2_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/NW_EURUSDIntervalin_30_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/NW_EURUSDIntervalin_3_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/NW_EURUSDIntervalin_45_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/NW_EURUSDIntervalin_5_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/NW_GBPAUDIntervalin_15_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/NW_GBPAUDIntervalin_1_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/NW_GBPAUDIntervalin_1_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/NW_GBPAUDIntervalin_2_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/NW_GBPAUDIntervalin_30_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/NW_GBPAUDIntervalin_3_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/NW_GBPAUDIntervalin_45_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/NW_GBPAUDIntervalin_5_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/NW_GBPUSDIntervalin_15_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/NW_GBPUSDIntervalin_1_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/NW_GBPUSDIntervalin_1_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/NW_GBPUSDIntervalin_2_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/NW_GBPUSDIntervalin_30_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/NW_GBPUSDIntervalin_3_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/NW_GBPUSDIntervalin_45_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/NW_GBPUSDIntervalin_5_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SOB_AUDCADIntervalin_15_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SOB_AUDCADIntervalin_1_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SOB_AUDCADIntervalin_1_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SOB_AUDCADIntervalin_2_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SOB_AUDCADIntervalin_30_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SOB_AUDCADIntervalin_3_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SOB_AUDCADIntervalin_45_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SOB_AUDCADIntervalin_5_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SOB_AUDCHFIntervalin_15_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SOB_AUDCHFIntervalin_1_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SOB_AUDCHFIntervalin_1_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SOB_AUDCHFIntervalin_2_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SOB_AUDCHFIntervalin_30_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SOB_AUDCHFIntervalin_3_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SOB_AUDCHFIntervalin_45_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SOB_AUDCHFIntervalin_5_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SOB_AUDJPYIntervalin_15_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SOB_AUDJPYIntervalin_1_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SOB_AUDJPYIntervalin_1_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SOB_AUDJPYIntervalin_2_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SOB_AUDJPYIntervalin_30_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SOB_AUDJPYIntervalin_3_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SOB_AUDJPYIntervalin_45_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SOB_AUDJPYIntervalin_5_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SOB_AUDUSDIntervalin_15_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SOB_AUDUSDIntervalin_1_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SOB_AUDUSDIntervalin_1_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SOB_AUDUSDIntervalin_2_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SOB_AUDUSDIntervalin_30_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SOB_AUDUSDIntervalin_3_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SOB_AUDUSDIntervalin_45_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SOB_AUDUSDIntervalin_5_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SOB_EURCADIntervalin_15_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SOB_EURCADIntervalin_1_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SOB_EURCADIntervalin_1_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SOB_EURCADIntervalin_2_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SOB_EURCADIntervalin_30_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SOB_EURCADIntervalin_3_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SOB_EURCADIntervalin_45_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SOB_EURCADIntervalin_5_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SOB_EURJPYIntervalin_15_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SOB_EURJPYIntervalin_1_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SOB_EURJPYIntervalin_1_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SOB_EURJPYIntervalin_2_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SOB_EURJPYIntervalin_30_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SOB_EURJPYIntervalin_3_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SOB_EURJPYIntervalin_45_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SOB_EURJPYIntervalin_5_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SOB_EURUSDIntervalin_15_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SOB_EURUSDIntervalin_1_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SOB_EURUSDIntervalin_1_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SOB_EURUSDIntervalin_2_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SOB_EURUSDIntervalin_30_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SOB_EURUSDIntervalin_3_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SOB_EURUSDIntervalin_45_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SOB_EURUSDIntervalin_5_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SOB_GBPAUDIntervalin_15_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SOB_GBPAUDIntervalin_1_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SOB_GBPAUDIntervalin_1_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SOB_GBPAUDIntervalin_2_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SOB_GBPAUDIntervalin_30_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SOB_GBPAUDIntervalin_3_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SOB_GBPAUDIntervalin_45_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SOB_GBPAUDIntervalin_5_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SOB_GBPUSDIntervalin_15_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SOB_GBPUSDIntervalin_1_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SOB_GBPUSDIntervalin_1_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SOB_GBPUSDIntervalin_2_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SOB_GBPUSDIntervalin_30_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SOB_GBPUSDIntervalin_3_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SOB_GBPUSDIntervalin_45_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SOB_GBPUSDIntervalin_5_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SP_AUDCADIntervalin_15_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SP_AUDCADIntervalin_1_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SP_AUDCADIntervalin_1_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SP_AUDCADIntervalin_2_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SP_AUDCADIntervalin_30_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SP_AUDCADIntervalin_3_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SP_AUDCADIntervalin_45_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SP_AUDCADIntervalin_5_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SP_AUDCHFIntervalin_15_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SP_AUDCHFIntervalin_1_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SP_AUDCHFIntervalin_1_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SP_AUDCHFIntervalin_2_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SP_AUDCHFIntervalin_30_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SP_AUDCHFIntervalin_3_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SP_AUDCHFIntervalin_45_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SP_AUDCHFIntervalin_5_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SP_AUDJPYIntervalin_15_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SP_AUDJPYIntervalin_1_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SP_AUDJPYIntervalin_1_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SP_AUDJPYIntervalin_2_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SP_AUDJPYIntervalin_30_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SP_AUDJPYIntervalin_3_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SP_AUDJPYIntervalin_45_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SP_AUDJPYIntervalin_5_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SP_AUDUSDIntervalin_15_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SP_AUDUSDIntervalin_1_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SP_AUDUSDIntervalin_1_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SP_AUDUSDIntervalin_2_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SP_AUDUSDIntervalin_30_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SP_AUDUSDIntervalin_3_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SP_AUDUSDIntervalin_45_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SP_AUDUSDIntervalin_5_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SP_EURCADIntervalin_15_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SP_EURCADIntervalin_1_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SP_EURCADIntervalin_1_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SP_EURCADIntervalin_2_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SP_EURCADIntervalin_30_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SP_EURCADIntervalin_3_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SP_EURCADIntervalin_45_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SP_EURCADIntervalin_5_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SP_EURJPYIntervalin_15_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SP_EURJPYIntervalin_1_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SP_EURJPYIntervalin_1_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SP_EURJPYIntervalin_2_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SP_EURJPYIntervalin_30_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SP_EURJPYIntervalin_3_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SP_EURJPYIntervalin_45_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SP_EURJPYIntervalin_5_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SP_EURUSDIntervalin_15_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SP_EURUSDIntervalin_1_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SP_EURUSDIntervalin_1_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SP_EURUSDIntervalin_2_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SP_EURUSDIntervalin_30_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SP_EURUSDIntervalin_3_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SP_EURUSDIntervalin_45_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SP_EURUSDIntervalin_5_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SP_GBPAUDIntervalin_15_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SP_GBPAUDIntervalin_1_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SP_GBPAUDIntervalin_1_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SP_GBPAUDIntervalin_2_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SP_GBPAUDIntervalin_30_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SP_GBPAUDIntervalin_3_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SP_GBPAUDIntervalin_45_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SP_GBPAUDIntervalin_5_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SP_GBPUSDIntervalin_15_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SP_GBPUSDIntervalin_1_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SP_GBPUSDIntervalin_1_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SP_GBPUSDIntervalin_2_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SP_GBPUSDIntervalin_30_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SP_GBPUSDIntervalin_3_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SP_GBPUSDIntervalin_45_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/SP_GBPUSDIntervalin_5_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/UMA_AUDCADIntervalin_15_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/UMA_AUDCADIntervalin_1_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/UMA_AUDCADIntervalin_1_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/UMA_AUDCADIntervalin_2_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/UMA_AUDCADIntervalin_30_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/UMA_AUDCADIntervalin_3_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/UMA_AUDCADIntervalin_45_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/UMA_AUDCADIntervalin_5_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/UMA_AUDCHFIntervalin_15_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/UMA_AUDCHFIntervalin_1_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/UMA_AUDCHFIntervalin_1_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/UMA_AUDCHFIntervalin_2_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/UMA_AUDCHFIntervalin_30_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/UMA_AUDCHFIntervalin_3_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/UMA_AUDCHFIntervalin_45_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/UMA_AUDCHFIntervalin_5_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/UMA_AUDJPYIntervalin_15_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/UMA_AUDJPYIntervalin_1_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/UMA_AUDJPYIntervalin_1_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/UMA_AUDJPYIntervalin_2_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/UMA_AUDJPYIntervalin_30_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/UMA_AUDJPYIntervalin_3_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/UMA_AUDJPYIntervalin_45_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/UMA_AUDJPYIntervalin_5_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/UMA_AUDUSDIntervalin_15_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/UMA_AUDUSDIntervalin_1_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/UMA_AUDUSDIntervalin_1_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/UMA_AUDUSDIntervalin_2_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/UMA_AUDUSDIntervalin_30_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/UMA_AUDUSDIntervalin_3_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/UMA_AUDUSDIntervalin_45_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/UMA_AUDUSDIntervalin_5_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/UMA_EURCADIntervalin_15_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/UMA_EURCADIntervalin_1_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/UMA_EURCADIntervalin_1_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/UMA_EURCADIntervalin_2_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/UMA_EURCADIntervalin_30_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/UMA_EURCADIntervalin_3_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/UMA_EURCADIntervalin_45_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/UMA_EURCADIntervalin_5_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/UMA_EURJPYIntervalin_15_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/UMA_EURJPYIntervalin_1_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/UMA_EURJPYIntervalin_1_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/UMA_EURJPYIntervalin_2_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/UMA_EURJPYIntervalin_30_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/UMA_EURJPYIntervalin_3_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/UMA_EURJPYIntervalin_45_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/UMA_EURJPYIntervalin_5_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/UMA_EURUSDIntervalin_15_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/UMA_EURUSDIntervalin_1_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/UMA_EURUSDIntervalin_1_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/UMA_EURUSDIntervalin_2_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/UMA_EURUSDIntervalin_30_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/UMA_EURUSDIntervalin_3_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/UMA_EURUSDIntervalin_45_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/UMA_EURUSDIntervalin_5_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/UMA_GBPAUDIntervalin_15_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/UMA_GBPAUDIntervalin_1_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/UMA_GBPAUDIntervalin_1_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/UMA_GBPAUDIntervalin_2_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/UMA_GBPAUDIntervalin_30_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/UMA_GBPAUDIntervalin_3_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/UMA_GBPAUDIntervalin_45_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/UMA_GBPAUDIntervalin_5_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/UMA_GBPUSDIntervalin_15_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/UMA_GBPUSDIntervalin_1_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/UMA_GBPUSDIntervalin_1_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/UMA_GBPUSDIntervalin_2_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/UMA_GBPUSDIntervalin_30_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/UMA_GBPUSDIntervalin_3_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/UMA_GBPUSDIntervalin_45_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/UMA_GBPUSDIntervalin_5_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/VOLUME_AUDCADIntervalin_15_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/VOLUME_AUDCADIntervalin_1_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/VOLUME_AUDCADIntervalin_1_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/VOLUME_AUDCADIntervalin_2_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/VOLUME_AUDCADIntervalin_30_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/VOLUME_AUDCADIntervalin_3_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/VOLUME_AUDCADIntervalin_45_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/VOLUME_AUDCADIntervalin_5_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/VOLUME_AUDCHFIntervalin_15_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/VOLUME_AUDCHFIntervalin_1_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/VOLUME_AUDCHFIntervalin_1_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/VOLUME_AUDCHFIntervalin_2_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/VOLUME_AUDCHFIntervalin_30_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/VOLUME_AUDCHFIntervalin_3_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/VOLUME_AUDCHFIntervalin_45_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/VOLUME_AUDCHFIntervalin_5_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/VOLUME_AUDJPYIntervalin_15_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/VOLUME_AUDJPYIntervalin_1_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/VOLUME_AUDJPYIntervalin_1_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/VOLUME_AUDJPYIntervalin_2_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/VOLUME_AUDJPYIntervalin_30_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/VOLUME_AUDJPYIntervalin_3_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/VOLUME_AUDJPYIntervalin_45_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/VOLUME_AUDJPYIntervalin_5_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/VOLUME_AUDUSDIntervalin_15_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/VOLUME_AUDUSDIntervalin_1_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/VOLUME_AUDUSDIntervalin_1_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/VOLUME_AUDUSDIntervalin_2_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/VOLUME_AUDUSDIntervalin_30_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/VOLUME_AUDUSDIntervalin_3_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/VOLUME_AUDUSDIntervalin_45_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/VOLUME_AUDUSDIntervalin_5_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/VOLUME_EURCADIntervalin_15_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/VOLUME_EURCADIntervalin_1_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/VOLUME_EURCADIntervalin_1_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/VOLUME_EURCADIntervalin_2_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/VOLUME_EURCADIntervalin_30_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/VOLUME_EURCADIntervalin_3_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/VOLUME_EURCADIntervalin_45_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/VOLUME_EURCADIntervalin_5_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/VOLUME_EURJPYIntervalin_15_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/VOLUME_EURJPYIntervalin_1_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/VOLUME_EURJPYIntervalin_1_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/VOLUME_EURJPYIntervalin_2_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/VOLUME_EURJPYIntervalin_30_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/VOLUME_EURJPYIntervalin_3_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/VOLUME_EURJPYIntervalin_45_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/VOLUME_EURJPYIntervalin_5_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/VOLUME_EURUSDIntervalin_15_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/VOLUME_EURUSDIntervalin_1_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/VOLUME_EURUSDIntervalin_1_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/VOLUME_EURUSDIntervalin_2_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/VOLUME_EURUSDIntervalin_30_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/VOLUME_EURUSDIntervalin_3_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/VOLUME_EURUSDIntervalin_45_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/VOLUME_EURUSDIntervalin_5_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/VOLUME_GBPAUDIntervalin_15_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/VOLUME_GBPAUDIntervalin_1_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/VOLUME_GBPAUDIntervalin_1_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/VOLUME_GBPAUDIntervalin_2_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/VOLUME_GBPAUDIntervalin_30_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/VOLUME_GBPAUDIntervalin_3_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/VOLUME_GBPAUDIntervalin_45_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/VOLUME_GBPAUDIntervalin_5_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/VOLUME_GBPUSDIntervalin_15_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/VOLUME_GBPUSDIntervalin_1_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/VOLUME_GBPUSDIntervalin_1_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/VOLUME_GBPUSDIntervalin_2_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/VOLUME_GBPUSDIntervalin_30_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/VOLUME_GBPUSDIntervalin_3_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/VOLUME_GBPUSDIntervalin_45_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/VOLUME_GBPUSDIntervalin_5_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/full_data/AUDCADIntervalin_15_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/full_data/AUDCADIntervalin_1_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/full_data/AUDCADIntervalin_1_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/full_data/AUDCADIntervalin_2_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/full_data/AUDCADIntervalin_30_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/full_data/AUDCADIntervalin_3_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/full_data/AUDCADIntervalin_45_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/full_data/AUDCADIntervalin_5_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/full_data/AUDCHFIntervalin_15_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/full_data/AUDCHFIntervalin_1_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/full_data/AUDCHFIntervalin_1_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/full_data/AUDCHFIntervalin_2_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/full_data/AUDCHFIntervalin_30_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/full_data/AUDCHFIntervalin_3_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/full_data/AUDCHFIntervalin_45_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/full_data/AUDCHFIntervalin_5_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/full_data/AUDJPYIntervalin_15_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/full_data/AUDJPYIntervalin_1_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/full_data/AUDJPYIntervalin_1_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/full_data/AUDJPYIntervalin_2_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/full_data/AUDJPYIntervalin_30_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/full_data/AUDJPYIntervalin_3_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/full_data/AUDJPYIntervalin_45_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/full_data/AUDJPYIntervalin_5_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/full_data/AUDUSDIntervalin_15_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/full_data/AUDUSDIntervalin_1_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/full_data/AUDUSDIntervalin_1_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/full_data/AUDUSDIntervalin_2_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/full_data/AUDUSDIntervalin_30_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/full_data/AUDUSDIntervalin_3_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/full_data/AUDUSDIntervalin_45_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/full_data/AUDUSDIntervalin_5_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/full_data/EURCADIntervalin_15_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/full_data/EURCADIntervalin_1_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/full_data/EURCADIntervalin_1_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/full_data/EURCADIntervalin_2_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/full_data/EURCADIntervalin_30_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/full_data/EURCADIntervalin_3_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/full_data/EURCADIntervalin_45_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/full_data/EURCADIntervalin_5_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/full_data/EURJPYIntervalin_15_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/full_data/EURJPYIntervalin_1_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/full_data/EURJPYIntervalin_1_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/full_data/EURJPYIntervalin_2_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/full_data/EURJPYIntervalin_30_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/full_data/EURJPYIntervalin_3_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/full_data/EURJPYIntervalin_45_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/full_data/EURJPYIntervalin_5_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/full_data/EURUSDIntervalin_15_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/full_data/EURUSDIntervalin_1_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/full_data/EURUSDIntervalin_1_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/full_data/EURUSDIntervalin_2_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/full_data/EURUSDIntervalin_30_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/full_data/EURUSDIntervalin_3_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/full_data/EURUSDIntervalin_45_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/full_data/EURUSDIntervalin_5_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/full_data/GBPAUDIntervalin_15_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/full_data/GBPAUDIntervalin_1_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/full_data/GBPAUDIntervalin_1_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/full_data/GBPAUDIntervalin_2_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/full_data/GBPAUDIntervalin_30_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/full_data/GBPAUDIntervalin_3_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/full_data/GBPAUDIntervalin_45_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/full_data/GBPAUDIntervalin_5_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/full_data/GBPUSDIntervalin_15_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/full_data/GBPUSDIntervalin_1_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/full_data/GBPUSDIntervalin_1_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/full_data/GBPUSDIntervalin_2_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/full_data/GBPUSDIntervalin_30_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/full_data/GBPUSDIntervalin_3_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/full_data/GBPUSDIntervalin_45_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/full_data/GBPUSDIntervalin_5_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/profit_AUDCADIntervalin_15_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/profit_AUDCADIntervalin_1_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/profit_AUDCADIntervalin_1_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/profit_AUDCADIntervalin_2_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/profit_AUDCADIntervalin_30_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/profit_AUDCADIntervalin_3_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/profit_AUDCADIntervalin_45_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/profit_AUDCADIntervalin_5_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/profit_AUDCHFIntervalin_15_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/profit_AUDCHFIntervalin_1_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/profit_AUDCHFIntervalin_1_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/profit_AUDCHFIntervalin_2_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/profit_AUDCHFIntervalin_30_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/profit_AUDCHFIntervalin_3_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/profit_AUDCHFIntervalin_45_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/profit_AUDCHFIntervalin_5_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/profit_AUDJPYIntervalin_15_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/profit_AUDJPYIntervalin_1_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/profit_AUDJPYIntervalin_1_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/profit_AUDJPYIntervalin_2_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/profit_AUDJPYIntervalin_30_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/profit_AUDJPYIntervalin_3_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/profit_AUDJPYIntervalin_45_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/profit_AUDJPYIntervalin_5_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/profit_AUDUSDIntervalin_15_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/profit_AUDUSDIntervalin_1_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/profit_AUDUSDIntervalin_1_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/profit_AUDUSDIntervalin_2_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/profit_AUDUSDIntervalin_30_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/profit_AUDUSDIntervalin_3_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/profit_AUDUSDIntervalin_45_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/profit_AUDUSDIntervalin_5_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/profit_EURCADIntervalin_15_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/profit_EURCADIntervalin_1_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/profit_EURCADIntervalin_1_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/profit_EURCADIntervalin_2_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/profit_EURCADIntervalin_30_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/profit_EURCADIntervalin_3_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/profit_EURCADIntervalin_45_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/profit_EURCADIntervalin_5_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/profit_EURJPYIntervalin_15_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/profit_EURJPYIntervalin_1_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/profit_EURJPYIntervalin_1_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/profit_EURJPYIntervalin_2_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/profit_EURJPYIntervalin_30_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/profit_EURJPYIntervalin_3_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/profit_EURJPYIntervalin_45_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/profit_EURJPYIntervalin_5_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/profit_EURUSDIntervalin_15_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/profit_EURUSDIntervalin_1_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/profit_EURUSDIntervalin_1_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/profit_EURUSDIntervalin_2_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/profit_EURUSDIntervalin_30_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/profit_EURUSDIntervalin_3_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/profit_EURUSDIntervalin_45_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/profit_EURUSDIntervalin_5_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/profit_GBPAUDIntervalin_15_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/profit_GBPAUDIntervalin_1_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/profit_GBPAUDIntervalin_1_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/profit_GBPAUDIntervalin_2_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/profit_GBPAUDIntervalin_30_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/profit_GBPAUDIntervalin_3_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/profit_GBPAUDIntervalin_45_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/profit_GBPAUDIntervalin_5_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/profit_GBPUSDIntervalin_15_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/profit_GBPUSDIntervalin_1_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/profit_GBPUSDIntervalin_1_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/profit_GBPUSDIntervalin_2_hour.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/profit_GBPUSDIntervalin_30_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/profit_GBPUSDIntervalin_3_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/profit_GBPUSDIntervalin_45_minute.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/debug/profit_GBPUSDIntervalin_5_minute.csv" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AUDCADIntervalin_15_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/AUDCADIntervalin_15_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AUDCADIntervalin_1_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/AUDCADIntervalin_1_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AUDCADIntervalin_30_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/AUDCADIntervalin_30_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AUDCADIntervalin_3_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/AUDCADIntervalin_3_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AUDCADIntervalin_5_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/AUDCADIntervalin_5_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AUDCHFIntervalin_15_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/AUDCHFIntervalin_15_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AUDCHFIntervalin_1_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/AUDCHFIntervalin_1_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AUDCHFIntervalin_30_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/AUDCHFIntervalin_30_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AUDCHFIntervalin_3_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/AUDCHFIntervalin_3_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AUDCHFIntervalin_5_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/AUDCHFIntervalin_5_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AUDJPYIntervalin_15_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/AUDJPYIntervalin_15_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AUDJPYIntervalin_1_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/AUDJPYIntervalin_1_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AUDJPYIntervalin_30_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/AUDJPYIntervalin_30_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AUDJPYIntervalin_3_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/AUDJPYIntervalin_3_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AUDJPYIntervalin_5_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/AUDJPYIntervalin_5_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AUDUSDIntervalin_15_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/AUDUSDIntervalin_15_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AUDUSDIntervalin_1_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/AUDUSDIntervalin_1_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AUDUSDIntervalin_30_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/AUDUSDIntervalin_30_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AUDUSDIntervalin_3_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/AUDUSDIntervalin_3_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AUDUSDIntervalin_5_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/AUDUSDIntervalin_5_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/EURCADIntervalin_15_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/EURCADIntervalin_15_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/EURCADIntervalin_1_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/EURCADIntervalin_1_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/EURCADIntervalin_30_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/EURCADIntervalin_30_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/EURCADIntervalin_3_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/EURCADIntervalin_3_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/EURCADIntervalin_5_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/EURCADIntervalin_5_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/EURJPYIntervalin_15_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/EURJPYIntervalin_15_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/EURJPYIntervalin_1_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/EURJPYIntervalin_1_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/EURJPYIntervalin_30_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/EURJPYIntervalin_30_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/EURJPYIntervalin_3_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/EURJPYIntervalin_3_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/EURJPYIntervalin_5_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/EURJPYIntervalin_5_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/EURUSDIntervalin_15_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/EURUSDIntervalin_15_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/EURUSDIntervalin_1_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/EURUSDIntervalin_1_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/EURUSDIntervalin_30_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/EURUSDIntervalin_30_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/EURUSDIntervalin_3_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/EURUSDIntervalin_3_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/EURUSDIntervalin_5_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/EURUSDIntervalin_5_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GBPAUDIntervalin_15_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/GBPAUDIntervalin_15_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GBPAUDIntervalin_1_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/GBPAUDIntervalin_1_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GBPAUDIntervalin_30_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/GBPAUDIntervalin_30_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GBPAUDIntervalin_3_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/GBPAUDIntervalin_3_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GBPAUDIntervalin_5_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/GBPAUDIntervalin_5_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GBPUSDIntervalin_15_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/GBPUSDIntervalin_15_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GBPUSDIntervalin_1_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/GBPUSDIntervalin_1_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GBPUSDIntervalin_30_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/GBPUSDIntervalin_30_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GBPUSDIntervalin_3_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/GBPUSDIntervalin_3_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GBPUSDIntervalin_5_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/GBPUSDIntervalin_5_minute.csv" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/analizer.py" beforeDir="false" afterPath="$PROJECT_DIR$/analizer.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/AUDCADIntervalin_15_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/AUDCADIntervalin_15_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/AUDCADIntervalin_1_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/AUDCADIntervalin_1_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/AUDCADIntervalin_30_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/AUDCADIntervalin_30_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/AUDCADIntervalin_3_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/AUDCADIntervalin_3_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/AUDCADIntervalin_5_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/AUDCADIntervalin_5_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/AUDCHFIntervalin_15_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/AUDCHFIntervalin_15_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/AUDCHFIntervalin_1_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/AUDCHFIntervalin_1_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/AUDCHFIntervalin_30_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/AUDCHFIntervalin_30_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/AUDCHFIntervalin_3_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/AUDCHFIntervalin_3_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/AUDCHFIntervalin_5_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/AUDCHFIntervalin_5_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/AUDJPYIntervalin_15_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/AUDJPYIntervalin_15_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/AUDJPYIntervalin_1_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/AUDJPYIntervalin_1_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/AUDJPYIntervalin_30_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/AUDJPYIntervalin_30_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/AUDJPYIntervalin_3_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/AUDJPYIntervalin_3_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/AUDJPYIntervalin_5_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/AUDJPYIntervalin_5_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/AUDUSDIntervalin_15_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/AUDUSDIntervalin_15_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/AUDUSDIntervalin_1_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/AUDUSDIntervalin_1_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/AUDUSDIntervalin_30_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/AUDUSDIntervalin_30_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/AUDUSDIntervalin_3_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/AUDUSDIntervalin_3_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/AUDUSDIntervalin_5_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/AUDUSDIntervalin_5_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/EURCADIntervalin_15_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/EURCADIntervalin_15_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/EURCADIntervalin_1_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/EURCADIntervalin_1_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/EURCADIntervalin_30_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/EURCADIntervalin_30_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/EURCADIntervalin_3_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/EURCADIntervalin_3_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/EURCADIntervalin_5_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/EURCADIntervalin_5_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/EURJPYIntervalin_15_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/EURJPYIntervalin_15_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/EURJPYIntervalin_1_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/EURJPYIntervalin_1_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/EURJPYIntervalin_30_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/EURJPYIntervalin_30_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/EURJPYIntervalin_3_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/EURJPYIntervalin_3_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/EURJPYIntervalin_5_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/EURJPYIntervalin_5_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/EURUSDIntervalin_15_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/EURUSDIntervalin_15_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/EURUSDIntervalin_1_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/EURUSDIntervalin_1_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/EURUSDIntervalin_30_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/EURUSDIntervalin_30_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/EURUSDIntervalin_3_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/EURUSDIntervalin_3_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/EURUSDIntervalin_5_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/EURUSDIntervalin_5_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/GBPAUDIntervalin_15_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/GBPAUDIntervalin_15_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/GBPAUDIntervalin_1_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/GBPAUDIntervalin_1_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/GBPAUDIntervalin_30_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/GBPAUDIntervalin_30_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/GBPAUDIntervalin_3_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/GBPAUDIntervalin_3_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/GBPAUDIntervalin_5_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/GBPAUDIntervalin_5_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/GBPUSDIntervalin_15_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/GBPUSDIntervalin_15_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/GBPUSDIntervalin_1_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/GBPUSDIntervalin_1_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/GBPUSDIntervalin_30_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/GBPUSDIntervalin_30_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/GBPUSDIntervalin_3_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/GBPUSDIntervalin_3_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/GBPUSDIntervalin_5_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/GBPUSDIntervalin_5_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/a" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/a2" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_AUDCAD_Intervalin_15_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_AUDCAD_Intervalin_1_hour.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_AUDCAD_Intervalin_1_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_AUDCAD_Intervalin_2_hour.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_AUDCAD_Intervalin_30_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_AUDCAD_Intervalin_3_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_AUDCAD_Intervalin_45_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_AUDCAD_Intervalin_5_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_AUDCHF_Intervalin_15_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_AUDCHF_Intervalin_1_hour.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_AUDCHF_Intervalin_1_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_AUDCHF_Intervalin_2_hour.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_AUDCHF_Intervalin_30_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_AUDCHF_Intervalin_3_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_AUDCHF_Intervalin_45_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_AUDCHF_Intervalin_5_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_AUDJPY_Intervalin_15_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_AUDJPY_Intervalin_1_hour.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_AUDJPY_Intervalin_1_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_AUDJPY_Intervalin_2_hour.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_AUDJPY_Intervalin_30_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_AUDJPY_Intervalin_3_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_AUDJPY_Intervalin_45_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_AUDJPY_Intervalin_5_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_AUDUSD_Intervalin_15_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_AUDUSD_Intervalin_1_hour.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_AUDUSD_Intervalin_1_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_AUDUSD_Intervalin_2_hour.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_AUDUSD_Intervalin_30_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_AUDUSD_Intervalin_3_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_AUDUSD_Intervalin_45_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_AUDUSD_Intervalin_5_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_EURCAD_Intervalin_15_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_EURCAD_Intervalin_1_hour.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_EURCAD_Intervalin_1_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_EURCAD_Intervalin_2_hour.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_EURCAD_Intervalin_30_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_EURCAD_Intervalin_3_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_EURCAD_Intervalin_45_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_EURCAD_Intervalin_5_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_EURJPY_Intervalin_15_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_EURJPY_Intervalin_1_hour.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_EURJPY_Intervalin_1_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_EURJPY_Intervalin_2_hour.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_EURJPY_Intervalin_30_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_EURJPY_Intervalin_3_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_EURJPY_Intervalin_45_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_EURJPY_Intervalin_5_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_EURUSD_Intervalin_15_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_EURUSD_Intervalin_1_hour.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_EURUSD_Intervalin_1_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_EURUSD_Intervalin_2_hour.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_EURUSD_Intervalin_30_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_EURUSD_Intervalin_3_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_EURUSD_Intervalin_45_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_EURUSD_Intervalin_5_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_GBPAUD_Intervalin_15_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_GBPAUD_Intervalin_1_hour.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_GBPAUD_Intervalin_1_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_GBPAUD_Intervalin_2_hour.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_GBPAUD_Intervalin_30_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_GBPAUD_Intervalin_3_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_GBPAUD_Intervalin_45_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_GBPAUD_Intervalin_5_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_GBPUSD_Intervalin_15_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_GBPUSD_Intervalin_1_hour.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_GBPUSD_Intervalin_1_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_GBPUSD_Intervalin_2_hour.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_GBPUSD_Intervalin_30_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_GBPUSD_Intervalin_3_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_GBPUSD_Intervalin_45_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_GBPUSD_Intervalin_5_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_dealtime_AUDCAD_Intervalin_15_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_dealtime_AUDCAD_Intervalin_1_hour.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_dealtime_AUDCAD_Intervalin_1_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_dealtime_AUDCAD_Intervalin_2_hour.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_dealtime_AUDCAD_Intervalin_30_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_dealtime_AUDCAD_Intervalin_3_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_dealtime_AUDCAD_Intervalin_45_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_dealtime_AUDCAD_Intervalin_5_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_dealtime_AUDCHF_Intervalin_15_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_dealtime_AUDCHF_Intervalin_1_hour.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_dealtime_AUDCHF_Intervalin_1_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_dealtime_AUDCHF_Intervalin_2_hour.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_dealtime_AUDCHF_Intervalin_30_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_dealtime_AUDCHF_Intervalin_3_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_dealtime_AUDCHF_Intervalin_45_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_dealtime_AUDCHF_Intervalin_5_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_dealtime_AUDJPY_Intervalin_15_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_dealtime_AUDJPY_Intervalin_1_hour.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_dealtime_AUDJPY_Intervalin_1_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_dealtime_AUDJPY_Intervalin_2_hour.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_dealtime_AUDJPY_Intervalin_30_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_dealtime_AUDJPY_Intervalin_3_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_dealtime_AUDJPY_Intervalin_45_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_dealtime_AUDJPY_Intervalin_5_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_dealtime_AUDUSD_Intervalin_15_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_dealtime_AUDUSD_Intervalin_1_hour.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_dealtime_AUDUSD_Intervalin_1_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_dealtime_AUDUSD_Intervalin_2_hour.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_dealtime_AUDUSD_Intervalin_30_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_dealtime_AUDUSD_Intervalin_3_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_dealtime_AUDUSD_Intervalin_45_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_dealtime_AUDUSD_Intervalin_5_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_dealtime_EURCAD_Intervalin_15_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_dealtime_EURCAD_Intervalin_1_hour.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_dealtime_EURCAD_Intervalin_1_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_dealtime_EURCAD_Intervalin_2_hour.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_dealtime_EURCAD_Intervalin_30_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_dealtime_EURCAD_Intervalin_3_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_dealtime_EURCAD_Intervalin_45_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_dealtime_EURCAD_Intervalin_5_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_dealtime_EURJPY_Intervalin_15_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_dealtime_EURJPY_Intervalin_1_hour.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_dealtime_EURJPY_Intervalin_1_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_dealtime_EURJPY_Intervalin_2_hour.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_dealtime_EURJPY_Intervalin_30_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_dealtime_EURJPY_Intervalin_3_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_dealtime_EURJPY_Intervalin_45_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_dealtime_EURJPY_Intervalin_5_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_dealtime_EURUSD_Intervalin_15_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_dealtime_EURUSD_Intervalin_1_hour.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_dealtime_EURUSD_Intervalin_1_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_dealtime_EURUSD_Intervalin_2_hour.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_dealtime_EURUSD_Intervalin_30_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_dealtime_EURUSD_Intervalin_3_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_dealtime_EURUSD_Intervalin_45_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_dealtime_EURUSD_Intervalin_5_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_dealtime_GBPAUD_Intervalin_15_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_dealtime_GBPAUD_Intervalin_1_hour.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_dealtime_GBPAUD_Intervalin_1_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_dealtime_GBPAUD_Intervalin_2_hour.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_dealtime_GBPAUD_Intervalin_30_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_dealtime_GBPAUD_Intervalin_3_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_dealtime_GBPAUD_Intervalin_45_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_dealtime_GBPAUD_Intervalin_5_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_dealtime_GBPUSD_Intervalin_15_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_dealtime_GBPUSD_Intervalin_1_hour.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_dealtime_GBPUSD_Intervalin_1_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_dealtime_GBPUSD_Intervalin_2_hour.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_dealtime_GBPUSD_Intervalin_30_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_dealtime_GBPUSD_Intervalin_3_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_dealtime_GBPUSD_Intervalin_45_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/new_dealtime_GBPUSD_Intervalin_5_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/updated_AUDCAD_Intervalin_15_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/updated_AUDCAD_Intervalin_1_hour.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/updated_AUDCAD_Intervalin_1_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/updated_AUDCAD_Intervalin_2_hour.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/updated_AUDCAD_Intervalin_30_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/updated_AUDCAD_Intervalin_3_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/updated_AUDCAD_Intervalin_45_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/updated_AUDCAD_Intervalin_5_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/updated_AUDCHF_Intervalin_15_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/updated_AUDCHF_Intervalin_1_hour.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/updated_AUDCHF_Intervalin_1_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/updated_AUDCHF_Intervalin_2_hour.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/updated_AUDCHF_Intervalin_30_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/updated_AUDCHF_Intervalin_3_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/updated_AUDCHF_Intervalin_45_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/updated_AUDCHF_Intervalin_5_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/updated_AUDJPY_Intervalin_15_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/updated_AUDJPY_Intervalin_1_hour.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/updated_AUDJPY_Intervalin_1_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/updated_AUDJPY_Intervalin_2_hour.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/updated_AUDJPY_Intervalin_30_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/updated_AUDJPY_Intervalin_3_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/updated_AUDJPY_Intervalin_45_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/updated_AUDJPY_Intervalin_5_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/updated_AUDUSD_Intervalin_15_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/updated_AUDUSD_Intervalin_1_hour.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/updated_AUDUSD_Intervalin_1_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/updated_AUDUSD_Intervalin_2_hour.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/updated_AUDUSD_Intervalin_30_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/updated_AUDUSD_Intervalin_3_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/updated_AUDUSD_Intervalin_45_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/updated_AUDUSD_Intervalin_5_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/updated_EURCAD_Intervalin_15_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/updated_EURCAD_Intervalin_1_hour.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/updated_EURCAD_Intervalin_1_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/updated_EURCAD_Intervalin_2_hour.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/updated_EURCAD_Intervalin_30_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/updated_EURCAD_Intervalin_3_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/updated_EURCAD_Intervalin_45_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/updated_EURCAD_Intervalin_5_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/updated_EURJPY_Intervalin_15_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/updated_EURJPY_Intervalin_1_hour.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/updated_EURJPY_Intervalin_1_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/updated_EURJPY_Intervalin_2_hour.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/updated_EURJPY_Intervalin_30_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/updated_EURJPY_Intervalin_3_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/updated_EURJPY_Intervalin_45_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/updated_EURJPY_Intervalin_5_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/updated_EURUSD_Intervalin_15_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/updated_EURUSD_Intervalin_1_hour.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/updated_EURUSD_Intervalin_1_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/updated_EURUSD_Intervalin_2_hour.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/updated_EURUSD_Intervalin_30_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/updated_EURUSD_Intervalin_3_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/updated_EURUSD_Intervalin_45_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/updated_EURUSD_Intervalin_5_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/updated_GBPAUD_Intervalin_15_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/updated_GBPAUD_Intervalin_1_hour.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/updated_GBPAUD_Intervalin_1_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/updated_GBPAUD_Intervalin_2_hour.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/updated_GBPAUD_Intervalin_30_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/updated_GBPAUD_Intervalin_3_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/updated_GBPAUD_Intervalin_45_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/updated_GBPAUD_Intervalin_5_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/updated_GBPUSD_Intervalin_15_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/updated_GBPUSD_Intervalin_1_hour.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/updated_GBPUSD_Intervalin_1_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/updated_GBPUSD_Intervalin_2_hour.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/updated_GBPUSD_Intervalin_30_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/updated_GBPUSD_Intervalin_3_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/updated_GBPUSD_Intervalin_45_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug/updated_GBPUSD_Intervalin_5_minute.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/indicators_reader.py" beforeDir="false" afterPath="$PROJECT_DIR$/indicators_reader.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/manager_module.py" beforeDir="false" afterPath="$PROJECT_DIR$/manager_module.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/signal_maker.py" beforeDir="false" afterPath="$PROJECT_DIR$/signal_maker.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/AUDCADIntervalin_1_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/signals/AUDCADIntervalin_1_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/AUDCADIntervalin_3_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/signals/AUDCADIntervalin_3_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/AUDCADIntervalin_5_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/signals/AUDCADIntervalin_5_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/AUDCHFIntervalin_1_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/signals/AUDCHFIntervalin_1_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/AUDCHFIntervalin_3_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/signals/AUDCHFIntervalin_3_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/AUDCHFIntervalin_5_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/signals/AUDCHFIntervalin_5_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/AUDJPYIntervalin_1_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/signals/AUDJPYIntervalin_1_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/AUDJPYIntervalin_3_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/signals/AUDJPYIntervalin_3_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/AUDJPYIntervalin_5_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/signals/AUDJPYIntervalin_5_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/AUDUSDIntervalin_1_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/signals/AUDUSDIntervalin_1_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/AUDUSDIntervalin_3_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/signals/AUDUSDIntervalin_3_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/AUDUSDIntervalin_5_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/signals/AUDUSDIntervalin_5_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/EURCADIntervalin_1_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/signals/EURCADIntervalin_1_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/EURCADIntervalin_3_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/signals/EURCADIntervalin_3_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/EURCADIntervalin_5_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/signals/EURCADIntervalin_5_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/EURJPYIntervalin_1_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/signals/EURJPYIntervalin_1_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/EURJPYIntervalin_3_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/signals/EURJPYIntervalin_3_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/EURJPYIntervalin_5_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/signals/EURJPYIntervalin_5_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/EURUSDIntervalin_1_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/signals/EURUSDIntervalin_1_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/EURUSDIntervalin_3_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/signals/EURUSDIntervalin_3_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/EURUSDIntervalin_5_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/signals/EURUSDIntervalin_5_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/GBPAUDIntervalin_1_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/signals/GBPAUDIntervalin_1_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/GBPAUDIntervalin_3_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/signals/GBPAUDIntervalin_3_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/GBPAUDIntervalin_5_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/signals/GBPAUDIntervalin_5_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/GBPUSDIntervalin_1_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/signals/GBPUSDIntervalin_1_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/GBPUSDIntervalin_3_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/signals/GBPUSDIntervalin_3_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/GBPUSDIntervalin_5_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/signals/GBPUSDIntervalin_5_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/check_ended/AUDCADIntervalin_1_minute.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/check_ended/AUDCADIntervalin_3_minute.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/check_ended/AUDCADIntervalin_5_minute.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/check_ended/AUDCHFIntervalin_1_minute.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/check_ended/AUDCHFIntervalin_3_minute.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/check_ended/AUDCHFIntervalin_5_minute.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/check_ended/AUDJPYIntervalin_1_minute.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/check_ended/AUDJPYIntervalin_3_minute.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/check_ended/AUDJPYIntervalin_5_minute.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/check_ended/AUDUSDIntervalin_1_minute.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/check_ended/AUDUSDIntervalin_3_minute.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/check_ended/AUDUSDIntervalin_5_minute.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/check_ended/EURCADIntervalin_1_minute.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/check_ended/EURCADIntervalin_3_minute.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/check_ended/EURCADIntervalin_5_minute.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/check_ended/EURJPYIntervalin_1_minute.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/check_ended/EURJPYIntervalin_3_minute.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/check_ended/EURJPYIntervalin_5_minute.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/check_ended/EURUSDIntervalin_1_minute.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/check_ended/EURUSDIntervalin_3_minute.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/check_ended/EURUSDIntervalin_5_minute.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/check_ended/GBPAUDIntervalin_1_minute.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/check_ended/GBPAUDIntervalin_3_minute.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/check_ended/GBPAUDIntervalin_5_minute.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/check_ended/GBPUSDIntervalin_1_minute.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/check_ended/GBPUSDIntervalin_3_minute.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/check_ended/GBPUSDIntervalin_5_minute.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/users/5964166439.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/users/db.txt" beforeDir="false" afterPath="$PROJECT_DIR$/users/db.txt" afterDir="false" />
     </list>
     <list id="cbe571c8-b52a-4250-a9e3-ad1313cd5330" name="Changes by Alex" comment="" />
     <list id="7fa9b9cd-5f0a-41aa-bb8c-dd6d412d680c" name="Changes by SIRIUS" comment="" />
@@ -422,7 +633,7 @@
     &quot;ShowUsagesActions.previewPropertyKey&quot;: &quot;true&quot;,
     &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
     &quot;git-widget-placeholder&quot;: &quot;stream&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/Alex/Projects/Programming/Vilors/Signal-bot&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/Alex/Projects/Programming/PyCharm/DataEngenearingLab3&quot;,
     &quot;settings.editor.selected.configurable&quot;: &quot;reference.settingsdialog.IDE.editor.colors&quot;
   }
 }</component>
