@@ -7,6 +7,8 @@ import interval_convertor
 from price_parser import PriceData
 import asyncio
 from signals import *
+import pytz
+import price_parser
 
 username = 't4331662@gmail.com'
 password = 'Pxp626AmH7_'
@@ -87,34 +89,43 @@ def reset_signals_files(prices_data: [PriceData]):
         file_manager.delete_file_if_exists(path)
 
 
-def analize_funcc(main_price_df, prices_dfs, check_pds: [PriceData]):
-    main_pd = check_pds[0]
-
-    analizer = MultitimeframeAnalizer(2, 2)
-    has_signal, signal, debug, deal_time = analizer.analize(prices_dfs, check_pds)
-
-    open_position_price = main_price_df.close[0]
-    msg = signal.get_open_msg_text(main_pd, deal_time)
-
-    data = [[has_signal, signal.type, msg, main_price_df.datetime[0], open_position_price, main_pd.interval,
-             main_pd.symbol, main_pd.exchange, deal_time]]
-    columns = ["has_signal", "signal_type", "msg", "date", "open_price", "interval", "symbol", "exchange", "deal_time"]
-    df = DataFrame(data, columns=columns)
-    save_signal_file(df, main_pd)
-
-    print("Created signal file:", msg, main_price_df.datetime[0])
+def is_all_charts_collected(main_pd: PriceData, parent_pds: [PriceData]):
+    expected_bars = []
+    main_df = main_pd.get_chart_data_if_exists()
+    if main_df is None:
+        return False
+    main_df_last_bar_checked = main_df["datetime"][0]
+    expected_bars.append(main_df_last_bar_checked)
+    for parent_pd in parent_pds:
+        parent_df = parent_pd.get_chart_data_if_exists()
+        if parent_df is None:
+            # print("expected bars", expected_bars)
+            return False
+        parent_df_last_bar_checked = parent_df["datetime"][0]
+        needed_bar = parent_pd.get_needed_chart_bar_to_analize(main_df_last_bar_checked)
+        expected_bars.append(needed_bar)
+        if not(parent_df_last_bar_checked == needed_bar):
+            # print("expected bars", expected_bars)
+            return False
+    # print("expected bars", expected_bars)
+    return True
 
 
 def analize_currency_data_controller(analize_pairs):
     async def analize_currency_data_function(check_pds: [PriceData], unit_pd: PriceData):
         main_pd = check_pds[0]
+        start_analize_time = check_pds[0].get_chart_download_time()
+
+        if not is_all_charts_collected(check_pds[0], check_pds[1:]):
+            return
+
         main_price_df = main_pd.get_chart_data_if_exists_if_can_analize()
         if main_price_df is None:
             return
 
-        dt = main_price_df["datetime"][0]
-        if not unit_pd.is_analize_time(dt):
-            return
+        # dt = main_price_df["datetime"][0]
+        # if not unit_pd.is_analize_time(dt):
+        #     return
 
         prices_dfs = []
         for pd in check_pds:
@@ -130,8 +141,8 @@ def analize_currency_data_controller(analize_pairs):
         msg = signal.get_open_msg_text(main_pd, deal_time)
 
         data = [[has_signal, signal.type, msg, main_price_df.datetime[0], open_position_price, main_pd.interval,
-                 main_pd.symbol, main_pd.exchange, deal_time]]
-        columns = ["has_signal", "signal_type", "msg", "date", "open_price", "interval", "symbol", "exchange", "deal_time"]
+                 main_pd.symbol, main_pd.exchange, deal_time, debug, start_analize_time]]
+        columns = ["has_signal", "signal_type", "msg", "date", "open_price", "interval", "symbol", "exchange", "deal_time", "debug", "start_analize_time"]
         df = DataFrame(data, columns=columns)
         save_signal_file(df, main_pd)
 
@@ -144,47 +155,9 @@ def analize_currency_data_controller(analize_pairs):
                 task = asyncio.create_task(analize_currency_data_function([analize_pair[0], *analize_pair[1]], analize_pair[2]))
                 tasks.append(task)
             await asyncio.gather(*tasks)
-            await asyncio.sleep(5)
+            await asyncio.sleep(1)
 
     asyncio.run(analize_currency_data_loop(analize_pairs))
-# def analize_currency_data_controller(analize_pair):
-#     def analize_currency_data_function(check_pds: [PriceData], unit_pd: PriceData):
-#         main_pd = check_pds[0]
-#         main_price_df = main_pd.get_chart_data_if_exists_if_can_analize()
-#         if main_price_df is None:
-#             return
-#
-#         dt = main_price_df["datetime"][0]
-#         if not unit_pd.is_analize_time(dt):
-#             return
-#
-#         prices_dfs = []
-#         for pd in check_pds:
-#             ch_data = pd.get_chart_data_if_exists()
-#             if ch_data is None:
-#                 continue
-#             prices_dfs.append(ch_data)
-#
-#         analizer = MultitimeframeAnalizer(2, 2)
-#         has_signal, signal, debug, deal_time = analizer.analize(prices_dfs, check_pds)
-#
-#         open_position_price = main_price_df.close[0]
-#         msg = signal.get_open_msg_text(main_pd, deal_time)
-#
-#         data = [[has_signal, signal.type, msg, main_price_df.datetime[0], open_position_price, main_pd.interval,
-#                  main_pd.symbol, main_pd.exchange, deal_time]]
-#         columns = ["has_signal", "signal_type", "msg", "date", "open_price", "interval", "symbol", "exchange", "deal_time"]
-#         df = DataFrame(data, columns=columns)
-#         save_signal_file(df, main_pd)
-#
-#         print("Created signal file:", msg, main_price_df.datetime[0])
-#
-#     async def analize_currency_data_loop(analize_pair):
-#         while True:
-#             analize_currency_data_function([analize_pair[0], *analize_pair[1]], analize_pair[2])
-#             await asyncio.sleep(1)
-#
-#     asyncio.run(analize_currency_data_loop(analize_pair))
 
 
 #test

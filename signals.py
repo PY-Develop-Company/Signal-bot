@@ -14,6 +14,9 @@ profit_smile = "✅"
 loss_smile = "❌"
 
 
+puncts_pohibka = 0.030
+
+
 class Signal:
     type = None
 
@@ -61,7 +64,7 @@ class LongSignal(Signal):
         self.text = long_signal_text
 
     def is_profit(self, open_price, close_price):
-        return True if close_price >= open_price else False
+        return True if close_price + puncts_pohibka >= open_price else False
 
 
 class ShortSignal(Signal):
@@ -74,7 +77,7 @@ class ShortSignal(Signal):
         self.text = short_signal_text
 
     def is_profit(self, open_price, close_price):
-        return True if (close_price <= open_price) else False
+        return True if (close_price - puncts_pohibka <= open_price) else False
 
 
 def get_signal_by_type(signal_type):
