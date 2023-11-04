@@ -98,6 +98,16 @@ sob_dict = {
         Interval.in_45_minute: 0.0121,
         Interval.in_1_hour: 0.0121,
         Interval.in_2_hour: 0.0121
+    },
+    "BTCUSD": {
+        Interval.in_1_minute: 0,
+        Interval.in_3_minute: 0,
+        Interval.in_5_minute: 0,
+        Interval.in_15_minute: 0,
+        Interval.in_30_minute: 0,
+        Interval.in_45_minute: 0,
+        Interval.in_1_hour: 0,
+        Interval.in_2_hour: 0
     }
 }
 

@@ -1,0 +1,2 @@
+,has_signal,signal_type,msg,date,open_price,interval,symbol,exchange,deal_time
+0,False,neutral,NoneBTC/USD Нет сигнала 25мин,2023-11-04 13:50:00,34728.55,Interval.in_5_minute,BTCUSD,COINBASE,25

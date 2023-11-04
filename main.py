@@ -15,7 +15,11 @@ from menu_text import *
 import interval_convertor
 from signals import get_signal_by_type
 
-API_TOKEN = "6538527964:AAHUUHZHYVnNFbYAPoMn4bRUMASKR0h9qfA"  # my token
+API_TOKEN = "6588822945:AAFX8eDWngrrbLeDLhzNw0nLkxI07D9wG8Y"  # my token
+
+manager = None
+shared_list = None
+
 logging.basicConfig(level=logging.INFO)
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot)
@@ -241,15 +245,25 @@ async def handle_media(message: types.Message):
                 await open_menu(message, not_vip_markup)
 
 
-def handle_signal_msg_controller(signal, msg, pd: PriceData, open_position_price, deal_time):
-    async def handle_signal_msg(signal, msg, pd: PriceData, open_position_price, deal_time):
+def handle_signal_msg_controller(signal, msg, pd: PriceData, open_position_price, deal_time, shared_list):
+    async def handle_signal_msg(signal, msg, pd: PriceData, open_position_price, deal_time, shared_list):
         deposit_users_ids = get_deposit_users_ids()
         await send_photo_text_message_to_users(deposit_users_ids, signal.photo_path, msg)
 
         close_signal_message, is_profit = await signal_maker.close_position(open_position_price, signal, pd, bars_count=deal_time)
+        shared_list[is_profit] += 1
         img_path = "./img/profit.jpg" if is_profit else "./img/loss.jpg"
         await send_photo_text_message_to_users(deposit_users_ids, img_path, close_signal_message)
-    asyncio.run(handle_signal_msg(signal, msg, pd, open_position_price, deal_time))
+    asyncio.run(handle_signal_msg(signal, msg, pd, open_position_price, deal_time, shared_list))
+
+
+async def try_send_day_profit(profit_count, loss_count):
+    time_zone = pytz.timezone("Europe/Bucharest")
+    time_now = datetime.now(time_zone)
+    if (profit_count > 0 or loss_count > 0) and time_now.hour == 0:
+        text = f"Total day statistics:\n\tprofits: {profit_count};\n\tloses: {loss_count};\n"
+        await send_message_to_users(get_deposit_users_ids(), text)
+        print(text)
 
 
 def is_market_working():
@@ -263,20 +277,21 @@ def is_market_working():
     return min_time_zone_hours <= time_now.hour < max_time_zone_hours
 
 
-def signals_message_sender_controller(prices_data, intervals, unit_pd, prices_data_all):
-    async def signals_message_sender_function(prices_data, intervals, unit_pd, prices_data_all):
+def signals_message_sender_controller(prices_data, intervals, unit_pd, prices_data_all, shared_list):
+    async def signals_message_sender_function(prices_data, intervals, unit_pd, prices_data_all, shared_list):
         signal_maker.reset_signals_files(prices_data)
 
         last_callback_update_time = callbacks_wait_time + 1
 
         while True:
+            await try_send_day_profit(shared_list[1],  shared_list[0])
             if time.time() - last_callback_update_time > callbacks_wait_time:
                 price_parser.create_parce_currencies_with_intervals_callbacks(prices_data_all)
                 last_callback_update_time = time.time()
                 signal_maker.reset_signals_files(prices_data)
                 continue
 
-            await asyncio.sleep(1)
+            await asyncio.sleep(60)
             try:
                 with open("users/test.txt", "r") as file:
                     cont = file.read().split(".")[0]
@@ -317,19 +332,25 @@ def signals_message_sender_controller(prices_data, intervals, unit_pd, prices_da
             pd = PriceData(df.symbol[0], df.exchange[0], interval_convertor.str_to_interval(df.interval[0]))
 
             multiprocessing.Process(target=handle_signal_msg_controller,
-                                    args=(signal, df.msg[0], pd, df.open_price[0], int(df.deal_time[0]), ), daemon=True).start()
+                                    args=(signal, df.msg[0], pd, df.open_price[0], int(df.deal_time[0]), shared_list ), daemon=True).start()
 
             await asyncio.sleep(signal_delay)
 
             signal_maker.reset_signals_files(prices_data)
 
-    asyncio.run(signals_message_sender_function(prices_data, intervals, unit_pd, prices_data_all))
+    asyncio.run(signals_message_sender_function(prices_data, intervals, unit_pd, prices_data_all, shared_list))
 
 
 if __name__ == '__main__':
     from aiogram import executor
 
     multiprocessing.freeze_support()
+
+    manager = multiprocessing.Manager()
+    shared_list = manager.list()
+    shared_list.append(0)
+    shared_list.append(0)
+
     currencies = price_parser.get_currencies()
     intervals = [Interval.in_1_minute, Interval.in_3_minute, Interval.in_5_minute, Interval.in_15_minute, Interval.in_30_minute]
     main_intervals = [Interval.in_1_minute, Interval.in_3_minute, Interval.in_5_minute]
@@ -377,6 +398,6 @@ if __name__ == '__main__':
         analize_pairs.append(analize_pair)
         multiprocessing.Process(target=signal_maker.analize_currency_data_controller, args=([analize_pair], )).start()
 
-    multiprocessing.Process(target=signals_message_sender_controller, args=(main_pds, main_intervals, unit_pd, prices_data)).start()
+    multiprocessing.Process(target=signals_message_sender_controller, args=(main_pds, main_intervals, unit_pd, prices_data, shared_list, )).start()
 
     executor.start_polling(dp, skip_updates=True)

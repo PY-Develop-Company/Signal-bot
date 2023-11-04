@@ -10,7 +10,6 @@ import interval_convertor
 from price_parser import PriceData
 import asyncio
 from signals import *
-import multiprocessing
 import price_parser
 
 username = 't4331662@gmail.com'

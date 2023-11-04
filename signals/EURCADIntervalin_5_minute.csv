@@ -1,2 +1,2 @@
 ,has_signal,signal_type,msg,date,open_price,interval,symbol,exchange,deal_time
-0,False,neutral,NoneEUR/CAD Нет сигнала 25мин,2023-10-26 23:20:00,1.46028,Interval.in_5_minute,EURCAD,OANDA,25
+0,False,neutral,NoneEUR/CAD Нет сигнала 25мин,2023-11-01 17:15:00,1.46302,Interval.in_5_minute,EURCAD,OANDA,25
