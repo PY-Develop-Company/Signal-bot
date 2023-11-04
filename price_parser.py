@@ -1,10 +1,10 @@
-import time
 from datetime import datetime, timedelta
 from tvDatafeed import TvDatafeed, TvDatafeedLive, Interval
 from tvDatafeed.seis import Seis
 from pandas import DataFrame, read_csv
 import file_manager
 import interval_convertor
+import pytz
 
 trade_pause_wait_time = 600
 
@@ -30,7 +30,16 @@ class PriceData:
         interval = str(self.interval).replace(".", "")
         df.to_csv(currencies_data_path + self.symbol + interval + ".csv")
         with open(f"{currency_check_ended}{self.symbol}{str(self.interval).replace('.', '')}.txt", "w") as file:
-            pass
+            time = datetime.now(pytz.timezone("Europe/Bucharest"))
+            file.write(str(time))
+
+    def get_chart_download_time(self):
+        try:
+            with open(f"{currency_check_ended}{self.symbol}{str(self.interval).replace('.', '')}.txt", "r") as file:
+                res = datetime.strptime(file.read().split(".")[0], '%Y-%m-%d %H:%M:%S')
+        except Exception as e:
+            return datetime.strptime(str(datetime.now(pytz.timezone("Europe/Bucharest"))).split(".")[0], '%Y-%m-%d %H:%M:%S')
+        return res
 
     def get_chart_data_if_exists(self):
         interval = str(self.interval).replace(".", "")
@@ -48,6 +57,11 @@ class PriceData:
         except Exception as e:
             print("3Error chart not exists", path, e)
             return None
+        try:
+            df["datetime"] = df.apply(lambda row: datetime.strptime(row["datetime"], '%Y-%m-%d %H:%M:%S'), axis=1)
+        except Exception as e:
+            print("Error date time is wrong formated", e, df.to_string())
+            return None
         return df
 
     def get_chart_data_if_exists_if_can_analize(self):
@@ -56,11 +70,6 @@ class PriceData:
 
         last_check_date = currencies_last_analize_date.get(self.symbol + interval)
         if not(df is None):
-            try:
-                df["datetime"] = df.apply(lambda row: datetime.strptime(row["datetime"], '%Y-%m-%d %H:%M:%S'), axis=1)
-            except Exception as e:
-                print("Error date time is wrong formated", e, df.to_string())
-                return None
             current_check_date = df.datetime[0]
             if current_check_date == last_check_date:
                 return None
@@ -72,13 +81,23 @@ class PriceData:
 
         df = self.get_price_data(500)
         if df is None:
+            print("ERROR: No df")
             pass
         else:
+            print("updated pd")
             path = currency_check_ended + self.symbol + interval + ".txt"
             file_manager.delete_file_if_exists(path)
             path = currencies_data_path + self.symbol + interval + ".csv"
             file_manager.delete_file_if_exists(path)
             self.save_chart_data(df)
+
+    def remove_chart_data(self):
+        interval = str(self.interval).replace(".", "")
+
+        path = currency_check_ended + self.symbol + interval + ".txt"
+        file_manager.delete_file_if_exists(path)
+        path = currencies_data_path + self.symbol + interval + ".csv"
+        file_manager.delete_file_if_exists(path)
 
     def get_price_data(self, bars_count=500):
         try:
@@ -90,11 +109,16 @@ class PriceData:
             return None
 
     def is_analize_time(self, update_date: datetime, debug=False):
-        minutes = interval_convertor.interval_to_datetime(self.interval) / timedelta(minutes=1)
+        minutes = interval_convertor.interval_to_int(self.interval)
         if debug:
             print("is_analize_time", (update_date.minute + 1), minutes, (update_date.minute + 1) % minutes)
 
         return (update_date.minute + 1) % minutes == 0
+
+    def get_needed_chart_bar_to_analize(self, chart_bar: datetime):
+        minutes = interval_convertor.interval_to_int(self.interval)
+        chart_bar = chart_bar + timedelta(minutes=1)
+        return chart_bar - timedelta(minutes=chart_bar.minute % minutes) - timedelta(minutes=minutes)
 
 
 def get_currencies():

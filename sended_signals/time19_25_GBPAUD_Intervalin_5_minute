@@ -1,0 +1,9 @@
+,Unnamed: 0,has_signal,signal_type,msg,date,open_price,interval,symbol,exchange,deal_time,debug,start_analize_time
+0,0,True,long,🟢GBP/AUD LONG ⬆ 25мин,2023-11-02 19:20:00,1.89783,Interval.in_5_minute,GBPAUD,OANDA,25,"
+
+Проверка сигнала:
+                    	Валютная пара: GBPAUD"" таймфрейми: [<Interval.in_5_minute: '5'>, <Interval.in_15_minute: '15'>, <Interval.in_30_minute: '30'>] время свеч: [Timestamp('2023-11-02 19:20:00'), Timestamp('2023-11-02 19:00:00'), Timestamp('2023-11-02 18:30:00')]
+                    	Есть ли сигнал: True
+                    	Показания индикаторов: long_sob_count2 short_sob_count0
+                    		 * SOB -> long [<Interval.in_5_minute: '5'>, <Interval.in_15_minute: '15'>] short []
+                     time_now 2023-11-02 19:25:23.665599+02:00",2023-11-02 19:25:22

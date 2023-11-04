@@ -1,5 +1,3 @@
-from interval_convertor import timedelta_to_close_string, interval_to_datetime
-
 photo_long_path = "img/long.jpg"
 photo_short_path = "img/short.jpg"
 
@@ -12,6 +10,20 @@ neutral_signal_text = "Нет сигнала"
 
 profit_smile = "✅"
 loss_smile = "❌"
+
+puncts_pohibka = 0.030
+
+puncts_pohibka_dict = {
+    "EURUSD": 0.00030,
+    "AUDUSD": 0.00030,
+    "AUDCAD": 0.00030,
+    "EURJPY": 0.030,
+    "EURCAD": 0.00030,
+    "AUDCHF": 0.00030,
+    "GBPUSD": 0.00030,
+    "AUDJPY": 0.030,
+    "GBPAUD": 0.00030
+}
 
 
 class Signal:
@@ -29,11 +41,11 @@ class Signal:
     def get_photo_path(self):
         return self.photo_path
 
-    def is_profit(self, open_price, close_price):
+    def is_profit(self, open_price, close_price, currency):
         return False
 
     def get_close_position_signal_message(self, pd, open, close, bars_count):
-        is_profit_position = self.is_profit(open, close)
+        is_profit_position = self.is_profit(open, close, pd.symbol)
         prifit_smile_text = profit_smile if is_profit_position else loss_smile
         # debug_text = f"\nЦіна закриття позиції {str(close)} Ціна відкриття позиції: {str(open)}"
 
@@ -60,8 +72,8 @@ class LongSignal(Signal):
         self.smile = long_signal_smile
         self.text = long_signal_text
 
-    def is_profit(self, open_price, close_price):
-        return True if close_price >= open_price else False
+    def is_profit(self, open_price, close_price, currency):
+        return True if close_price + puncts_pohibka_dict.get(currency) >= open_price else False
 
 
 class ShortSignal(Signal):
@@ -73,8 +85,8 @@ class ShortSignal(Signal):
         self.smile = short_signal_smile
         self.text = short_signal_text
 
-    def is_profit(self, open_price, close_price):
-        return True if (close_price <= open_price) else False
+    def is_profit(self, open_price, close_price, currency):
+        return True if close_price - puncts_pohibka_dict.get(currency) <= open_price else False
 
 
 def get_signal_by_type(signal_type):

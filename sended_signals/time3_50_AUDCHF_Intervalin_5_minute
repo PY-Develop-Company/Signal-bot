@@ -1,0 +1,9 @@
+,Unnamed: 0,has_signal,signal_type,msg,date,open_price,interval,symbol,exchange,deal_time,debug
+0,0,True,long,🟢AUD/CHF LONG ⬆ 25мин,2023-11-02 03:45:00,0.58214,Interval.in_5_minute,AUDCHF,OANDA,25,"
+
+Проверка сигнала:
+                    	Валютная пара: AUDCHF"" таймфрейми: [<Interval.in_5_minute: '5'>, <Interval.in_15_minute: '15'>, <Interval.in_30_minute: '30'>] время свеч: [Timestamp('2023-11-02 03:45:00'), Timestamp('2023-11-02 03:30:00'), Timestamp('2023-11-02 03:00:00')]
+                    	Есть ли сигнал: True
+                    	Показания индикаторов: long_sob_count2 short_sob_count0
+                    		 * SOB -> long [<Interval.in_15_minute: '15'>, <Interval.in_30_minute: '30'>] short []
+                     time_now 2023-11-02 03:50:23.443478+02:00"

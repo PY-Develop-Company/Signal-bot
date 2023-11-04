@@ -1,17 +1,9 @@
-import time
-from _operator import index
-
-# import tradingview_ta
-# from tradingview_ta import TA_Handler, Interval, Exchange
 import pandas as pd
 from pandas import Timedelta
 from signals import *
 from datetime import timedelta, datetime
-from tvDatafeed import Interval
 from interval_convertor import interval_to_int, str_to_interval, interval_to_string
 from signals import get_signal_by_type
-import price_parser
-
 
 def income_percent_diff(df1, df2):
     if len(df1) > 0 and len(df2) > 0:

@@ -10,94 +10,94 @@ from signals import *
 
 sob_dict = {
     "EURUSD": {
-        Interval.in_1_minute: 0.0015,
-        Interval.in_3_minute: 0.0025,
-        Interval.in_5_minute: 0.0033,
-        Interval.in_15_minute: 0.0045,
-        Interval.in_30_minute: 0.006,
-        Interval.in_45_minute: 0.006,
-        Interval.in_1_hour: 0.006,
-        Interval.in_2_hour: 0.006
+        Interval.in_1_minute: 0.00035,
+        Interval.in_3_minute: 0.00070,
+        Interval.in_5_minute: 0.00110,
+        Interval.in_15_minute: 0.00155,
+        Interval.in_30_minute: 0.00210,
+        Interval.in_45_minute: 0.00210,
+        Interval.in_1_hour: 0.00210,
+        Interval.in_2_hour: 0.00210
     },
     "AUDUSD": {
-        Interval.in_1_minute: 0.0015,
-        Interval.in_3_minute: 0.0024,
-        Interval.in_5_minute: 0.0032,
-        Interval.in_15_minute: 0.0042,
-        Interval.in_30_minute: 0.0053,
-        Interval.in_45_minute: 0.0053,
-        Interval.in_1_hour: 0.0053,
-        Interval.in_2_hour: 0.0053
+        Interval.in_1_minute: 0.00035,
+        Interval.in_3_minute: 0.00075,
+        Interval.in_5_minute: 0.00120,
+        Interval.in_15_minute: 0.00150,
+        Interval.in_30_minute: 0.00220,
+        Interval.in_45_minute: 0.00220,
+        Interval.in_1_hour: 0.00220,
+        Interval.in_2_hour: 0.00220
     },
     "AUDCAD": {
-        Interval.in_1_minute: 0.0019,
-        Interval.in_3_minute: 0.0031,
-        Interval.in_5_minute: 0.0042,
-        Interval.in_15_minute: 0.0056,
-        Interval.in_30_minute: 0.0064,
-        Interval.in_45_minute: 0.0064,
-        Interval.in_1_hour: 0.0064,
-        Interval.in_2_hour: 0.0064
+        Interval.in_1_minute: 0.00040,
+        Interval.in_3_minute: 0.00094,
+        Interval.in_5_minute: 0.00145,
+        Interval.in_15_minute: 0.00150,
+        Interval.in_30_minute: 0.00200,
+        Interval.in_45_minute: 0.00200,
+        Interval.in_1_hour: 0.00200,
+        Interval.in_2_hour: 0.00200
     },
     "EURJPY": {
-        Interval.in_1_minute: 0.0026,
-        Interval.in_3_minute: 0.0034,
-        Interval.in_5_minute: 0.0049,
-        Interval.in_15_minute: 0.0065,
-        Interval.in_30_minute: 0.0083,
-        Interval.in_45_minute: 0.0083,
-        Interval.in_1_hour: 0.0083,
-        Interval.in_2_hour: 0.0083
+        Interval.in_1_minute: 0.040,
+        Interval.in_3_minute: 0.090,
+        Interval.in_5_minute: 0.124,
+        Interval.in_15_minute: 0.155,
+        Interval.in_30_minute: 0.199,
+        Interval.in_45_minute: 0.199,
+        Interval.in_1_hour: 0.199,
+        Interval.in_2_hour: 0.199
     },
     "EURCAD": {
-        Interval.in_1_minute: 0.0039,
-        Interval.in_3_minute: 0.0058,
-        Interval.in_5_minute: 0.0065,
-        Interval.in_15_minute: 0.0079,
-        Interval.in_30_minute: 0.0091,
-        Interval.in_45_minute: 0.0091,
-        Interval.in_1_hour: 0.0091,
-        Interval.in_2_hour: 0.0091
+        Interval.in_1_minute: 0.00085,
+        Interval.in_3_minute: 0.00146,
+        Interval.in_5_minute: 0.00178,
+        Interval.in_15_minute: 0.00235,
+        Interval.in_30_minute: 0.00270,
+        Interval.in_45_minute: 0.00270,
+        Interval.in_1_hour: 0.00270,
+        Interval.in_2_hour: 0.00270
     },
     "AUDCHF": {
-        Interval.in_1_minute: 0.001,
-        Interval.in_3_minute: 0.0018,
-        Interval.in_5_minute: 0.0026,
-        Interval.in_15_minute: 0.0037,
-        Interval.in_30_minute: 0.0047,
-        Interval.in_45_minute: 0.0047,
-        Interval.in_1_hour: 0.0047,
-        Interval.in_2_hour: 0.0047
+        Interval.in_1_minute: 0.00030,
+        Interval.in_3_minute: 0.00079,
+        Interval.in_5_minute: 0.00125,
+        Interval.in_15_minute: 0.00170,
+        Interval.in_30_minute: 0.00200,
+        Interval.in_45_minute: 0.00200,
+        Interval.in_1_hour: 0.00200,
+        Interval.in_2_hour: 0.00200
     },
     "GBPUSD": {
-        Interval.in_1_minute: 0.0021,
-        Interval.in_3_minute: 0.0033,
-        Interval.in_5_minute: 0.0041,
-        Interval.in_15_minute: 0.0053,
-        Interval.in_30_minute: 0.0065,
-        Interval.in_45_minute: 0.0065,
-        Interval.in_1_hour: 0.0065,
-        Interval.in_2_hour: 0.0065
+        Interval.in_1_minute: 0.00085,
+        Interval.in_3_minute: 0.00099,
+        Interval.in_5_minute: 0.00125,
+        Interval.in_15_minute: 0.00185,
+        Interval.in_30_minute: 0.00220,
+        Interval.in_45_minute: 0.00220,
+        Interval.in_1_hour: 0.00220,
+        Interval.in_2_hour: 0.00220
     },
     "AUDJPY": {
-        Interval.in_1_minute: 0.0025,
-        Interval.in_3_minute: 0.0037,
-        Interval.in_5_minute: 0.0046,
-        Interval.in_15_minute: 0.0056,
-        Interval.in_30_minute: 0.0068,
-        Interval.in_45_minute: 0.0068,
-        Interval.in_1_hour: 0.0068,
-        Interval.in_2_hour: 0.0068
+        Interval.in_1_minute: 0.050,
+        Interval.in_3_minute: 0.120,
+        Interval.in_5_minute: 0.170,
+        Interval.in_15_minute: 0.220,
+        Interval.in_30_minute: 0.240,
+        Interval.in_45_minute: 0.240,
+        Interval.in_1_hour: 0.240,
+        Interval.in_2_hour: 0.240
     },
     "GBPAUD": {
-        Interval.in_1_minute: 0.0045,
-        Interval.in_3_minute: 0.0067,
-        Interval.in_5_minute: 0.0088,
-        Interval.in_15_minute: 0.0102,
-        Interval.in_30_minute: 0.0121,
-        Interval.in_45_minute: 0.0121,
-        Interval.in_1_hour: 0.0121,
-        Interval.in_2_hour: 0.0121
+        Interval.in_1_minute: 0.00077,
+        Interval.in_3_minute: 0.00155,
+        Interval.in_5_minute: 0.00215,
+        Interval.in_15_minute: 0.00320,
+        Interval.in_30_minute: 0.00370,
+        Interval.in_45_minute: 0.00370,
+        Interval.in_1_hour: 0.00370,
+        Interval.in_2_hour: 0.00370
     },
     "BTCUSD": {
         Interval.in_1_minute: 0,
@@ -130,7 +130,7 @@ class Indicator:
 
 
 class SuperOrderBlockIndicator(Indicator):
-    def __init__(self, src, open, close, high, low, interval: timedelta, analize_block_delta, includeDelta=True, obMaxBoxSet=10, fvgMaxBoxSet=10):
+    def __init__(self, src, open, close, high, low, interval: timedelta, analize_block_delta, includeDelta=True, obMaxBoxSet=100, fvgMaxBoxSet=100):
         super().__init__(src, open, close, high, low)
         self.src.datetime = pandas.to_datetime(self.src.datetime)
         self.interval = interval

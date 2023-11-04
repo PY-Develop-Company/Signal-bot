@@ -5,6 +5,8 @@ from signals import *
 from signals import Signal
 from interval_convertor import interval_to_int, str_to_interval
 from price_parser import PriceData
+import pytz
+from datetime import datetime
 
 
 class Analizer:
@@ -105,7 +107,10 @@ class MultitimeframeAnalizer(Analizer):
 
     def analize(self, parent_dfs, pds) -> (bool, Signal, str, int):
         has_signal, signal, debug, deal_time = self.analize_func(parent_dfs, pds)
-        # print(debug)
+        time_zone = pytz.timezone("Europe/Bucharest")
+        time_now = datetime.now(time_zone)
+        debug += f" time_now {time_now}"
+        print(debug)
         return has_signal, signal, debug, deal_time
 
 

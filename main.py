@@ -245,16 +245,27 @@ async def handle_media(message: types.Message):
                 await open_menu(message, not_vip_markup)
 
 
-def handle_signal_msg_controller(signal, msg, pd: PriceData, open_position_price, deal_time, shared_list):
-    async def handle_signal_msg(signal, msg, pd: PriceData, open_position_price, deal_time, shared_list):
+def handle_signal_msg_controller(signal, msg, pd: PriceData, open_position_price, deal_time, start_analize_time, shared_list):
+    async def handle_signal_msg(signal, msg, pd: PriceData, open_position_price, deal_time, start_analize_time, shared_list):
         deposit_users_ids = get_deposit_users_ids()
         await send_photo_text_message_to_users(deposit_users_ids, signal.photo_path, msg)
+
+        try:
+            send_message_time = datetime.strptime(str(datetime.now(pytz.timezone("Europe/Bucharest"))).split(".")[0], '%Y-%m-%d %H:%M:%S')
+            start_analize_time = datetime.strptime(str(start_analize_time).split(".")[0], '%Y-%m-%d %H:%M:%S')
+            delay = send_message_time - start_analize_time
+            print("delay", delay)
+            await send_message_to_users(managers_id, "delay: " + str(delay) + "; analize_time: " + str(
+                start_analize_time) + "; send_msg_time: " + str(send_message_time))
+        except Exception as e:
+            print(e)
 
         close_signal_message, is_profit = await signal_maker.close_position(open_position_price, signal, pd, bars_count=deal_time)
         shared_list[is_profit] += 1
         img_path = "./img/profit.jpg" if is_profit else "./img/loss.jpg"
         await send_photo_text_message_to_users(deposit_users_ids, img_path, close_signal_message)
-    asyncio.run(handle_signal_msg(signal, msg, pd, open_position_price, deal_time, shared_list))
+    
+    asyncio.run(handle_signal_msg(signal, msg, pd, open_position_price, deal_time, start_analize_time, shared_list))
 
 
 async def try_send_day_profit(profit_count, loss_count):
@@ -270,48 +281,53 @@ def is_market_working():
     time_zone = pytz.timezone("Europe/Bucharest")
     time_now = datetime.now(time_zone)
 
-    print(f"time hour {time_now.hour}")
-    print(f"max_time_zone_hours {max_time_zone_hours}")
-    print(f"min_time_zone_hours {min_time_zone_hours}")
-    print(f"bool {min_time_zone_hours <= time_now.hour < max_time_zone_hours}")
     return min_time_zone_hours <= time_now.hour < max_time_zone_hours
 
 
 def signals_message_sender_controller(prices_data, intervals, unit_pd, prices_data_all, shared_list):
-    async def signals_message_sender_function(prices_data, intervals, unit_pd, prices_data_all, shared_list):
-        signal_maker.reset_signals_files(prices_data)
+    async def signals_message_sender_function(main_prices_data, intervals, unit_pd, prices_data_all, shared_list):
+        price_parser.create_parce_currencies_with_intervals_callbacks(prices_data_all)
+        last_send_message_check = time.time()
+        for pd in prices_data_all:
+            pd.reset_chart_data()
+        signal_maker.reset_signals_files(main_prices_data)
 
-        last_callback_update_time = callbacks_wait_time + 1
+        need_to_reset_seis = False
+        reset_seis_wait_time = 600
 
         while True:
             await try_send_day_profit(shared_list[1],  shared_list[0])
-            if time.time() - last_callback_update_time > callbacks_wait_time:
+            # need_to_reset_seis = time.time() - last_callback_update_time > callbacks_wait_time
+            need_to_reset_seis = last_send_message_check + reset_seis_wait_time < time.time()
+            if need_to_reset_seis:
                 price_parser.create_parce_currencies_with_intervals_callbacks(prices_data_all)
-                last_callback_update_time = time.time()
-                signal_maker.reset_signals_files(prices_data)
+                last_send_message_check = time.time()
+                signal_maker.reset_signals_files(main_prices_data)
                 continue
 
-            await asyncio.sleep(60)
+            await asyncio.sleep(1)
             try:
                 with open("users/test.txt", "r") as file:
                     cont = file.read().split(".")[0]
                     if cont.isdigit():
-                        print("isdigit cont", cont)
                         cont = float(cont)
                         if cont > time.time():
                             print("wait for signal", cont, time.time())
                             continue
             except Exception as e:
                 print("Error", e)
+            print("search signals to send...")
             if not is_market_working():
                 continue
 
             created_prices_data = []
-            for pd in prices_data:
+            for pd in main_prices_data:
                 if signal_maker.is_signal_analized(pd):
                     created_prices_data.append(pd)
             if len(created_prices_data) == 0:
                 continue
+
+            last_send_message_check = time.time()
 
             dfs_with_signals = []
             for pd in created_prices_data:
@@ -329,14 +345,17 @@ def signals_message_sender_controller(prices_data, intervals, unit_pd, prices_da
             df = random.choice(dfs_with_signals)
             signal = get_signal_by_type(df.signal_type[0])
 
+            time_zone = pytz.timezone("Europe/Bucharest")
+            time_now = datetime.now(time_zone)
             pd = PriceData(df.symbol[0], df.exchange[0], interval_convertor.str_to_interval(df.interval[0]))
+            path = f"sended_signals/time{time_now.hour}_{time_now.minute}_{pd.symbol}_{interval_convertor.interval_to_string(pd.interval).replace('.', '')}"
+            df.to_csv(path)
 
-            multiprocessing.Process(target=handle_signal_msg_controller,
-                                    args=(signal, df.msg[0], pd, df.open_price[0], int(df.deal_time[0]), shared_list ), daemon=True).start()
+            multiprocessing.Process(target=handle_signal_msg_controller, args=(signal, df.msg[0], pd, df.open_price[0], int(df.deal_time[0]), df.start_analize_time[0], shared_list), daemon=True).start()
 
             await asyncio.sleep(signal_delay)
 
-            signal_maker.reset_signals_files(prices_data)
+            signal_maker.reset_signals_files(main_prices_data)
 
     asyncio.run(signals_message_sender_function(prices_data, intervals, unit_pd, prices_data_all, shared_list))
 
@@ -352,6 +371,7 @@ if __name__ == '__main__':
     shared_list.append(0)
 
     currencies = price_parser.get_currencies()
+
     intervals = [Interval.in_1_minute, Interval.in_3_minute, Interval.in_5_minute, Interval.in_15_minute, Interval.in_30_minute]
     main_intervals = [Interval.in_1_minute, Interval.in_3_minute, Interval.in_5_minute]
     parent_intervals = [
@@ -364,40 +384,31 @@ if __name__ == '__main__':
     main_pds = []
     parent_pds = []
 
-    intervals_set = set()
-    for interval in main_intervals:
-        intervals_set.add(interval)
-    for intervals in parent_intervals:
-        for interval in intervals:
-            intervals_set.add(interval)
-    intervals_set = list(intervals_set)
     for currency in currencies:
-        for interval in intervals_set:
+        for interval in intervals:
             prices_data.append(PriceData(currency[0], currency[1], interval))
 
     ind = -1
-    for currency_ind in range(len(currencies)):
+    for currency_index in range(len(currencies)):
         for main_interval_index in range(len(main_intervals)):
-            main_pd = PriceData(currencies[currency_ind][0], currencies[currency_ind][1], main_intervals[main_interval_index])
+            main_pd = PriceData(currencies[currency_index][0], currencies[currency_index][1], main_intervals[main_interval_index])
             main_pds.append(main_pd)
             parent_pds.append([])
             ind += 1
             for p_i in parent_intervals[main_interval_index]:
-                parent_pds[ind].append(PriceData(currencies[currency_ind][0], currencies[currency_ind][1], p_i))
+                parent_pds[ind].append(PriceData(currencies[currency_index][0], currencies[currency_index][1], p_i))
 
     for pd in prices_data:
-        pd.reset_chart_data()
+        pd.remove_chart_data()
 
     unit_pd = main_pds[0]
-    unit_pd.print()
+    multiprocessing.Process(target=signals_message_sender_controller, args=(main_pds, main_intervals, unit_pd, prices_data, shared_list, )).start()
+
     analize_pairs = []
     for i in range(len(main_pds)):
         i_main_pd = main_pds[i]
         i_parent_pds = parent_pds[i]
         analize_pair = (i_main_pd, i_parent_pds, unit_pd)
         analize_pairs.append(analize_pair)
-        multiprocessing.Process(target=signal_maker.analize_currency_data_controller, args=([analize_pair], )).start()
-
-    multiprocessing.Process(target=signals_message_sender_controller, args=(main_pds, main_intervals, unit_pd, prices_data, shared_list, )).start()
-
+    multiprocessing.Process(target=signal_maker.analize_currency_data_controller, args=(analize_pairs, )).start()
     executor.start_polling(dp, skip_updates=True)

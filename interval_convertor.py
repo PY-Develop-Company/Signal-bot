@@ -6,8 +6,8 @@ from datetime import timedelta
 
 def timedelta_to_close_string(interval, bars_count=3):
     delay_days = int(1 / Timedelta(days=1) * bars_count)
-    delay_hours = int(interval / Timedelta(hours=1) * bars_count - delay_days*24)
-    delay_minutes = int(interval / Timedelta(minutes=1) * bars_count - delay_days*24*60 - delay_hours*60)
+    delay_hours = int(interval / Timedelta(hours=1) * bars_count - delay_days * 24)
+    delay_minutes = int(interval / Timedelta(minutes=1) * bars_count - delay_days * 24 * 60 - delay_hours * 60)
 
     if delay_days > 0:
         str(delay_days) + "Д"
@@ -106,4 +106,3 @@ def interval_to_int(interval: Interval):
         return 120
     else:
         return None
-
