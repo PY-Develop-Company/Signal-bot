@@ -1,9 +1,0 @@
-,has_signal,signal_type,msg,date,open_price,interval,symbol,exchange,deal_time,debug
-0,False,neutral,NoneGBP/USD Нет сигнала 4мин,2023-11-01 22:09:00,1.21513,Interval.in_1_minute,GBPUSD,OANDA,4,"
-
-Проверка сигнала:
-                    	Валютная пара: GBPUSD"" таймфрейми: [<Interval.in_1_minute: '1'>, <Interval.in_3_minute: '3'>, <Interval.in_5_minute: '5'>] время свеч: [Timestamp('2023-11-01 22:09:00'), Timestamp('2023-11-01 22:06:00'), Timestamp('2023-11-01 22:05:00')]
-                    	Есть ли сигнал: False
-                    	Показания индикаторов: long_sob_count0 short_sob_count0
-                    		 * SOB -> long [] short []
-                    "

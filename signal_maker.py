@@ -1,14 +1,12 @@
 from pandas import DataFrame, Timedelta, read_csv
 from datetime import datetime
-from tvDatafeed import Interval, TvDatafeed
+from tvDatafeed import Interval
 import file_manager
 from analizer import MultitimeframeAnalizer
 import interval_convertor
 from price_parser import PriceData
 import asyncio
 from signals import *
-import pytz
-import price_parser
 
 username = 't4331662@gmail.com'
 password = 'Pxp626AmH7_'
@@ -30,9 +28,11 @@ async def close_position(position_open_price_original, signal: Signal, pd: Price
 
     price_data = pd.get_price_data(bars_count=2)
     if (price_data is None) or (position_open_price is None):
-        msg, is_profit_position = signal.get_close_position_signal_message(pd, position_open_price_original, position_open_price_original, bars_count)
+        msg, is_profit_position = signal.get_close_position_signal_message(pd, position_open_price_original,
+                                                                           position_open_price_original, bars_count)
     else:
-        msg, is_profit_position = signal.get_close_position_signal_message(pd, position_open_price.close[0], price_data.close[0], bars_count)
+        msg, is_profit_position = signal.get_close_position_signal_message(pd, position_open_price.close[0],
+                                                                           price_data.close[0], bars_count)
     return msg, is_profit_position
 
 
@@ -99,15 +99,12 @@ def is_all_charts_collected(main_pd: PriceData, parent_pds: [PriceData]):
     for parent_pd in parent_pds:
         parent_df = parent_pd.get_chart_data_if_exists()
         if parent_df is None:
-            # print("expected bars", expected_bars)
             return False
         parent_df_last_bar_checked = parent_df["datetime"][0]
         needed_bar = parent_pd.get_needed_chart_bar_to_analize(main_df_last_bar_checked)
         expected_bars.append(needed_bar)
-        if not(parent_df_last_bar_checked == needed_bar):
-            # print("expected bars", expected_bars)
+        if not (parent_df_last_bar_checked == needed_bar):
             return False
-    # print("expected bars", expected_bars)
     return True
 
 
@@ -142,7 +139,8 @@ def analize_currency_data_controller(analize_pairs):
 
         data = [[has_signal, signal.type, msg, main_price_df.datetime[0], open_position_price, main_pd.interval,
                  main_pd.symbol, main_pd.exchange, deal_time, debug, start_analize_time]]
-        columns = ["has_signal", "signal_type", "msg", "date", "open_price", "interval", "symbol", "exchange", "deal_time", "debug", "start_analize_time"]
+        columns = ["has_signal", "signal_type", "msg", "date", "open_price", "interval", "symbol", "exchange",
+                   "deal_time", "debug", "start_analize_time"]
         df = DataFrame(data, columns=columns)
         save_signal_file(df, main_pd)
 
@@ -152,15 +150,15 @@ def analize_currency_data_controller(analize_pairs):
         while True:
             tasks = []
             for analize_pair in analize_pairs:
-                task = asyncio.create_task(analize_currency_data_function([analize_pair[0], *analize_pair[1]], analize_pair[2]))
+                task = asyncio.create_task(
+                    analize_currency_data_function([analize_pair[0], *analize_pair[1]], analize_pair[2]))
                 tasks.append(task)
             await asyncio.gather(*tasks)
             await asyncio.sleep(1)
 
     asyncio.run(analize_currency_data_loop(analize_pairs))
 
-
-#test
+# test
 
 
 # def analize_controller(pds, dfs, bars_to_analize):

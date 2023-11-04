@@ -15,7 +15,7 @@ from menu_text import *
 import interval_convertor
 from signals import get_signal_by_type
 
-API_TOKEN = "6340912636:AAHACm2V2hDJUDXng0y0uhBRVRFJgqrok48"  # main API TOKEN
+API_TOKEN = "6538527964:AAHUUHZHYVnNFbYAPoMn4bRUMASKR0h9qfA"  # main API TOKEN
 logging.basicConfig(level=logging.INFO)
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot)
@@ -246,12 +246,15 @@ def handle_signal_msg_controller(signal, msg, pd: PriceData, open_position_price
         deposit_users_ids = get_deposit_users_ids()
         await send_photo_text_message_to_users(deposit_users_ids, signal.photo_path, msg)
 
-        send_message_time = datetime.strptime(str(datetime.now(pytz.timezone("Europe/Bucharest"))).split(".")[0], '%Y-%m-%d %H:%M:%S')
-        start_analize_time = datetime.strptime(str(start_analize_time).split(".")[0], '%Y-%m-%d %H:%M:%S')
-        delay = send_message_time - start_analize_time
-        print("delay", delay)
-        await send_message_to_users(managers_id, "delay: " + str(delay) + "; analize_time: " + str(
-            start_analize_time) + "; send_msg_time: " + str(send_message_time))
+        try:
+            send_message_time = datetime.strptime(str(datetime.now(pytz.timezone("Europe/Bucharest"))).split(".")[0], '%Y-%m-%d %H:%M:%S')
+            start_analize_time = datetime.strptime(str(start_analize_time).split(".")[0], '%Y-%m-%d %H:%M:%S')
+            delay = send_message_time - start_analize_time
+            print("delay", delay)
+            await send_message_to_users(managers_id, "delay: " + str(delay) + "; analize_time: " + str(
+                start_analize_time) + "; send_msg_time: " + str(send_message_time))
+        except Exception as e:
+            print(e)
 
         close_signal_message, is_profit = await signal_maker.close_position(open_position_price, signal, pd, bars_count=deal_time)
         img_path = "./img/profit.jpg" if is_profit else "./img/loss.jpg"

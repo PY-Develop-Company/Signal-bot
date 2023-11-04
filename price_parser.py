@@ -1,4 +1,3 @@
-import time
 from datetime import datetime, timedelta
 from tvDatafeed import TvDatafeed, TvDatafeedLive, Interval
 from tvDatafeed.seis import Seis
