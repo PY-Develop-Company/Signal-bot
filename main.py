@@ -15,7 +15,7 @@ from menu_text import *
 import interval_convertor
 from signals import get_signal_by_type
 
-API_TOKEN = "6538527964:AAHUUHZHYVnNFbYAPoMn4bRUMASKR0h9qfA"  # main API TOKEN
+API_TOKEN = "6340912636:AAHACm2V2hDJUDXng0y0uhBRVRFJgqrok48"  # main API TOKEN
 logging.basicConfig(level=logging.INFO)
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot)

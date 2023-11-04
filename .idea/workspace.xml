@@ -6,26 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="c8e52443-fb39-41fa-9e09-4877251a22f1" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bwg_signal_extended.spec" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/bwg_signal_optimized.spec" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist.zip" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/currencies_data/EURUSDIntervalin_15_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/dist/currencies_data/EURUSDIntervalin_15_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/currencies_data/EURUSDIntervalin_3_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/dist/currencies_data/EURUSDIntervalin_3_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/currencies_data/check_ended/EURUSDIntervalin_15_minute.txt" beforeDir="false" afterPath="$PROJECT_DIR$/dist/currencies_data/check_ended/EURUSDIntervalin_15_minute.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/currencies_data/check_ended/EURUSDIntervalin_3_minute.txt" beforeDir="false" afterPath="$PROJECT_DIR$/dist/currencies_data/check_ended/EURUSDIntervalin_3_minute.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/optimized-signal-saver.exe" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/signals/AUDCADIntervalin_1_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/dist/signals/AUDCADIntervalin_1_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/signals/AUDUSDIntervalin_1_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/dist/signals/AUDUSDIntervalin_1_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/signals/EURJPYIntervalin_1_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/dist/signals/EURJPYIntervalin_1_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/signals/EURUSDIntervalin_1_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/dist/signals/EURUSDIntervalin_1_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/interval_convertor.py" beforeDir="false" afterPath="$PROJECT_DIR$/interval_convertor.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.spec" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/optimized-signal-saver.spec" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/price_parser.py" beforeDir="false" afterPath="$PROJECT_DIR$/price_parser.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/signal_maker.py" beforeDir="false" afterPath="$PROJECT_DIR$/signal_maker.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals.py" beforeDir="false" afterPath="$PROJECT_DIR$/signals.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ta_test.py" beforeDir="false" afterPath="$PROJECT_DIR$/ta_test.py" afterDir="false" />
     </list>
     <list id="cbe571c8-b52a-4250-a9e3-ad1313cd5330" name="Changes by Alex" comment="" />
     <list id="7fa9b9cd-5f0a-41aa-bb8c-dd6d412d680c" name="Changes by SIRIUS" comment="" />
