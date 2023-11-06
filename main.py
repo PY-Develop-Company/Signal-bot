@@ -15,7 +15,7 @@ from menu_text import *
 import interval_convertor
 from signals import get_signal_by_type
 
-API_TOKEN = "6588822945:AAFX8eDWngrrbLeDLhzNw0nLkxI07D9wG8Y"  # my token
+API_TOKEN = "6538527964:AAHUUHZHYVnNFbYAPoMn4bRUMASKR0h9qfA"  # my token
 
 manager = None
 shared_list = None
@@ -268,11 +268,11 @@ def handle_signal_msg_controller(signal, msg, pd: PriceData, open_position_price
     asyncio.run(handle_signal_msg(signal, msg, pd, open_position_price, deal_time, start_analize_time, shared_list))
 
 
-async def try_send_day_profit(profit_count, loss_count):
+async def try_send_day_profit(shared_list):
     time_zone = pytz.timezone("Europe/Bucharest")
     time_now = datetime.now(time_zone)
-    if (profit_count > 0 or loss_count > 0) and time_now.hour == 0:
-        text = f"Total day statistics:\n\tprofits: {profit_count};\n\tloses: {loss_count};\n"
+    if (shared_list[1] > 0 or shared_list[0] > 0) and time_now.hour == 0:
+        text = f"Total day statistics:\n\tprofits: {shared_list[1]};\n\tloses: {shared_list[0]};\n"
         await send_message_to_users(get_deposit_users_ids(), text)
         print(text)
 
@@ -296,7 +296,7 @@ def signals_message_sender_controller(prices_data, intervals, unit_pd, prices_da
         reset_seis_wait_time = 600
 
         while True:
-            await try_send_day_profit(shared_list[1],  shared_list[0])
+            await try_send_day_profit(shared_list)
             # need_to_reset_seis = time.time() - last_callback_update_time > callbacks_wait_time
             need_to_reset_seis = last_send_message_check + reset_seis_wait_time < time.time()
             if need_to_reset_seis:
@@ -315,7 +315,7 @@ def signals_message_sender_controller(prices_data, intervals, unit_pd, prices_da
                             print("wait for signal", cont, time.time())
                             continue
             except Exception as e:
-                print("Error", e)
+                print("4Error", e)
             print("search signals to send...")
             if not is_market_working():
                 continue
@@ -372,12 +372,12 @@ if __name__ == '__main__':
 
     currencies = price_parser.get_currencies()
 
-    intervals = [Interval.in_1_minute, Interval.in_3_minute, Interval.in_5_minute, Interval.in_15_minute, Interval.in_30_minute]
-    main_intervals = [Interval.in_1_minute, Interval.in_3_minute, Interval.in_5_minute]
+    intervals = [Interval.in_1_minute, Interval.in_3_minute, Interval.in_5_minute, Interval.in_15_minute] #, Interval.in_30_minute]
+    main_intervals = [Interval.in_1_minute, Interval.in_3_minute] #, Interval.in_5_minute]
     parent_intervals = [
         [Interval.in_3_minute, Interval.in_5_minute],
-        [Interval.in_5_minute, Interval.in_15_minute],
-        [Interval.in_15_minute, Interval.in_30_minute]
+        [Interval.in_5_minute, Interval.in_15_minute]
+        # [Interval.in_15_minute, Interval.in_30_minute]
     ]
     prices_data = []
 

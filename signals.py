@@ -14,15 +14,16 @@ loss_smile = "❌"
 puncts_pohibka = 0.030
 
 puncts_pohibka_dict = {
-    "EURUSD": 0.00030,
-    "AUDUSD": 0.00030,
-    "AUDCAD": 0.00030,
-    "EURJPY": 0.030,
-    "EURCAD": 0.00030,
-    "AUDCHF": 0.00030,
-    "GBPUSD": 0.00030,
-    "AUDJPY": 0.030,
-    "GBPAUD": 0.00030
+    "EURUSD": 0,
+    "AUDUSD": 0,
+    "AUDCAD": 0,
+    "EURJPY": 0,
+    "EURCAD": 0,
+    "AUDCHF": 0,
+    "GBPUSD": 0,
+    "AUDJPY": 0,
+    "GBPAUD": 0,
+    "BTCUSD": 0
 }
 
 
