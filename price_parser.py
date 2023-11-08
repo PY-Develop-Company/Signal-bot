@@ -115,9 +115,11 @@ class PriceData:
 
         return (update_date.minute + 1) % minutes == 0
 
-    def get_needed_chart_bar_to_analize(self, chart_bar: datetime):
+    def get_needed_chart_bar_to_analize(self, chart_bar: datetime, main_signal_interval):
         minutes = interval_convertor.interval_to_int(self.interval)
-        chart_bar = chart_bar + timedelta(minutes=1)
+        main_minutes = interval_convertor.interval_to_int(main_signal_interval)
+
+        chart_bar = chart_bar + timedelta(minutes=main_minutes)
         return chart_bar - timedelta(minutes=chart_bar.minute % minutes) - timedelta(minutes=minutes)
 
 

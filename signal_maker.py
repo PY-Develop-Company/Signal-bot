@@ -101,10 +101,12 @@ def is_all_charts_collected(main_pd: PriceData, parent_pds: [PriceData]):
         if parent_df is None:
             return False
         parent_df_last_bar_checked = parent_df["datetime"][0]
-        needed_bar = parent_pd.get_needed_chart_bar_to_analize(main_df_last_bar_checked)
+        needed_bar = parent_pd.get_needed_chart_bar_to_analize(main_df_last_bar_checked, main_pd.interval)
+
         expected_bars.append(needed_bar)
         if not (parent_df_last_bar_checked == needed_bar):
             return False
+
     return True
 
 
