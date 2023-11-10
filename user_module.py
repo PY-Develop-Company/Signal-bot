@@ -2,10 +2,10 @@ import file_manager
 
 user_db_path = "users/db.txt"
 
-current_users_pointer_max = -1
-current_users_pointer_min = -1
+current_users_pointer_max_dict = dict()
+current_users_pointer_min_dict = dict()
 
-current_users_data = []
+current_users_data_dict = dict()
 
 # STATUSES
 deposit_status = "status ДЕПОЗИТ"
@@ -21,7 +21,7 @@ def remove_user_with_id(id):
     for i, user_data in enumerate(users_data):
         if int(user_data['id']) == id and users_data[i]['status'] == deposit_status:
             users_data[i]['status'] = none_status
-            data = users_data[i]['name'] + " | " + users_data[i]['acount_number'] + " | " + users_data[i]['status']
+            data = users_data[i]['name'] + " | " + str(users_data[i]['acount_number']) + " | " + users_data[i]['status']
             file_manager.write_file(user_db_path, users_data)
             return True, data
     return False, ""
@@ -46,61 +46,61 @@ def get_users_strings():
     return users_strings_list, users_data
 
 
-def get_current_users_data():
-    return current_users_data
+def get_current_users_data(manager_id):
+    return current_users_data_dict.get(manager_id, [])
 
 
-def prev_user_strings(users_for_print_count):
-    global current_users_pointer_min, current_users_pointer_max, current_users_data
+def prev_user_strings(users_for_print_count, manager_id):
+    global current_users_pointer_min_dict, current_users_pointer_max_dict, current_users_data_dict
     users_strings_list, users_data = get_users_strings()
 
     counter = 1
     strings = []
 
-    if current_users_pointer_min - 1 < 0:
-        current_users_pointer_min = len(users_strings_list)
-    range_val = range(current_users_pointer_min - 1, -1, -1)
+    if current_users_pointer_min_dict.get(manager_id, -1) - 1 < 0:
+        current_users_pointer_min_dict.update({manager_id: len(users_strings_list)})
+    range_val = range(current_users_pointer_min_dict.get(manager_id, -1) - 1, -1, -1)
 
-    current_users_pointer_max = current_users_pointer_min - 1
+    current_users_pointer_max_dict.update({manager_id: current_users_pointer_min_dict.get(manager_id, -1) - 1})
     new_current_users_data = []
     for i in range_val:
         strings.append(users_strings_list[i])
-        new_current_users_data.append((i+1, *users_data[i]))
+        new_current_users_data.append((i + 1, *users_data[i]))
         counter = counter + 1
         is_last_user = (i == 0)
         if counter > users_for_print_count or is_last_user:
-            current_users_pointer_min = i
+            current_users_pointer_min_dict.update({manager_id: current_users_pointer_max_dict.get(manager_id) - users_for_print_count + 1})
             break
 
     new_current_users_data.reverse()
     strings.reverse()
-    current_users_data = new_current_users_data
+    current_users_data_dict.update({manager_id: new_current_users_data})
     return strings
 
 
-def next_user_strings(users_for_print_count):
-    global current_users_pointer_max, current_users_pointer_min, current_users_data
+def next_user_strings(users_for_print_count, manager_id):
+    global current_users_pointer_max_dict, current_users_pointer_min_dict, current_users_data_dict
     users_strings_list, users_data = get_users_strings()
 
     counter = 1
     strings = []
 
-    if current_users_pointer_max + 1 >= len(users_strings_list):
-        current_users_pointer_max = -1
-    range_val = range(current_users_pointer_max + 1, len(users_strings_list))
+    if current_users_pointer_max_dict.get(manager_id, -1) + 1 >= len(users_strings_list):
+        current_users_pointer_max_dict.update({manager_id: -1})
+    range_val = range(current_users_pointer_max_dict.get(manager_id, -1) + 1, len(users_strings_list))
 
-    current_users_pointer_min = current_users_pointer_max + 1
+    current_users_pointer_min_dict.update({manager_id: current_users_pointer_max_dict.get(manager_id, -1) + 1})
     new_current_users_data = []
     for i in range_val:
         strings.append(users_strings_list[i])
-        new_current_users_data.append((i+1, *users_data[i]))
+        new_current_users_data.append((i + 1, *users_data[i]))
         counter = counter + 1
         is_last_user = (i == len(users_strings_list) - 1)
         if counter > users_for_print_count or is_last_user:
-            current_users_pointer_max = i
+            current_users_pointer_max_dict.update({manager_id: current_users_pointer_min_dict.get(manager_id) + users_for_print_count - 1})
             break
 
-    current_users_data = new_current_users_data
+    current_users_data_dict.update({manager_id: new_current_users_data})
     return strings
 
 
@@ -139,7 +139,7 @@ def add_user(id, first_name, last_name):
         bufer_user = {
             "id": id,
             "name": full_name,
-            "language":"none",
+            "language": "none",
             "status": "none",
             "acount_number": 0
         }

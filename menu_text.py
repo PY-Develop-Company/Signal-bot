@@ -1,7 +1,19 @@
+from aiogram import types
+from file_manager import *
+
+
+def getLanguageFile(path="language.json"):
+    return read_file(path)
+
+
+languageFile = getLanguageFile()
+
+
 select_language_text = "Select language:"
 select_language_eng = "english"
 select_language_ru = "руский"
 select_language_hin = "हिंदी"
+
 
 accept_id_message_text = """🎉Поздравляем ваш ID подтвержден🎉. 
 
@@ -13,9 +25,8 @@ accept_deposit_message_text = """🎉Поздравляем ваш депози�
 
 reject_id_message_text = """Ты ОПЯТЬ неправильно зарегистрировал аккаунт,
  и его нет в списке нашей базы трейдеров ❌ 
- 
- попробуйте снова, нажмите /start что бы продолжит"""
 
+ попробуйте снова, нажмите /start что бы продолжит"""
 
 reject_deposit_message_text = """Ваш депозит не внесен😵. 
 Проверьте действительно ли вы его внесли и отправьте запрос на проверку снова
@@ -53,7 +64,6 @@ for_vip_text = """
 
 """
 
-
 you_have_vip_text = "У вас уже активный VIP статус"
 get_vip_text = """Поздравляю, ваша заявка принята, вам предоставлен VIP-статус 
 для начала работы нажмите: /check """
@@ -89,3 +99,35 @@ cant_remove_user_text = "Статус пользователя уже измен
 next_text = "Далее"
 previous_text = "Назад"
 ban_user_text = "Убрать VIP статус"
+
+
+def getSelectLanguageMarkap():
+    select_language_markup = types.ReplyKeyboardMarkup(resize_keyboard=True, keyboard=[
+        [types.KeyboardButton(select_language_eng), types.KeyboardButton(select_language_ru),
+         types.KeyboardButton(select_language_hin)]
+    ])
+    return select_language_markup
+
+
+def GetManagerMarkup():
+    manager_markup = types.ReplyKeyboardMarkup(resize_keyboard=True, keyboard=[
+        [types.KeyboardButton(search_id_request), types.KeyboardButton(search_deposit_request),
+         types.KeyboardButton(user_management_button)]
+    ])
+    return manager_markup
+
+
+accept_reject_markup = types.ReplyKeyboardMarkup(resize_keyboard=True, keyboard=[
+    [types.KeyboardButton(accept_button), types.KeyboardButton(reject_button)]
+])
+vip_markup = types.ReplyKeyboardMarkup(resize_keyboard=True, keyboard=[
+    [types.KeyboardButton(contact_manager)]
+])
+not_vip_markup = types.ReplyKeyboardMarkup(resize_keyboard=True, keyboard=[
+    [types.KeyboardButton(vip_status_info), types.KeyboardButton(check_id_text), types.KeyboardButton(contact_manager)]
+])
+
+users_markup = types.InlineKeyboardMarkup(row_width=2).add(
+    types.InlineKeyboardButton(text=previous_text, callback_data="previous_users"),
+    types.InlineKeyboardButton(text=next_text, callback_data="next_users"),
+    types.InlineKeyboardButton(text=ban_user_text, callback_data="manage_user"))

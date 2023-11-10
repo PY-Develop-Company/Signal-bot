@@ -25,37 +25,51 @@ signal_delay = 300
 
 callbacks_wait_time = 600
 
-users_for_print_count = 20
+users_for_print_count = 3
 
 min_time_zone_hours = 10
 max_time_zone_hours = 23
 
-last_user_list_message = -1
-last_user_manage_message = -1
+last_user_list_message = dict()
+last_user_manage_message = dict()
 
-select_language_markup = types.ReplyKeyboardMarkup(resize_keyboard=True, keyboard=[
-    [types.KeyboardButton(select_language_eng), types.KeyboardButton(select_language_ru),
-     types.KeyboardButton(select_language_hin)]
-])
 
-manager_markup = types.ReplyKeyboardMarkup(resize_keyboard=True, keyboard=[
-    [types.KeyboardButton(search_id_request), types.KeyboardButton(search_deposit_request),
-     types.KeyboardButton(user_management_button)]
-])
-accept_reject_markup = types.ReplyKeyboardMarkup(resize_keyboard=True, keyboard=[
-    [types.KeyboardButton(accept_button), types.KeyboardButton(reject_button)]
-])
-vip_markup = types.ReplyKeyboardMarkup(resize_keyboard=True, keyboard=[
-    [types.KeyboardButton(contact_manager)]
-])
-not_vip_markup = types.ReplyKeyboardMarkup(resize_keyboard=True, keyboard=[
-    [types.KeyboardButton(vip_status_info), types.KeyboardButton(check_id_text), types.KeyboardButton(contact_manager)]
-])
+def update_last_user_list_message(message):
+    global last_user_list_message
+    print("update before", last_user_list_message.get(message.chat.id, None))
+    last_user_list_message.update({message.chat.id: message})
+    print("update after", last_user_list_message.get(message.chat.id, None))
 
-users_markup = types.InlineKeyboardMarkup(row_width=2).add(
-    types.InlineKeyboardButton(text=previous_text, callback_data="previous_users"),
-    types.InlineKeyboardButton(text=next_text, callback_data="next_users"),
-    types.InlineKeyboardButton(text=ban_user_text, callback_data="manage_user"))
+
+async def remove_last_user_list_message(user_id):
+    global last_user_list_message
+    message = last_user_list_message.get(user_id, None)
+
+    print("remove before", last_user_list_message.get(user_id, None))
+    if message is not None:
+        try:
+            await bot.delete_message(user_id, message.message_id)
+            last_user_list_message.update({user_id: None})
+        except:
+            pass
+    print("remove after", last_user_list_message.get(user_id, None))
+
+
+def update_last_user_manage_message(message):
+    global last_user_manage_message
+    last_user_manage_message.update({message.chat.id: message})
+
+
+async def remove_last_user_manage_message(user_id):
+    global last_user_manage_message
+    message = last_user_manage_message.get(user_id, None)
+
+    if message is not None:
+        try:
+            await bot.delete_message(user_id, message.message_id)
+            last_user_manage_message.update({user_id: None})
+        except:
+            pass
 
 
 async def get_chat_id(user_id):
@@ -72,11 +86,13 @@ async def send_message_to_user(user_id, text, markup=None):
 
     try:
         if markup is None:
-            await bot.send_message(user_id, text, disable_notification=False)
+            return await bot.send_message(user_id, text, disable_notification=False)
         else:
-            await bot.send_message(user_id, text, disable_notification=False, reply_markup=markup)
+            return await bot.send_message(user_id, text, disable_notification=False, reply_markup=markup)
     except Exception as e:
         print("Error: bot is blocked by user", e)
+
+    return None
 
 
 async def send_message_to_users(users_ids: [], text):
@@ -127,21 +143,20 @@ async def update_account_user(id, account_number):
 
 
 async def show_users_list_to_user(user_id, is_next=True):
-    global last_user_list_message
     print_str = users_list_title_text + "\n"
 
     users_to_show = []
     if is_next:
-        users_to_show = next_user_strings(users_for_print_count)
+        users_to_show = next_user_strings(users_for_print_count, user_id)
     else:
-        users_to_show = prev_user_strings(users_for_print_count)
+        users_to_show = prev_user_strings(users_for_print_count, user_id)
 
     for user_to_show in users_to_show:
         print_str += "\n" + user_to_show
 
     if len(users_to_show) == 0:
         print_str = no_users_list_title_text
-    await send_message_to_user(user_id, print_str, users_markup)
+    return await send_message_to_user(user_id, print_str, users_markup)
 
 
 @dp.message_handler(commands="start")
@@ -149,13 +164,13 @@ async def start_command(message):
     # await send_photo_text_message_to_user(message.from_user.id, start_img_path, start_text)
     if message.from_user.id in managers_id:
         await add_manager(message)
-        await open_menu(message, manager_markup)
+        await open_menu(message, GetManagerMarkup())
     elif has_user_status(message.from_user.id, deposit_status):
         await open_menu(message, vip_markup)
     else:
         add_user(message.from_user.id, message.from_user.first_name, message.from_user.last_name)
         if getUserLanguage(message.from_user.id) == "none":
-            await open_menu(message, select_language_markup)
+            await open_menu(message, getSelectLanguageMarkap())
         else:
             await open_menu(message, not_vip_markup)
 
@@ -189,13 +204,7 @@ async def check_deposit_command(message):
 
 @dp.callback_query_handler(text_contains="removeuser_")
 async def remove_user_command(call: types.CallbackQuery):
-    global last_user_manage_message
-    if last_user_manage_message > 0:
-        try:
-            await bot.delete_message(call.message.chat.id, last_user_manage_message)
-            last_user_manage_message = -1
-        except:
-            pass
+    await remove_last_user_list_message(call.message.chat.id)
 
     user_id = int(call.data.split("_")[-1])
     have_user_with_id = find_user_with_id(user_id)
@@ -210,25 +219,18 @@ async def remove_user_command(call: types.CallbackQuery):
         await bot.send_message(call.message.chat.id, error_no_user)
 
     await call.answer(call.data)
+    await remove_last_user_manage_message(call.message.chat.id)
 
 
 @dp.message_handler(commands="users")
 async def users_list_command(message):
-    global last_user_list_message, last_user_manage_message
+    global last_user_list_message
     if message.from_user.id in managers_id:
-        if last_user_list_message > 0:
-            try:
-                await bot.delete_message(message.chat.id, last_user_list_message)
-            except:
-                pass
-        if last_user_manage_message > 0:
-            try:
-                await bot.delete_message(message.chat.id, last_user_manage_message)
-                last_user_manage_message = -1
-            except:
-                pass
-        await show_users_list_to_user(message.from_user.id)
-        last_user_list_message = message.message_id + 1
+        await remove_last_user_list_message(message.chat.id)
+        await remove_last_user_manage_message(last_user_manage_message.get(message.chat.id))
+
+        sent_msg = await show_users_list_to_user(message.from_user.id)
+        update_last_user_list_message(sent_msg)
 
 
 @dp.message_handler(commands="check")
@@ -292,7 +294,7 @@ async def handle_media(message: types.Message):
 
                 await send_message_to_user(user_under_do, message_to_user)
 
-                await open_menu(message, manager_markup)
+                await open_menu(message, GetManagerMarkup())
                 update_manager_do(message.from_user.id, "none")
                 await update_manager_status(message.from_user.id, none_manager_status)
     # user part
@@ -331,39 +333,23 @@ async def handle_media(message: types.Message):
 
 @dp.callback_query_handler(text="next_users")
 async def next_users_callback(call: types.CallbackQuery):
-    global last_user_list_message, last_user_manage_message
-    if last_user_list_message > 0:
-        try:
-            await bot.delete_message(call.message.chat.id, last_user_list_message)
-        except:
-            pass
-    if last_user_manage_message > 0:
-        try:
-            await bot.delete_message(call.message.chat.id, last_user_manage_message)
-            last_user_manage_message = -1
-        except:
-            pass
-    await show_users_list_to_user(call.message.chat.id)
-    last_user_list_message = call.message.message_id + 1
+    global last_user_list_message
+    await remove_last_user_list_message(call.message.chat.id)
+    await remove_last_user_manage_message(call.message.chat.id)
+
+    sent_msg = await show_users_list_to_user(call.message.chat.id)
+    update_last_user_list_message(sent_msg)
     await call.answer(call.data)
 
 
 @dp.callback_query_handler(text="previous_users")
 async def previous_users_callback(call: types.CallbackQuery):
-    global last_user_list_message, last_user_manage_message
-    if last_user_list_message > 0:
-        try:
-            await bot.delete_message(call.message.chat.id, last_user_list_message)
-        except:
-            pass
-    if last_user_manage_message > 0:
-        try:
-            await bot.delete_message(call.message.chat.id, last_user_manage_message)
-            last_user_manage_message = -1
-        except:
-            pass
-    await show_users_list_to_user(call.message.chat.id, is_next=False)
-    last_user_list_message = call.message.message_id + 1
+    global last_user_list_message
+    await remove_last_user_list_message(call.message.chat.id)
+    await remove_last_user_manage_message(call.message.chat.id)
+
+    sent_msg = await show_users_list_to_user(call.message.chat.id, is_next=False)
+    update_last_user_list_message(sent_msg)
     await call.answer(call.data)
 
 
@@ -371,20 +357,16 @@ async def previous_users_callback(call: types.CallbackQuery):
 async def manage_user_callback(call: types.CallbackQuery):
     global last_user_manage_message
 
-    if last_user_manage_message > 0:
-        try:
-            await bot.delete_message(call.message.chat.id, last_user_manage_message)
-        except:
-            pass
+    await remove_last_user_manage_message(call.message.chat.id)
 
-    users_data = get_current_users_data()
+    users_data = get_current_users_data(call.message.chat.id)
     buttons = []
     for user_data in users_data:
         buttons.append(types.InlineKeyboardButton(text=user_data[0], callback_data=f"removeuser_{user_data[1]}"))
 
     keyboard = types.InlineKeyboardMarkup(row_width=5).add(*buttons)
-    await bot.send_message(call.message.chat.id, text=select_user_id_to_ban_text, reply_markup=keyboard)
-    last_user_manage_message = call.message.message_id + 1
+    sent_msg = await bot.send_message(call.message.chat.id, text=select_user_id_to_ban_text, reply_markup=keyboard)
+    update_last_user_manage_message(sent_msg)
     await call.answer(call.data)
 
 
@@ -499,47 +481,47 @@ def signals_message_sender_controller(prices_data, intervals, unit_pd, prices_da
 if __name__ == '__main__':
     from aiogram import executor
 
-    multiprocessing.freeze_support()
-    currencies = price_parser.get_currencies()
-
-    intervals = [Interval.in_1_minute, Interval.in_3_minute, Interval.in_5_minute, Interval.in_15_minute, Interval.in_30_minute]
-    main_intervals = [Interval.in_1_minute, Interval.in_3_minute, Interval.in_5_minute]
-    parent_intervals = [
-        [Interval.in_3_minute, Interval.in_5_minute],
-        [Interval.in_5_minute, Interval.in_15_minute],
-        [Interval.in_15_minute, Interval.in_30_minute]
-    ]
-    prices_data = []
-
-    main_pds = []
-    parent_pds = []
-
-    for currency in currencies:
-        for interval in intervals:
-            prices_data.append(PriceData(currency[0], currency[1], interval))
-
-    ind = -1
-    for currency_index in range(len(currencies)):
-        for main_interval_index in range(len(main_intervals)):
-            main_pd = PriceData(currencies[currency_index][0], currencies[currency_index][1], main_intervals[main_interval_index])
-            main_pds.append(main_pd)
-            parent_pds.append([])
-            ind += 1
-            for p_i in parent_intervals[main_interval_index]:
-                parent_pds[ind].append(PriceData(currencies[currency_index][0], currencies[currency_index][1], p_i))
-
-    for pd in prices_data:
-        pd.remove_chart_data()
-
-    unit_pd = main_pds[0]
-    multiprocessing.Process(target=signals_message_sender_controller, args=(main_pds, main_intervals, unit_pd, prices_data)).start()
-
-    analize_pairs = []
-    for i in range(len(main_pds)):
-        i_main_pd = main_pds[i]
-        i_parent_pds = parent_pds[i]
-        analize_pair = (i_main_pd, i_parent_pds, unit_pd)
-        analize_pairs.append(analize_pair)
-    multiprocessing.Process(target=signal_maker.analize_currency_data_controller, args=(analize_pairs, )).start()
+    # multiprocessing.freeze_support()
+    # currencies = price_parser.get_currencies()
+    #
+    # intervals = [Interval.in_1_minute, Interval.in_3_minute, Interval.in_5_minute, Interval.in_15_minute, Interval.in_30_minute]
+    # main_intervals = [Interval.in_1_minute, Interval.in_3_minute, Interval.in_5_minute]
+    # parent_intervals = [
+    #     [Interval.in_3_minute, Interval.in_5_minute],
+    #     [Interval.in_5_minute, Interval.in_15_minute],
+    #     [Interval.in_15_minute, Interval.in_30_minute]
+    # ]
+    # prices_data = []
+    #
+    # main_pds = []
+    # parent_pds = []
+    #
+    # for currency in currencies:
+    #     for interval in intervals:
+    #         prices_data.append(PriceData(currency[0], currency[1], interval))
+    #
+    # ind = -1
+    # for currency_index in range(len(currencies)):
+    #     for main_interval_index in range(len(main_intervals)):
+    #         main_pd = PriceData(currencies[currency_index][0], currencies[currency_index][1], main_intervals[main_interval_index])
+    #         main_pds.append(main_pd)
+    #         parent_pds.append([])
+    #         ind += 1
+    #         for p_i in parent_intervals[main_interval_index]:
+    #             parent_pds[ind].append(PriceData(currencies[currency_index][0], currencies[currency_index][1], p_i))
+    #
+    # for pd in prices_data:
+    #     pd.remove_chart_data()
+    #
+    # unit_pd = main_pds[0]
+    # multiprocessing.Process(target=signals_message_sender_controller, args=(main_pds, main_intervals, unit_pd, prices_data)).start()
+    #
+    # analize_pairs = []
+    # for i in range(len(main_pds)):
+    #     i_main_pd = main_pds[i]
+    #     i_parent_pds = parent_pds[i]
+    #     analize_pair = (i_main_pd, i_parent_pds, unit_pd)
+    #     analize_pairs.append(analize_pair)
+    # multiprocessing.Process(target=signal_maker.analize_currency_data_controller, args=(analize_pairs, )).start()
 
     executor.start_polling(dp, skip_updates=True)
