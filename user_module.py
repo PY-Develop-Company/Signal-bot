@@ -31,6 +31,7 @@ def remove_user_with_id(id):
 
 def get_users_strings():
     data = file_manager.read_file(user_db_path)
+    print(data)
     users_strings_list = []
     user_number = 1
 
@@ -84,13 +85,15 @@ def next_user_strings(users_for_print_count, manager_id):
     global current_users_pointer_max_dict, current_users_pointer_min_dict, current_users_data_dict
     users_strings_list, users_data = get_users_strings()
 
+    print("user_strs", users_strings_list)
+
     counter = 1
     strings = []
 
     if current_users_pointer_max_dict.get(manager_id, -1) + 1 >= len(users_strings_list):
         current_users_pointer_max_dict.update({manager_id: -1})
     range_val = range(current_users_pointer_max_dict.get(manager_id, -1) + 1, len(users_strings_list))
-
+    print(range_val)
     current_users_pointer_min_dict.update({manager_id: current_users_pointer_max_dict.get(manager_id, -1) + 1})
     new_current_users_data = []
     for i in range_val:

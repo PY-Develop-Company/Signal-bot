@@ -16,7 +16,7 @@ import interval_convertor
 from signals import get_signal_by_type
 from math import ceil
 
-API_TOKEN = "5767062743:AAHudfbNfElrindW2PpmbPua0CM1ybbPryA"  # my API
+API_TOKEN = "5767062743:AAF3wfEbw5gkKO6-jARSM29qHbg4PN1a_kA"  # my API
 # API_TOKEN = "6340912636:AAHACm2V2hDJUDXng0y0uhBRVRFJgqrok48"  # main API TOKEN
 logging.basicConfig(level=logging.INFO)
 bot = Bot(token=API_TOKEN)
@@ -155,12 +155,14 @@ async def show_users_list_to_user(user_id, is_next=True):
     else:
         users_to_show = prev_user_strings(users_for_print_count, user_id)
 
+    print(users_to_show)
+
     for user_to_show in users_to_show:
         print_str += "\n" + user_to_show
 
     if len(users_to_show) == 0:
         print_str = languageFile[getUserLanguage(user_id)]["no_users_list_title_text"]
-    return await send_message_to_user(user_id, print_str)
+    return await send_message_to_user(user_id, print_str, getUsersMarkup(getUserLanguage(user_id)))
 
 
 @dp.message_handler(commands="start")
@@ -222,7 +224,8 @@ async def remove_user_command(call: types.CallbackQuery):
 
     if have_user_with_id:
         if is_user_removed:
-            await bot.send_message(call.message.chat.id, languageFile[getUserLanguage(user_id)]["removed_user_text"] + f"\n " + user_string)
+            await bot.send_message(call.message.chat.id, languageFile[getUserLanguage(call.message.chat.id)]["removed_user_text"] + f"\n " + user_string)
+            await bot.send_message(user_id, text=languageFile[getUserLanguage(user_id)]["delete_vip_user_text"], reply_markup=getNoVipMarkup(getUserLanguage(user_id)))
         else:
             await bot.send_message(call.message.chat.id, languageFile[getUserLanguage(user_id)]["cant_remove_user_text"])
     else:
@@ -241,16 +244,6 @@ async def users_list_command(message):
 
         sent_msg = await show_users_list_to_user(message.from_user.id)
         update_last_user_list_message(sent_msg)
-
-
-@dp.message_handler(commands="check")
-async def check_command(message):
-    if message.from_user.id in managers_id:
-        return
-
-    has_user_deposit_status = has_user_status(message.from_user.id, deposit_status)
-    markup = getVipMarkup(getUserLanguage(message.from_user.id)) if has_user_deposit_status else getNoVipMarkup(getUserLanguage(message.from_user.id))
-    await open_menu(message, markup, "check_text")
 
 
 @dp.message_handler(content_types=["text"])
@@ -297,19 +290,19 @@ async def handle_media(message: types.Message):
 
                 if is_accept_button and is_search_id_status:
                     status = id_status
-                    message_to_user = languageFile[getUserLanguage(message.from_user.id)]["accept_id_message_text"]
+                    message_to_user = languageFile[getUserLanguage(user_under_do)]["accept_id_message_text"]
                 elif is_reject_button and is_search_id_status:
                     status = none_status
-                    message_to_user = languageFile[getUserLanguage(message.from_user.id)]["reject_id_message_text"]
+                    message_to_user = languageFile[getUserLanguage(user_under_do)]["reject_id_message_text"]
                 elif is_accept_button and is_search_deposit_status:
                     status = deposit_status
-                    message_to_user = languageFile[getUserLanguage(message.from_user.id)]["accept_deposit_message_text"]
+                    message_to_user = languageFile[getUserLanguage(user_under_do)]["accept_deposit_message_text"]
                 elif is_reject_button and is_search_deposit_status:
                     status = id_status
-                    message_to_user = languageFile[getUserLanguage(message.from_user.id)]["reject_deposit_message_text"]
+                    message_to_user = languageFile[getUserLanguage(user_under_do)]["reject_deposit_message_text"]
 
                 await update_status_user(user_under_do, status)
-                await send_message_to_user(user_under_do, message_to_user, getMarkupWithStatus(user_under_do,status))
+                await send_message_to_user(user_under_do, message_to_user, getMarkupWithStatus(user_under_do, status))
 
                 await open_menu(message, getManagerMarkup(getUserLanguage(message.from_user.id)), languageFile[getUserLanguage(message.from_user.id)]["process_finishing_text"])
                 update_manager_do(message.from_user.id, "none")
@@ -349,6 +342,7 @@ async def handle_media(message: types.Message):
 @dp.callback_query_handler(text="next_users")
 async def next_users_callback(call: types.CallbackQuery):
     global last_user_list_message
+    print(10)
     await remove_last_user_list_message(call.message.chat.id)
     await remove_last_user_manage_message(call.message.chat.id)
 
@@ -359,6 +353,7 @@ async def next_users_callback(call: types.CallbackQuery):
 
 @dp.callback_query_handler(text="previous_users")
 async def previous_users_callback(call: types.CallbackQuery):
+    print(10)
     global last_user_list_message
     await remove_last_user_list_message(call.message.chat.id)
     await remove_last_user_manage_message(call.message.chat.id)
@@ -380,7 +375,8 @@ async def manage_user_callback(call: types.CallbackQuery):
         buttons.append(types.InlineKeyboardButton(text=user_data[0], callback_data=f"removeuser_{user_data[1]}"))
 
     keyboard = types.InlineKeyboardMarkup(row_width=5).add(*buttons)
-    sent_msg = await bot.send_message(call.message.chat.id, text=languageFile[getUserLanguage(call.message.from_user.id)]["select_user_id_to_ban_text"], reply_markup=keyboard)
+    sent_msg = await bot.send_message(call.message.chat.id, text=languageFile[getUserLanguage(call.message.chat.id)]["select_user_id_to_ban_text"], reply_markup=keyboard)
+
     update_last_user_manage_message(sent_msg)
     await call.answer(call.data)
 
