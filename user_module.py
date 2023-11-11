@@ -1,6 +1,8 @@
 import file_manager
+import manager_module
 
 user_db_path = "users/db.txt"
+startLanguage="none"
 
 current_users_pointer_max_dict = dict()
 current_users_pointer_min_dict = dict()
@@ -8,12 +10,12 @@ current_users_pointer_min_dict = dict()
 current_users_data_dict = dict()
 
 # STATUSES
-deposit_status = "status ДЕПОЗИТ"
+deposit_status = "status Deposit"
 id_status = "status ID"
 none_status = "status none"
-wait_id_status = 'Ожидайте проверку ID ⏳'
-wait_id_input_status = 'Ожидание ввода проверки ID 🔖'
-wait_deposit_status = 'Ожидание проверки депозита 💵'
+wait_id_status = 'status wait check ID'
+wait_id_input_status = 'status wait input ID'
+wait_deposit_status = 'status wait check Deposit'
 
 
 def remove_user_with_id(id):
@@ -113,10 +115,24 @@ def has_user_status(id, status):
 
 
 def getUserLanguage(id):
-    data = file_manager.read_file(user_db_path)
-    for user in data:
-        if user['id'] == id:
-            return user['language']
+    if id in manager_module.managers_id:
+        return manager_module.getManagerLanguage(id)
+    else:
+        data = file_manager.read_file(user_db_path)
+        for user in data:
+            if user['id'] == id:
+                return user['language']
+
+
+def setUserLanguage(id, newLanguage):
+    if id in manager_module.managers_id:
+        manager_module.setManagerLanguage(id, newLanguage)
+    else:
+        data = file_manager.read_file(user_db_path)
+        for user in data:
+            if user['id'] == id:
+                 user['language'] = newLanguage
+        file_manager.write_file(user_db_path, data)
 
 
 def get_users_with_status(status):
@@ -139,8 +155,8 @@ def add_user(id, first_name, last_name):
         bufer_user = {
             "id": id,
             "name": full_name,
-            "language": "none",
-            "status": "none",
+            "language": startLanguage,
+            "status": none_status,
             "acount_number": 0
         }
         data.append(bufer_user)
@@ -167,6 +183,13 @@ async def get_user_with_status(status):
     return False, None
 
 
+def get_user_status(id):
+    data = file_manager.read_file(user_db_path)
+    for user in data:
+        if user['id'] == id:
+            return user["status"]
+    return None
+
 def get_user_account_number(id):
     data = file_manager.read_file(user_db_path)
     for user in data:
@@ -181,3 +204,4 @@ def find_user_with_id(id):
         if user['id'] == id:
             return True
     return False
+

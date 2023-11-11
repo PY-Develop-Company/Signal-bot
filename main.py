@@ -16,7 +16,7 @@ import interval_convertor
 from signals import get_signal_by_type
 from math import ceil
 
-API_TOKEN = "6588822945:AAFX8eDWngrrbLeDLhzNw0nLkxI07D9wG8Y"  # my API
+API_TOKEN = "5767062743:AAHudfbNfElrindW2PpmbPua0CM1ybbPryA"  # my API
 # API_TOKEN = "6340912636:AAHACm2V2hDJUDXng0y0uhBRVRFJgqrok48"  # main API TOKEN
 logging.basicConfig(level=logging.INFO)
 bot = Bot(token=API_TOKEN)
@@ -33,6 +33,7 @@ max_time_zone_hours = 23
 last_user_list_message = dict()
 last_user_manage_message = dict()
 
+start_img_path = "img/logo.jpg"
 
 def update_last_user_list_message(message):
     global last_user_list_message
@@ -104,13 +105,16 @@ async def send_message_to_users(users_ids: [], text):
     await asyncio.gather(*send_signal_message_tasks)
 
 
-async def send_photo_text_message_to_user(user_id, img_path, text=" "):
+async def send_photo_text_message_to_user(user_id, img_path, text=" ", markup=None):
     if await get_chat_id(user_id) == 0:
         return
 
     try:
         with open(img_path, "rb") as file:
-            await bot.send_photo(user_id, photo=file, caption=text)
+            if markup is None:
+                await bot.send_photo(user_id, photo=file, caption=text)
+            else:
+                await bot.send_photo(user_id, photo=file, caption=text, reply_markup=markup)
     except Exception as e:
         print("Error: bot is blocked by user")
 
@@ -124,7 +128,7 @@ async def send_photo_text_message_to_users(users_ids: [], img_path, text=" "):
     await asyncio.gather(*send_signal_message_tasks)
 
 
-async def open_menu(message, menu_markup, answer_text=wait_command_text):
+async def open_menu(message, menu_markup, answer_text="none"):
     await message.answer(answer_text, reply_markup=menu_markup)
 
 
@@ -135,15 +139,15 @@ async def update_account_user(id, account_number):
         if found_user:
             user['acount_number'] = account_number
             if user['status'] == deposit_status:
-                await send_message_to_user(id, get_vip_text)
+                await send_message_to_user(id, languageFile[getUserLanguage(id)]["get_vip_text"])
             elif account_number == none_status:
-                await send_message_to_user(id, reject_vip_text)
+                await send_message_to_user(id, languageFile[getUserLanguage(id)]["reject_vip_text"])
             break
     file_manager.write_file(user_db_path, data)
 
 
 async def show_users_list_to_user(user_id, is_next=True):
-    print_str = users_list_title_text + "\n"
+    print_str = languageFile[getUserLanguage(user_id)]["users_list_title_text"] + "\n"
 
     users_to_show = []
     if is_next:
@@ -155,24 +159,30 @@ async def show_users_list_to_user(user_id, is_next=True):
         print_str += "\n" + user_to_show
 
     if len(users_to_show) == 0:
-        print_str = no_users_list_title_text
-    return await send_message_to_user(user_id, print_str, users_markup)
+        print_str = languageFile[getUserLanguage(user_id)]["no_users_list_title_text"]
+    return await send_message_to_user(user_id, print_str)
 
 
 @dp.message_handler(commands="start")
 async def start_command(message):
-    # await send_photo_text_message_to_user(message.from_user.id, start_img_path, start_text)
     if message.from_user.id in managers_id:
         await add_manager(message)
-        await open_menu(message, GetManagerMarkup())
-    elif has_user_status(message.from_user.id, deposit_status):
-        await open_menu(message, vip_markup)
     else:
         add_user(message.from_user.id, message.from_user.first_name, message.from_user.last_name)
-        if getUserLanguage(message.from_user.id) == "none":
-            await open_menu(message, getSelectLanguageMarkap())
-        else:
-            await open_menu(message, not_vip_markup)
+
+    if getUserLanguage(message.from_user.id) == startLanguage:
+        await open_menu(message, getSelectLanguageMarkap(), "Select language:")
+        return
+
+    # await send_photo_text_message_to_user(message.from_user.id, start_img_path, start_text)
+    if message.from_user.id in managers_id:
+        markup = getManagerMarkup(getUserLanguage(message.from_user.id))
+    elif has_user_status(message.from_user.id, deposit_status):
+        markup = getVipMarkup(getUserLanguage(message.from_user.id))
+    else:
+        markup = getNoVipMarkup(getUserLanguage(message.from_user.id))
+
+    await send_photo_text_message_to_user(message.from_user.id, start_img_path, languageFile[getUserLanguage(message.from_user.id)]["start_text"], markup)
 
 
 @dp.message_handler(commands="start_test")
@@ -198,7 +208,7 @@ async def check_deposit_command(message):
         return
 
     if has_user_status(message.from_user.id, id_status):
-        await message.answer(wait_deposit_status)
+        await message.answer(languageFile[getUserLanguage(message.from_user.id)]["wait_deposit_status"])
         await update_status_user(message.from_user.id, wait_deposit_status)
 
 
@@ -212,11 +222,11 @@ async def remove_user_command(call: types.CallbackQuery):
 
     if have_user_with_id:
         if is_user_removed:
-            await bot.send_message(call.message.chat.id, removed_user_text + f"\n " + user_string)
+            await bot.send_message(call.message.chat.id, languageFile[getUserLanguage(user_id)]["removed_user_text"] + f"\n " + user_string)
         else:
-            await bot.send_message(call.message.chat.id, cant_remove_user_text)
+            await bot.send_message(call.message.chat.id, languageFile[getUserLanguage(user_id)]["cant_remove_user_text"])
     else:
-        await bot.send_message(call.message.chat.id, error_no_user)
+        await bot.send_message(call.message.chat.id, languageFile[getUserLanguage(user_id)]["error_no_user"])
 
     await call.answer(call.data)
     await remove_last_user_manage_message(call.message.chat.id)
@@ -239,37 +249,44 @@ async def check_command(message):
         return
 
     has_user_deposit_status = has_user_status(message.from_user.id, deposit_status)
-    markup = vip_markup if has_user_deposit_status else not_vip_markup
-    await open_menu(message, markup)
+    markup = getVipMarkup(getUserLanguage(message.from_user.id)) if has_user_deposit_status else getNoVipMarkup(getUserLanguage(message.from_user.id))
+    await open_menu(message, markup, "check_text")
 
 
 @dp.message_handler(content_types=["text"])
 async def handle_media(message: types.Message):
+    if message.text in [select_language_eng, select_language_ru, select_language_hin] and getUserLanguage(message.from_user.id) == "none":
+        setUserLanguage(message.from_user.id, message.text)
+        markup = getMarkupWithStatus(message.from_user.id, get_user_status(message.from_user.id))
+
+        await open_menu(message, markup, languageFile[getUserLanguage(message.from_user.id)]["selected_language_success_text"])
+        await start_command(message)
+
+        return
+
     # manager part
     if message.from_user.id in managers_id:
-        if message.text == user_management_button:
+        if message.text == languageFile[getUserLanguage(message.from_user.id)]["user_management_button"]:
             await users_list_command(message)
-        elif message.text == search_id_request:
+        elif message.text == languageFile[getUserLanguage(message.from_user.id)]["search_id_request"]:
             is_user_exists, user_id = await get_user_with_status(wait_id_status)
             if is_user_exists:
                 update_manager_do(message.from_user.id, user_id)
                 await update_manager_status(message.from_user.id, search_id_manager_status)
-                await message.answer(get_manager_user_acount(message.from_user.id))
-                await open_menu(message, accept_reject_markup)
+                await open_menu(message, getAcceptRejectMarkup(getUserLanguage(message.from_user.id)), get_manager_user_acount(message.from_user.id))
             else:
-                await message.answer(no_id_requests_text)
-        elif message.text == search_deposit_request:
+                await message.answer(languageFile[getUserLanguage(message.from_user.id)]["no_id_requests_text"])
+        elif message.text == languageFile[getUserLanguage(message.from_user.id)]["search_deposit_request"]:
             is_user_exists, user_id = await get_user_with_status(wait_deposit_status)
             if is_user_exists:
                 update_manager_do(message.from_user.id, user_id)
                 await update_manager_status(message.from_user.id, search_deposit_manager_status)
-                await message.answer(get_manager_user_acount(message.from_user.id))
-                await open_menu(message, accept_reject_markup)
+                await open_menu(message, getAcceptRejectMarkup(getUserLanguage(message.from_user.id)), get_manager_user_acount(message.from_user.id))
             else:
-                await message.answer(no_deposit_requests_text)
+                await message.answer(languageFile[getUserLanguage(message.from_user.id)]["no_deposit_requests_text"])
         else:
-            is_accept_button = message.text == accept_button
-            is_reject_button = message.text == reject_button
+            is_accept_button = message.text == languageFile[getUserLanguage(message.from_user.id)]["accept_button"]
+            is_reject_button = message.text == languageFile[getUserLanguage(message.from_user.id)]["reject_button"]
             if is_accept_button or is_reject_button:
                 is_search_id_status = is_manager_status(message.from_user.id, search_id_manager_status)
                 is_search_deposit_status = is_manager_status(message.from_user.id, search_deposit_manager_status)
@@ -280,21 +297,21 @@ async def handle_media(message: types.Message):
 
                 if is_accept_button and is_search_id_status:
                     status = id_status
-                    message_to_user = accept_id_message_text
+                    message_to_user = languageFile[getUserLanguage(message.from_user.id)]["accept_id_message_text"]
                 elif is_reject_button and is_search_id_status:
                     status = none_status
-                    message_to_user = reject_id_message_text
+                    message_to_user = languageFile[getUserLanguage(message.from_user.id)]["reject_id_message_text"]
                 elif is_accept_button and is_search_deposit_status:
                     status = deposit_status
-                    message_to_user = accept_deposit_message_text
+                    message_to_user = languageFile[getUserLanguage(message.from_user.id)]["accept_deposit_message_text"]
                 elif is_reject_button and is_search_deposit_status:
                     status = id_status
-                    message_to_user = reject_deposit_message_text
+                    message_to_user = languageFile[getUserLanguage(message.from_user.id)]["reject_deposit_message_text"]
+
                 await update_status_user(user_under_do, status)
+                await send_message_to_user(user_under_do, message_to_user, getMarkupWithStatus(user_under_do,status))
 
-                await send_message_to_user(user_under_do, message_to_user)
-
-                await open_menu(message, GetManagerMarkup())
+                await open_menu(message, getManagerMarkup(getUserLanguage(message.from_user.id)), languageFile[getUserLanguage(message.from_user.id)]["process_finishing_text"])
                 update_manager_do(message.from_user.id, "none")
                 await update_manager_status(message.from_user.id, none_manager_status)
     # user part
@@ -303,32 +320,30 @@ async def handle_media(message: types.Message):
         if message.text.isdigit() and len(message.text) == 8:
             await update_status_user(message.from_user.id, wait_id_status)
             await update_account_user(message.from_user.id, message.text)
-            await message.answer(wait_id_status)
-            await open_menu(message, vip_markup)
+            await open_menu(message, getVipMarkup(getUserLanguage(message.from_user.id)),languageFile[getUserLanguage(message.from_user.id)]["wait_id_status"])
         else:
-            await message.reply(error_id_text)
+            await message.reply(languageFile[getUserLanguage(message.from_user.id)]["error_id_text"])
     else:  # answer for user
-        if message.text == vip_status_info:
+        if message.text == languageFile[getUserLanguage(message.from_user.id)]["vip_status_info"]:
             if has_user_status(message.from_user.id, deposit_status):
-                await message.answer(you_have_vip_text)
-                await open_menu(message, vip_markup)
+                await open_menu(message, getVipMarkup(getUserLanguage(message.from_user.id)), languageFile[getUserLanguage(message.from_user.id)]["you_have_vip_text"])
             else:
-                await message.answer(for_vip_text)
-        elif message.text == check_id_text:
+                await message.answer(languageFile[getUserLanguage(message.from_user.id)]["for_vip_text"])
+        elif message.text == languageFile[getUserLanguage(message.from_user.id)]["check_id_text"]:#питання
             if has_user_status(message.from_user.id, deposit_status):
-                await message.answer(you_have_vip_text)
-                await open_menu(message, vip_markup)
+                await open_menu(message, getVipMarkup(getUserLanguage(message.from_user.id)), languageFile[getUserLanguage(message.from_user.id)]["you_have_vip_text"])
             else:
                 await update_status_user(message.from_user.id, wait_id_input_status)
-                await message.answer(wait_id_text)
-        elif message.text == contact_manager:
-            await message.answer(contact_manager_text)
+                await message.answer(languageFile[getUserLanguage(message.from_user.id)]["wait_id_text"])
+        elif message.text == languageFile[getUserLanguage(message.from_user.id)]["contact_manager"]:#питання
+            await message.answer(languageFile[getUserLanguage(message.from_user.id)]["contact_manager_text"])
             await message.answer(manager_url)
         else:
             if has_user_status(message.from_user.id, deposit_status):
-                await open_menu(message, vip_markup)
+                await open_menu(message, getVipMarkup(getUserLanguage(message.from_user.id)),1)
             else:
-                await open_menu(message, not_vip_markup)
+                ...
+                # await open_menu(message, getNoVipMarkup(getUserLanguage(message.from_user.id)),)
 
 
 @dp.callback_query_handler(text="next_users")
@@ -365,7 +380,7 @@ async def manage_user_callback(call: types.CallbackQuery):
         buttons.append(types.InlineKeyboardButton(text=user_data[0], callback_data=f"removeuser_{user_data[1]}"))
 
     keyboard = types.InlineKeyboardMarkup(row_width=5).add(*buttons)
-    sent_msg = await bot.send_message(call.message.chat.id, text=select_user_id_to_ban_text, reply_markup=keyboard)
+    sent_msg = await bot.send_message(call.message.chat.id, text=languageFile[getUserLanguage(call.message.from_user.id)]["select_user_id_to_ban_text"], reply_markup=keyboard)
     update_last_user_manage_message(sent_msg)
     await call.answer(call.data)
 

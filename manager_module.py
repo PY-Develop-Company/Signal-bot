@@ -1,3 +1,5 @@
+import os
+
 import file_manager
 from user_module import *
 
@@ -17,8 +19,24 @@ def get_url(manager_id):
 
 async def add_manager(message):
     url = f"users/{message.from_user.id}.txt"
-    data = {"id": message.from_user.id, "status": "none", "do": "none"}
-    file_manager.write_file(url, data)
+    if (f"{message.from_user.id}.txt") in os.listdir("users/"):
+        ...
+    else:
+        data = {"id": message.from_user.id, "status": "none", "do": "none", "language": "none"}
+        file_manager.write_file(url, data)
+
+
+def getManagerLanguage(id):
+    url = get_url(id)
+    manager = file_manager.read_file(url)
+    return manager["language"]
+
+
+def setManagerLanguage(id, language):
+    url = get_url(id)
+    manager = file_manager.read_file(url)
+    manager["language"] = language
+    file_manager.write_file(url, manager)
 
 
 def update_manager_do(manager_id, do):
