@@ -1,5 +1,6 @@
 import file_manager
 import manager_module
+import market_info
 
 user_db_path = "users/db.txt"
 startLanguage="none"
@@ -11,6 +12,7 @@ current_users_data_dict = dict()
 
 # STATUSES
 deposit_status = "status Deposit"
+trial_status = 'status Trial'
 id_status = "status ID"
 none_status = "status none"
 wait_id_status = 'status wait check ID'
@@ -145,6 +147,44 @@ def get_users_with_status(status):
     return users_with_status
 
 
+def had_trial_status(id):
+    data = file_manager.read_file(user_db_path)
+    for user in data:
+        if user['id'] == id:
+            return user['had_trial_status']
+
+
+def set_trial_to_user(id):
+    data = file_manager.read_file(user_db_path)
+    for user in data:
+        found_user = user['id'] == id
+        if found_user:
+            user["had_trial_status"] = True
+            user['before_trial_status'] = user['status']
+            user['status'] = trial_status
+            user['trial_end_date'] = market_info.get_trial_end_date()
+            break
+    file_manager.write_file(user_db_path, data)
+
+
+def remove_trial_from_user(id):
+    data = file_manager.read_file(user_db_path)
+    for user in data:
+        found_user = user['id'] == id
+        if found_user:
+            user['status'] = user['before_trial_status']
+            user['before_trial_status'] = none_status
+            break
+    file_manager.write_file(user_db_path, data)
+
+
+def get_user_trial_end_date(id):
+    data = file_manager.read_file(user_db_path)
+    for user in data:
+        if user["id"] == id:
+            return user["trial_end_date"]
+
+
 def add_user(id, first_name, last_name):
     data = file_manager.read_file(user_db_path)
     user_exists = any(user['id'] == id for user in data)
@@ -157,7 +197,10 @@ def add_user(id, first_name, last_name):
             "name": full_name,
             "language": startLanguage,
             "status": none_status,
-            "acount_number": 0
+            "acount_number": 0,
+            "had_trial_status": False,
+            "trial_end_date": None,
+            "before_trial_status": "none"
         }
         data.append(bufer_user)
         file_manager.write_file(user_db_path, data)

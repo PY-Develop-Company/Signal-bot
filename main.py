@@ -8,13 +8,13 @@ import price_parser
 from price_parser import PriceData
 import signal_maker
 from tvDatafeed import Interval
+import market_info
 import asyncio
 import multiprocessing
 from manager_module import *
 from menu_text import *
 import interval_convertor
 from signals import get_signal_by_type
-from math import ceil
 
 API_TOKEN = "5767062743:AAHudfbNfElrindW2PpmbPua0CM1ybbPryA"  # my API
 # API_TOKEN = "6340912636:AAHACm2V2hDJUDXng0y0uhBRVRFJgqrok48"  # main API TOKEN
@@ -25,15 +25,19 @@ signal_delay = 300
 
 callbacks_wait_time = 600
 
-users_for_print_count = 3
+users_for_print_count = 15
 
-min_time_zone_hours = 10
-max_time_zone_hours = 23
 
 last_user_list_message = dict()
 last_user_manage_message = dict()
 
 start_img_path = "img/logo.jpg"
+
+cant_get_trial_error_text = "❗Ошибка (Вам невозможно получить пробную версию)"
+already_had_trial_text = "На этом аккаунте уже активировали пробную версию! Это можно сделать только один раз!"
+started_trial_text = "Поздравляем! Вы получили пробную версию бота и сможете получать сигналы в течение 3 дней бесплатно."
+ended_trial_text = "Ой! У тебя завершилсась пробная версия. Чтобы снова получать сигналы нужно получить VIP статус."
+
 
 def update_last_user_list_message(message):
     global last_user_list_message
@@ -232,6 +236,19 @@ async def remove_user_command(call: types.CallbackQuery):
     await remove_last_user_manage_message(call.message.chat.id)
 
 
+@dp.message_handler(commands="trial")
+async def get_trial_command(message):
+    if has_user_status(message.from_user.id, deposit_status) or message.from_user.id in managers_id:
+        await send_message_to_user(message.from_user.id, cant_get_trial_error_text)
+        return
+    elif had_trial_status(message.from_user.id):
+        await send_message_to_user(message.from_user.id, already_had_trial_text)
+        return
+    else:
+        await send_message_to_user(message.from_user.id, started_trial_text)
+        set_trial_to_user(message.from_user.id)
+
+
 @dp.message_handler(commands="users")
 async def users_list_command(message):
     global last_user_list_message
@@ -409,11 +426,13 @@ def handle_signal_msg_controller(signal, msg, pd: PriceData, open_position_price
     asyncio.run(handle_signal_msg(signal, msg, pd, open_position_price, deal_time, start_analize_time))
 
 
-def is_market_working():
-    time_zone = pytz.timezone("Europe/Bucharest")
-    time_now = datetime.now(time_zone)
-
-    return min_time_zone_hours <= time_now.hour < max_time_zone_hours
+async def check_trial_users():
+    users_ids = get_users_with_status(trial_status)
+    for user_id in users_ids:
+        if market_info.is_trial_ended(get_user_trial_end_date(user_id)):
+            remove_trial_from_user(user_id)
+            await send_message_to_user(user_id, ended_trial_text)
+            await send_message_to_user(user_id, for_vip_text)
 
 
 def signals_message_sender_controller(prices_data, intervals, unit_pd, prices_data_all):
@@ -436,7 +455,8 @@ def signals_message_sender_controller(prices_data, intervals, unit_pd, prices_da
                 signal_maker.reset_signals_files(main_prices_data)
                 continue
 
-            await asyncio.sleep(1)
+            await check_trial_users()
+            await asyncio.sleep(3)
             try:
                 with open("users/test.txt", "r") as file:
                     cont = file.read().split(".")[0]
@@ -448,7 +468,7 @@ def signals_message_sender_controller(prices_data, intervals, unit_pd, prices_da
             except Exception as e:
                 print("Error", e)
             print("search signals to send...")
-            if not is_market_working():
+            if not market_info.is_market_working():
                 continue
 
             created_prices_data = []

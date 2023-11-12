@@ -160,6 +160,7 @@ def analize_currency_data_controller(analize_pairs):
 
     asyncio.run(analize_currency_data_loop(analize_pairs))
 
+
 # test
 
 
