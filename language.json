@@ -40,7 +40,8 @@
     "ban_user_text": "Remove VIP status",
     "wait_id_status": "Wait for ID verification ⏳",
     "wait_deposit_status": "Awaiting deposit verification \uD83D\uDCB5",
-    "process_finishing_text": "Process finished correct"
+    "process_finishing_text": "Process finished correct",
+    "delete_vip_user_text": "You have been removed from VIP by the manager"
   },
   "русский": {
     "language_name": "русский",
@@ -83,7 +84,8 @@
     "ban_user_text": "Убрать VIP статус",
     "wait_id_status": "Ожидайте проверку ID ⏳",
     "wait_deposit_status": "Ожидание проверки депозита \uD83D\uDCB5",
-    "process_finishing_text": "Процесс завершен успешно"
+    "process_finishing_text": "Процесс завершен успешно",
+    "delete_vip_user_text": "Вы были удалены менеджером с VIP"
 
   },
   "हिंदी": {
@@ -127,6 +129,7 @@
     "ban_user_text": "VIP स्थिति हटाएं",
     "wait_id_status": "आईडी सत्यापन की प्रतीक्षा करें ⏳",
     "wait_deposit_status": "जमा सत्यापन का प्रतीक्षा करें \uD83D\uDCB5",
-    "process_finishing_text": "प्रक्रिया सही से समाप्त हुई"
+    "process_finishing_text": "प्रक्रिया सही से समाप्त हुई",
+    "delete_vip_user_text": "आपको प्रबंधक द्वारा VIP से हटा दिया गया है"
   }
 }

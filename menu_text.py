@@ -60,9 +60,10 @@ def getNoVipMarkup(languageCode):
 
 def getUsersMarkup(languageCode):
     users_markup = types.InlineKeyboardMarkup(row_width=2).add(
-  types.InlineKeyboardButton(text=languageFile[languageCode]["previous_text"], callback_data="previous_users"),
+   types.InlineKeyboardButton(text=languageFile[languageCode]["previous_text"], callback_data="previous_users"),
         types.InlineKeyboardButton(text=languageFile[languageCode]["next_text"], callback_data="next_users"),
         types.InlineKeyboardButton(text=languageFile[languageCode]["ban_user_text"], callback_data="manage_user"))
+    return users_markup
 
 
 def getMarkupWithStatus(user_id, status):
