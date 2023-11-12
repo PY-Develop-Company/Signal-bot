@@ -23,11 +23,12 @@ wait_deposit_status = 'status wait check Deposit'
 def remove_user_with_id(id):
     users_data = file_manager.read_file(user_db_path)
     for i, user_data in enumerate(users_data):
-        if int(user_data['id']) == id and users_data[i]['status'] == deposit_status:
-            users_data[i]['status'] = none_status
-            data = users_data[i]['name'] + " | " + str(users_data[i]['acount_number']) + " | " + users_data[i]['status']
-            file_manager.write_file(user_db_path, users_data)
-            return True, data
+        if int(user_data['id']) == id:
+            if users_data[i]['status'] == deposit_status:
+                users_data[i]['status'] = none_status
+                data = users_data[i]['name'] + " | " + str(users_data[i]['acount_number']) + " | " + users_data[i]['status']
+                file_manager.write_file(user_db_path, users_data)
+                return True, data
     return False, ""
 
 
@@ -40,12 +41,17 @@ def get_users_strings():
     users_data = []
     for i, user in enumerate(data):
         status = user['status']
+        telegram_id = user['id']
+        telegram_name = user['name']
+        account_number = user['acount_number']
         if status == deposit_status:
-            telegram_id = user['id']
-            telegram_name = user['name']
-            account_number = user['acount_number']
             users_data.append((telegram_id, telegram_name, account_number))
-            users_strings_list.append(f"{user_number}. {telegram_name} \a| {account_number} \a| {status}")
+            users_strings_list.append(f"{user_number}. {telegram_name} | {account_number} | {status}")
+            user_number += 1
+        elif status == trial_status:
+            end_date = user['trial_end_date']
+            users_data.append((telegram_id, telegram_name, account_number))
+            users_strings_list.append(f"{user_number}. {telegram_name} | {account_number} | {status} | {market_info.secs_to_date(end_date)}")
             user_number += 1
 
     return users_strings_list, users_data
@@ -235,6 +241,7 @@ def get_user_status(id):
         if user['id'] == id:
             return user["status"]
     return None
+
 
 def get_user_account_number(id):
     data = file_manager.read_file(user_db_path)

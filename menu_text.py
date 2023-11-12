@@ -16,6 +16,10 @@ select_language_ru = "русский"
 select_language_hin = "हिंदी"
 
 
+def getTrialButton(language):
+    return types.KeyboardButton(languageFile[language]["get_trial_button_text"])
+
+
 def getSelectLanguageMarkap():
     select_language_markup = types.ReplyKeyboardMarkup(resize_keyboard=True, keyboard=[
         [types.KeyboardButton(select_language_eng), types.KeyboardButton(select_language_ru),
@@ -31,8 +35,8 @@ def getEmptyMarkup():
 
 def getManagerMarkup(languageCode):
     manager_markup = types.ReplyKeyboardMarkup(resize_keyboard=True, keyboard=[
-        [types.KeyboardButton(languageFile[languageCode]["search_id_request"]), types.KeyboardButton(languageFile[languageCode]["search_deposit_request"] ),
-         types.KeyboardButton(languageFile[languageCode]["user_management_button"])]
+        [types.KeyboardButton(languageFile[languageCode]["search_id_request"]), types.KeyboardButton(languageFile[languageCode]["search_deposit_request"])],
+        [types.KeyboardButton(languageFile[languageCode]["user_management_button"])]
     ])
     return manager_markup
 
@@ -44,6 +48,14 @@ def getAcceptRejectMarkup(languageCode):
     return accept_reject_markup
 
 
+def getHalfVipMarkup(languageCode):
+    vip_markup = types.ReplyKeyboardMarkup(resize_keyboard=True, keyboard=[
+        [getTrialButton(languageCode)],
+        [types.KeyboardButton(languageFile[languageCode]["contact_manager"])]
+    ])
+    return vip_markup
+
+
 def getVipMarkup(languageCode):
     vip_markup = types.ReplyKeyboardMarkup(resize_keyboard=True, keyboard=[
         [types.KeyboardButton(languageFile[languageCode]["contact_manager"])]
@@ -52,8 +64,10 @@ def getVipMarkup(languageCode):
 
 
 def getNoVipMarkup(languageCode):
-    not_vip_markup = types.ReplyKeyboardMarkup(resize_keyboard=True, keyboard=[
-        [types.KeyboardButton(languageFile[languageCode]["vip_status_info"]), types.KeyboardButton(languageFile[languageCode]["check_id_text"]), types.KeyboardButton(languageFile[languageCode]["contact_manager"])]
+    not_vip_markup = types.ReplyKeyboardMarkup(row_width=2, resize_keyboard=True, keyboard=[
+        [types.KeyboardButton(languageFile[languageCode]["vip_status_info"]), types.KeyboardButton(languageFile[languageCode]["check_id_text"])],
+        [getTrialButton(languageCode)],
+        [types.KeyboardButton(languageFile[languageCode]["contact_manager"])]
     ])
     return not_vip_markup
 
@@ -72,7 +86,9 @@ def getMarkupWithStatus(user_id, status):
     else:
         if status in [none_status]:
             return getNoVipMarkup(getUserLanguage(user_id))
-        elif status in [deposit_status, wait_id_status, wait_deposit_status, id_status]: # 1
+        elif status in [deposit_status, trial_status]:
             return getVipMarkup(getUserLanguage(user_id))
+        elif status in [wait_id_status, wait_deposit_status, id_status]:
+            return getHalfVipMarkup(getUserLanguage(user_id))
         elif status in [wait_id_input_status]:
             return getEmptyMarkup()

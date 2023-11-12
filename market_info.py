@@ -1,6 +1,8 @@
 import pytz
 from datetime import datetime, timedelta
 
+import user_module
+
 min_time_zone_hours = 10
 max_time_zone_hours = 23
 
@@ -8,6 +10,11 @@ trial_days = 3
 
 time_zone = pytz.timezone("Europe/Bucharest")
 origin_date = datetime(1900, 1, 1, tzinfo=time_zone)
+
+
+def secs_to_date(end_date):
+    res = datetime.fromtimestamp(end_date) #.strftime("%A, %B %d, %Y %I:%M:%S")
+    return res
 
 
 def date_by_adding_business_days(from_date, add_days):
@@ -31,16 +38,13 @@ def date_by_adding_business_days(from_date, add_days):
 def get_trial_end_date():
     time_now = datetime.now(time_zone)
     end_trial_date = date_by_adding_business_days(time_now, trial_days)
-    print(end_trial_date)
-    return (end_trial_date - origin_date).total_seconds()
+    end_trial_date = datetime.timestamp(end_trial_date)
+    return end_trial_date
 
 
 def is_trial_ended(trial_end_date):
     time_now = datetime.now(time_zone)
-    time_now_secs = (time_now - origin_date).total_seconds()
-    print(time_now_secs)
-    print(trial_end_date)
-    return (time_now - origin_date).total_seconds() > trial_end_date
+    return datetime.timestamp(time_now) > trial_end_date
 
 
 def is_market_working():
@@ -49,4 +53,5 @@ def is_market_working():
 
 
 if __name__ == "__main__":
-    pass
+    res = secs_to_date(user_module.get_user_trial_end_date(6916117863))
+    print(res)

@@ -1,10 +1,11 @@
 import os
 
 import file_manager
+import user_module
 from user_module import *
 
 manager_username = "@bwg_Golden"
-tester_ids = [741867026, 693562775]
+tester_ids = [741867026, 693562775, 5359645780]
 managers_id = [5964166439, 741867026, 693562775]
 manager_url = f"https://t.me/{manager_username[1:]}"
 
@@ -62,7 +63,7 @@ def get_manager_do(manager_id):
 def get_manager_user_acount(manager_id):
     url = get_url(manager_id)
     manager = file_manager.read_file(url)
-    return get_user_account_number(int(manager["do"]))
+    return user_module.get_user_account_number(int(manager["do"]))
 
 
 def is_manager_status(manager_id, status):

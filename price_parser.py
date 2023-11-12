@@ -45,11 +45,11 @@ class PriceData:
         interval = str(self.interval).replace(".", "")
         path = currency_check_ended + self.symbol + interval + ".txt"
         if not file_manager.is_file_exists(path):
-            print("1Error chart not exists")
+            # print("1Error chart not exists")
             return None
         path = currencies_data_path + self.symbol + interval + ".csv"
         if not file_manager.is_file_exists(path):
-            print("2Error chart not exists")
+            # print("2Error chart not exists")
             return None
 
         try:
