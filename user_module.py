@@ -195,7 +195,7 @@ def get_user_trial_end_date(id):
             return user["trial_end_date"]
 
 
-def add_user(id, first_name, last_name,tag):
+def add_user(id, first_name, last_name, tag):
     data = file_manager.read_file(user_db_path)
     user_exists = any(user['id'] == id for user in data)
     if user_exists:
