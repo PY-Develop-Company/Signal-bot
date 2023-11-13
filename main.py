@@ -107,9 +107,11 @@ async def send_message_to_users(users_ids: [], text):
 async def send_photo_text_message_to_user(user_id, img_path, text=" ", markup=None, args=[]):
     if await get_chat_id(user_id) == 0:
         return
+    if getUserLanguage(user_id) == "none":
+        return
 
-    input_text = args.copy()
     if len(args) > 0:
+        input_text = args.copy()
         for i, arg in enumerate(args):
             print(i, arg)
             input_text[i] = languageFile[getUserLanguage(user_id)][arg]
@@ -175,7 +177,7 @@ async def start_command(message):
     if message.from_user.id in managers_id:
         await add_manager(message)
     else:
-        add_user(message.from_user.id, message.from_user.first_name, message.from_user.last_name)
+        add_user(message.from_user.id, message.from_user.first_name, message.from_user.last_name, message.from_user.username)
 
     if getUserLanguage(message.from_user.id) == startLanguage:
         await open_menu(message, getSelectLanguageMarkap(), "Select language:")
@@ -189,7 +191,11 @@ async def start_command(message):
     else:
         markup = getNoVipMarkup(getUserLanguage(message.from_user.id))
 
-    await send_photo_text_message_to_user(message.from_user.id, start_img_path, languageFile[getUserLanguage(message.from_user.id)]["start_text"], markup)
+    if has_user_status(message.from_user.id, deposit_status):
+        msg_text = languageFile[getUserLanguage(message.from_user.id)]["start_vip_text"]
+    else:
+        msg_text = languageFile[getUserLanguage(message.from_user.id)]["start_text"]
+    await send_photo_text_message_to_user(message.from_user.id, start_img_path, msg_text, markup)
 
 
 @dp.message_handler(commands="language")
@@ -241,6 +247,7 @@ async def remove_user_command(call: types.CallbackQuery):
             if is_user_removed:
                 await bot.send_message(call.message.chat.id, languageFile[getUserLanguage(call.message.chat.id)]["removed_user_text"] + f"\n " + user_string)
                 await bot.send_message(user_id, text=languageFile[getUserLanguage(user_id)]["delete_vip_user_text"], reply_markup=getNoVipMarkup(getUserLanguage(user_id)))
+                await bot.send_message(user_id, text=languageFile[getUserLanguage(user_id)]["contact_manager_text"] + "\n" + manager_url)
             else:
                 await bot.send_message(call.message.chat.id, languageFile[getUserLanguage(call.message.chat.id)]["cant_remove_user_text"])
     else:
@@ -280,10 +287,13 @@ async def users_list_command(message):
 async def handle_media(message: types.Message):
     user_id = message.from_user.id
     user_language = getUserLanguage(user_id)
+    if get_user_Tag(message.from_user.id) == "none":
+        await setUserTag(message.from_user.id,message.from_user.username)
 
     # LANGUAGE
     if message.text not in [select_language_eng, select_language_ru, select_language_hin] and user_language == "none":
-       await openLanguageComand(message)
+        await openLanguageComand(message)
+        return
     if message.text in [select_language_eng, select_language_ru, select_language_hin] and user_language == "none":
         setUserLanguage(user_id, message.text)
         user_language = getUserLanguage(user_id)
@@ -415,10 +425,9 @@ async def manage_user_callback(call: types.CallbackQuery):
 
 def handle_signal_msg_controller(signal, msg, pd: PriceData, open_position_price, deal_time, start_analize_time):
     async def handle_signal_msg(signal, msg, pd: PriceData, open_position_price, deal_time, start_analize_time):
-        users = []
         deposit_user_ids = get_users_with_status(deposit_status)
         trial_user_ids = get_users_with_status(trial_status)
-        users.append(*deposit_user_ids, *trial_user_ids, *tester_ids)
+        users = [*deposit_user_ids, *trial_user_ids, *tester_ids]
         await send_photo_text_message_to_users(users, signal.photo_path, msg, args=["signal_min_text"])
 
         try:

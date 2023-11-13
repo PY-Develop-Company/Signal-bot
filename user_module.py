@@ -44,14 +44,15 @@ def get_users_strings():
         telegram_id = user['id']
         telegram_name = user['name']
         account_number = user['acount_number']
+        tag = user['tag']
         if status == deposit_status:
             users_data.append((telegram_id, telegram_name, account_number))
-            users_strings_list.append(f"{user_number}. {telegram_name} | {account_number} | {status}")
+            users_strings_list.append(f"{user_number}. @{tag} | {telegram_name} | {account_number} | {status}")
             user_number += 1
         elif status == trial_status:
             end_date = user['trial_end_date']
             users_data.append((telegram_id, telegram_name, account_number))
-            users_strings_list.append(f"{user_number}. {telegram_name} | {account_number} | {status} | {market_info.secs_to_date(end_date)}")
+            users_strings_list.append(f"{user_number}. @{tag} | {telegram_name} | {account_number} | {status} | {market_info.secs_to_date(end_date)}")
             user_number += 1
 
     return users_strings_list, users_data
@@ -194,7 +195,7 @@ def get_user_trial_end_date(id):
             return user["trial_end_date"]
 
 
-def add_user(id, first_name, last_name):
+def add_user(id, first_name, last_name,tag):
     data = file_manager.read_file(user_db_path)
     user_exists = any(user['id'] == id for user in data)
     if user_exists:
@@ -204,6 +205,7 @@ def add_user(id, first_name, last_name):
         bufer_user = {
             "id": id,
             "name": full_name,
+            "tag": tag,
             "language": startLanguage,
             "status": none_status,
             "acount_number": 0,
@@ -225,6 +227,17 @@ async def update_status_user(id, status):
     file_manager.write_file(user_db_path, data)
 
 
+async def setUserTag(id, tag):
+    data = file_manager.read_file(user_db_path)
+    for user in data:
+        found_user = user['id'] == id
+        if found_user:
+            user['tag'] = tag
+            break
+    file_manager.write_file(user_db_path, data)
+
+
+
 async def get_user_with_status(status):
     data = file_manager.read_file(user_db_path)
     for user in data:
@@ -240,6 +253,14 @@ def get_user_status(id):
     for user in data:
         if user['id'] == id:
             return user["status"]
+    return None
+
+
+def get_user_Tag(id):
+    data = file_manager.read_file(user_db_path)
+    for user in data:
+        if user['id'] == id:
+            return user["tag"]
     return None
 
 
