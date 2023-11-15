@@ -150,13 +150,14 @@ def analize_currency_data_controller(analize_pairs):
 
     async def analize_currency_data_loop(analize_pairs):
         while True:
+            print("analize_loop")
             tasks = []
             for analize_pair in analize_pairs:
                 task = asyncio.create_task(
                     analize_currency_data_function([analize_pair[0], *analize_pair[1]], analize_pair[2]))
                 tasks.append(task)
             await asyncio.gather(*tasks)
-            await asyncio.sleep(1)
+            await asyncio.sleep(3)
 
     asyncio.run(analize_currency_data_loop(analize_pairs))
 

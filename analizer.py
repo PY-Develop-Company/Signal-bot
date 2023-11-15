@@ -1,9 +1,8 @@
 from indicators_reader import VolumeIndicator, SuperOrderBlockIndicator, ScalpProIndicator, NadarayaWatsonIndicator, \
-    UMAIndicator, sob_dict
-import interval_convertor
+    UMAIndicator
 from signals import *
 from signals import Signal
-from interval_convertor import interval_to_int, str_to_interval
+from interval_convertor import interval_to_int
 from price_parser import PriceData
 import pytz
 from datetime import datetime
@@ -91,7 +90,8 @@ class MultitimeframeAnalizer(Analizer):
         time_zone = pytz.timezone("Europe/Bucharest")
         time_now = datetime.now(time_zone)
         debug += f" time_now {time_now}"
-        print(debug)
+        # if has_signal:
+        #     print(debug)
         return has_signal, signal, debug, deal_time
 
 
@@ -100,13 +100,10 @@ class MainAnalizer(Analizer):
         self.successful_indicators_count = successful_indicators_count
 
     def analize_func(self, df, pd) -> (bool, Signal, str):
-        interval_td = interval_convertor.interval_to_datetime(pd.interval)
-        analize_block_delta = sob_dict.get(df["symbol"][0].split(":")[1]).get(pd.interval)
-
         volume_ind = VolumeIndicator(df, df.open, df.close, df.high, df.low)
         sp_ind = ScalpProIndicator(df, df.open, df.close, df.high, df.low)
         uma_ind = UMAIndicator(df, df.open, df.close, df.high, df.low)
-        sob_ind = SuperOrderBlockIndicator(df, df.open, df.close, df.high, df.low, interval_td, analize_block_delta)
+        sob_ind = SuperOrderBlockIndicator(df, df.open, df.close, df.high, df.low, pd)
         nw_ind = NadarayaWatsonIndicator(df, df.open, df.close, df.high, df.low)
 
         indicators_signals = {
@@ -150,9 +147,7 @@ class MainAnalizer(Analizer):
 
 class NoDeltaSOBAnalizer(Analizer):
     def analize_func(self, df, pd: PriceData) -> (bool, Signal, str):
-        interval_td = interval_convertor.interval_to_datetime(pd.interval)
-        analize_block_delta = sob_dict.get(df["symbol"][0].split(":")[1]).get(pd.interval)
-        sob_ind = SuperOrderBlockIndicator(df, df.open, df.close, df.high, df.low, interval_td, analize_block_delta, includeDelta=False)
+        sob_ind = SuperOrderBlockIndicator(df, df.open, df.close, df.high, df.low, pd, includeDelta=False)
 
         signal = sob_ind.get_signal()
         has_signal = not(signal.type == NeutralSignal())
@@ -164,9 +159,7 @@ class NoDeltaSOBAnalizer(Analizer):
 
 class SOBAnalizer(Analizer):
     def analize_func(self, df, pd: PriceData) -> (bool, Signal, str):
-        interval_td = interval_convertor.interval_to_datetime(pd.interval)
-        analize_block_delta = sob_dict.get(df["symbol"][0].split(":")[1]).get(pd.interval)
-        sob_ind = SuperOrderBlockIndicator(df, df.open, df.close, df.high, df.low, interval_td, analize_block_delta)
+        sob_ind = SuperOrderBlockIndicator(df, df.open, df.close, df.high, df.low, pd)
 
         signal = sob_ind.get_signal()
         has_signal = not(signal.type == NeutralSignal())

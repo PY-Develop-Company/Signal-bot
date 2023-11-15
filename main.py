@@ -16,7 +16,8 @@ from menu_text import *
 import interval_convertor
 from signals import get_signal_by_type
 
-API_TOKEN = "6340912636:AAHACm2V2hDJUDXng0y0uhBRVRFJgqrok48"  # main API TOKEN
+API_TOKEN = "6588822945:AAFX8eDWngrrbLeDLhzNw0nLkxI07D9wG8Y"  # my API TOKEN
+# API_TOKEN = "6340912636:AAHACm2V2hDJUDXng0y0uhBRVRFJgqrok48"  # main API TOKEN
 
 logging.basicConfig(level=logging.INFO)
 bot = Bot(token=API_TOKEN)
@@ -36,23 +37,19 @@ start_img_path = "img/logo.jpg"
 
 def update_last_user_list_message(message):
     global last_user_list_message
-    print("update before", last_user_list_message.get(message.chat.id, None))
     last_user_list_message.update({message.chat.id: message})
-    print("update after", last_user_list_message.get(message.chat.id, None))
 
 
 async def remove_last_user_list_message(user_id):
     global last_user_list_message
     message = last_user_list_message.get(user_id, None)
 
-    print("remove before", last_user_list_message.get(user_id, None))
     if message is not None:
         try:
             await bot.delete_message(user_id, message.message_id)
             last_user_list_message.update({user_id: None})
         except:
             pass
-    print("remove after", last_user_list_message.get(user_id, None))
 
 
 def update_last_user_manage_message(message):
@@ -113,7 +110,6 @@ async def send_photo_text_message_to_user(user_id, img_path, text=" ", markup=No
     if len(args) > 0:
         input_text = args.copy()
         for i, arg in enumerate(args):
-            print(i, arg)
             input_text[i] = languageFile[getUserLanguage(user_id)][arg]
         text = text.format(*input_text)
     try:
@@ -161,8 +157,6 @@ async def show_users_list_to_user(user_id, is_next=True):
         users_to_show = next_user_strings(users_for_print_count, user_id)
     else:
         users_to_show = prev_user_strings(users_for_print_count, user_id)
-
-    print(users_to_show)
 
     for user_to_show in users_to_show:
         print_str += "\n" + user_to_show
@@ -472,7 +466,10 @@ def signals_message_sender_controller(prices_data, intervals, unit_pd, prices_da
         reset_seis_wait_time = 600
 
         while True:
-            await check_trial_users()
+            try:
+                await check_trial_users()
+            except Exception as e:
+                print("check_trial_users_ERROR", e)
 
             need_to_reset_seis = last_send_message_check + reset_seis_wait_time < time.time()
             if need_to_reset_seis:

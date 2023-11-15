@@ -1,77 +1,87 @@
 import numpy as np
 import pandas
 import math
-from tvDatafeed import Interval
+from tvDatafeed import Interval, TvDatafeed
 from datetime import timedelta
 from pandas import Series
 import plotly.graph_objects as go
 from signals import *
+from price_parser import PriceData
+import interval_convertor
 
 
 sob_dict = {
     "EURUSD": {
-        Interval.in_1_minute: 0.00035,
-        Interval.in_3_minute: 0.00070,
-        Interval.in_5_minute: 0.00110,
-        Interval.in_15_minute: 0.00155,
-        Interval.in_30_minute: 0.00210
+        Interval.in_1_minute: 35,
+        Interval.in_3_minute: 70,
+        Interval.in_5_minute: 110,
+        Interval.in_15_minute: 155,
+        Interval.in_30_minute: 210
     },
     "AUDUSD": {
-        Interval.in_1_minute: 0.00035,
-        Interval.in_3_minute: 0.00075,
-        Interval.in_5_minute: 0.00120,
-        Interval.in_15_minute: 0.00150,
-        Interval.in_30_minute: 0.00220
+        Interval.in_1_minute: 35,
+        Interval.in_3_minute: 75,
+        Interval.in_5_minute: 120,
+        Interval.in_15_minute: 150,
+        Interval.in_30_minute: 220
     },
     "AUDCAD": {
-        Interval.in_1_minute: 0.00040,
-        Interval.in_3_minute: 0.00094,
-        Interval.in_5_minute: 0.00145,
-        Interval.in_15_minute: 0.00150,
-        Interval.in_30_minute: 0.00200
+        Interval.in_1_minute: 40,
+        Interval.in_3_minute: 94,
+        Interval.in_5_minute: 145,
+        Interval.in_15_minute: 150,
+        Interval.in_30_minute: 200
     },
     "EURJPY": {
-        Interval.in_1_minute: 0.040,
-        Interval.in_3_minute: 0.090,
-        Interval.in_5_minute: 0.124,
-        Interval.in_15_minute: 0.155,
-        Interval.in_30_minute: 0.199
+        Interval.in_1_minute: 40,
+        Interval.in_3_minute: 90,
+        Interval.in_5_minute: 124,
+        Interval.in_15_minute: 155,
+        Interval.in_30_minute: 199
     },
     "EURCAD": {
-        Interval.in_1_minute: 0.00085,
-        Interval.in_3_minute: 0.00146,
-        Interval.in_5_minute: 0.00178,
-        Interval.in_15_minute: 0.00235,
-        Interval.in_30_minute: 0.00270
+        Interval.in_1_minute: 85,
+        Interval.in_3_minute: 146,
+        Interval.in_5_minute: 178,
+        Interval.in_15_minute: 235,
+        Interval.in_30_minute: 270
     },
     "AUDCHF": {
-        Interval.in_1_minute: 0.00030,
-        Interval.in_3_minute: 0.00079,
-        Interval.in_5_minute: 0.00125,
-        Interval.in_15_minute: 0.00170,
-        Interval.in_30_minute: 0.00200
+        Interval.in_1_minute: 30,
+        Interval.in_3_minute: 79,
+        Interval.in_5_minute: 125,
+        Interval.in_15_minute: 170,
+        Interval.in_30_minute: 200
     },
     "GBPUSD": {
-        Interval.in_1_minute: 0.00085,
-        Interval.in_3_minute: 0.00099,
-        Interval.in_5_minute: 0.00125,
-        Interval.in_15_minute: 0.00185,
-        Interval.in_30_minute: 0.00220
+        Interval.in_1_minute: 85,
+        Interval.in_3_minute: 99,
+        Interval.in_5_minute: 125,
+        Interval.in_15_minute: 185,
+        Interval.in_30_minute: 220
     },
     "AUDJPY": {
-        Interval.in_1_minute: 0.050,
-        Interval.in_3_minute: 0.120,
-        Interval.in_5_minute: 0.170,
-        Interval.in_15_minute: 0.220,
-        Interval.in_30_minute: 0.240
+        Interval.in_1_minute: 50,
+        Interval.in_3_minute: 120,
+        Interval.in_5_minute: 170,
+        Interval.in_15_minute: 220,
+        Interval.in_30_minute: 240
     },
     "GBPAUD": {
-        Interval.in_1_minute: 0.00077,
-        Interval.in_3_minute: 0.00155,
-        Interval.in_5_minute: 0.00215,
-        Interval.in_15_minute: 0.00320,
-        Interval.in_30_minute: 0.00370
+        Interval.in_1_minute: 77,
+        Interval.in_3_minute: 155,
+        Interval.in_5_minute: 215,
+        Interval.in_15_minute: 320,
+        Interval.in_30_minute: 370
     }
+}
+
+min_sob_size = {
+    Interval.in_1_minute: 12,
+    Interval.in_3_minute: 27,
+    Interval.in_5_minute: 44,
+    Interval.in_15_minute: 60,
+    Interval.in_30_minute: 75
 }
 
 
@@ -93,15 +103,14 @@ class Indicator:
 
 
 class SuperOrderBlockIndicator(Indicator):
-    def __init__(self, src, open, close, high, low, interval: timedelta, analize_block_delta, includeDelta=True, obMaxBoxSet=100, fvgMaxBoxSet=100):
+    def __init__(self, src, open, close, high, low, price_data: PriceData, includeDelta=True, obMaxBoxSet=100, fvgMaxBoxSet=100):
         super().__init__(src, open, close, high, low)
         self.src.datetime = pandas.to_datetime(self.src.datetime)
-        self.interval = interval
-        obMaxBoxSet = clamp(obMaxBoxSet, 1, 100)
-        fvgMaxBoxSet = clamp(fvgMaxBoxSet, 1, 100)
-        self.obMaxBoxSet = obMaxBoxSet
-        self.fvgMaxBoxSet = fvgMaxBoxSet
-        self.analize_block_delta = analize_block_delta
+        self.interval = interval_convertor.interval_to_datetime(price_data.interval)
+        self.obMaxBoxSet = clamp(obMaxBoxSet, 1, 100)
+        self.fvgMaxBoxSet = clamp(fvgMaxBoxSet, 1, 100)
+        self.analize_block_delta = price_data.get_real_puncts(sob_dict.get(price_data.symbol).get(price_data.interval))
+        self.min_sob_size = price_data.get_real_puncts(min_sob_size.get(price_data.interval))
         self.name = "SuperOrderBlock"
         self.includeDelta = includeDelta
 
@@ -212,33 +221,60 @@ class SuperOrderBlockIndicator(Indicator):
             h2 = self.high[i + 2]
             l2 = self.low[i + 2]
 
-            if self.is_ob_box_up(i + 1) and bull_boxes_index_OB <= 10:
-                _bullboxOB = self.Box(left=left, top=h2, right=right, bottom=min(l2, self.low[i + 1]), signal=LongSignal())
-                _bullBoxesOB.append(_bullboxOB)
-                bull_boxes_index_OB += 1
-                last_added_box_index = i
+            if self.is_ob_box_up(i) and bull_boxes_index_OB <= self.obMaxBoxSet:
+                left = right - self.interval
+                h2 = self.high[i + 1]
+                l2 = self.low[i + 1]
+                t = h2
+                b = min(l2, self.low[i])
+                if t-b >= self.min_sob_size:
+                    _bullboxOB = self.Box(left=left, top=t, right=right, bottom=b, signal=LongSignal())
+                    _bullBoxesOB.append(_bullboxOB)
+                    bull_boxes_index_OB += 1
+                    last_added_box_index = i
 
-            if self.is_ob_box_down(i + 1) and bear_boxes_index_OB <= 10:
-                _bearboxOB = self.Box(left=left, top=max(h2, self.high[i + 1]), right=right, bottom=l2, signal=ShortSignal())
-                _bearBoxesOB.append(_bearboxOB)
-                bear_boxes_index_OB += 1
-                last_added_box_index = i
+            if self.is_ob_box_down(i) and bear_boxes_index_OB <= self.obMaxBoxSet:
+                left = right - self.interval
+                h2 = self.high[i + 1]
+                l2 = self.low[i + 1]
+                t = max(h2, self.high[i])
+                b = l2
+                if t-b >= self.min_sob_size:
+                    _bearboxOB = self.Box(left=left, top=t, right=right, bottom=b, signal=ShortSignal())
+                    _bearBoxesOB.append(_bearboxOB)
+                    bear_boxes_index_OB += 1
+                    last_added_box_index = i
 
             # # # # # # # # # Fair Value Gap # # # # # # # # #
             h = self.high[i]
             l = self.low[i]
 
-            if self.is_fvg_box_up(i) and bull_boxes_index_FVG <= 10:
-                _bullboxFVG = self.Box(left=left, top=l, right=right, bottom=self.high[i + 2], signal=LongSignal())
-                _bullBoxesFVG.append(_bullboxFVG)
-                bull_boxes_index_FVG += 1
-                last_added_box_index = i
+            if self.is_fvg_box_up(i) and bull_boxes_index_FVG <= self.fvgMaxBoxSet:
+                t = l
+                b = self.high[i + 2]
+                if t-b >= self.min_sob_size:
+                    _bullboxFVG = self.Box(left=left, top=t, right=right, bottom=b, signal=LongSignal())
+                    _bullBoxesFVG.append(_bullboxFVG)
+                    bull_boxes_index_FVG += 1
+                    last_added_box_index = i
 
-            if self.is_fvg_box_down(i) and bear_boxes_index_FVG <= 10:
-                _bearboxFVG = self.Box(left=left, top=self.low[i + 2], right=right, bottom=h, signal=ShortSignal())
-                _bearBoxesFVG.append(_bearboxFVG)
-                bear_boxes_index_FVG += 1
-                last_added_box_index = i
+            if self.is_fvg_box_down(i) and bear_boxes_index_FVG <= self.fvgMaxBoxSet:
+                t = self.low[i + 2]
+                b = h
+                if t-b >= self.min_sob_size:
+                    _bearboxFVG = self.Box(left=left, top=t, right=right, bottom=b, signal=ShortSignal())
+                    _bearBoxesFVG.append(_bearboxFVG)
+                    bear_boxes_index_FVG += 1
+                    last_added_box_index = i
+
+        for i, box in enumerate(_bullBoxesOB):
+            if _bullBoxesOB[i].right == self.src.datetime[i]:
+                continue
+            _bullBoxesOB[i].right += self.interval
+        for i, box in enumerate(_bearBoxesOB):
+            if _bearBoxesOB[i].right == self.src.datetime[i]:
+                continue
+            _bearBoxesOB[i].right += self.interval
 
         boxes = _bullBoxesOB + _bearBoxesOB + _bullBoxesFVG + _bearBoxesFVG
         for i in range(last_added_box_index, -1, -1):
@@ -279,6 +315,7 @@ class SuperOrderBlockIndicator(Indicator):
         if self.includeDelta and self.is_closing_block_nearby(return_signal, not_closed_boxes):
             return NeutralSignal()
 
+        # self.graph(boxes)
         return return_signal
 
     def graph(self, boxes):
@@ -609,3 +646,15 @@ class NadarayaWatsonIndicator(Indicator):
 
 def clamp(value, min_value, max_value):
     return max(min(value, max_value), min_value)
+
+
+if __name__ == "__main__":
+    tv = TvDatafeed()
+    interval = Interval.in_1_minute
+    currency = "GBPUSD"
+    data = tv.get_hist(currency, "OANDA", interval=interval, n_bars=500)
+    data = data.reindex(index=data.index[::-1]).iloc[1:].reset_index()
+
+    interval_timedelta = interval_convertor.interval_to_datetime(interval)
+    sob = SuperOrderBlockIndicator(data, data.open, data.close, data.high, data.low, interval_timedelta, sob_dict[currency][interval])
+    res = sob.get_signal()

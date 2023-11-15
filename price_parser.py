@@ -16,6 +16,18 @@ currencies_last_analize_date = {}
 tv = TvDatafeed()
 tvl = TvDatafeedLive()
 
+currencies_puncts = {
+    "EURUSD": 0.00001,
+    "AUDUSD": 0.00001,
+    "AUDCAD": 0.00001,
+    "EURJPY": 0.001,
+    "EURCAD": 0.00001,
+    "AUDCHF": 0.00001,
+    "GBPUSD": 0.00001,
+    "AUDJPY": 0.001,
+    "GBPAUD": 0.00001
+}
+
 
 class PriceData:
     def __init__(self, symbol: str, exchange: str, interval: Interval):
@@ -25,6 +37,9 @@ class PriceData:
 
     def print(self):
         print("\t", self.symbol, self.interval)
+
+    def get_real_puncts(self, puncts):
+        return currencies_puncts[self.symbol] * puncts
 
     def save_chart_data(self, df: DataFrame):
         interval = str(self.interval).replace(".", "")
