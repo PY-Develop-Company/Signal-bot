@@ -77,11 +77,11 @@ sob_dict = {
 }
 
 min_sob_size = {
-    Interval.in_1_minute: 12,
-    Interval.in_3_minute: 27,
-    Interval.in_5_minute: 44,
-    Interval.in_15_minute: 60,
-    Interval.in_30_minute: 75
+    Interval.in_1_minute: 10,
+    Interval.in_3_minute: 30,
+    Interval.in_5_minute: 45,
+    Interval.in_15_minute: 68,
+    Interval.in_30_minute: 100
 }
 
 

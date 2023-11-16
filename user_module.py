@@ -1,9 +1,13 @@
+import random
+
 import file_manager
 import manager_module
 import market_info
+from manager_module import tester_ids
+from  market_info import get_time_in_seconds
 
 user_db_path = "users/db.txt"
-startLanguage="none"
+startLanguage = "none"
 
 current_users_pointer_max_dict = dict()
 current_users_pointer_min_dict = dict()
@@ -18,6 +22,21 @@ none_status = "status none"
 wait_id_status = 'status wait check ID'
 wait_id_input_status = 'status wait input ID'
 wait_deposit_status = 'status wait check Deposit'
+
+
+def get_users_group_ids(users_count, next_signal_delay_in_seconds):
+    curr_time = get_time_in_seconds()
+    next_signal_time = curr_time + next_signal_delay_in_seconds
+
+    deposit_users = get_users_with_status(deposit_status)
+    trial_users = get_users_with_status(trial_status)
+    tester_users = tester_ids
+
+    # перевірка часу коли можна буде надсилати наступний сигналу (через next_signal_delay_in_seconds)
+    # Вибір юзерів для відправлення (users_count штук)
+    # запис часу наступного сигналу (аби потім не вибирати тих же самих юзерів)
+
+    return random.sample([*deposit_users, *trial_users, *tester_users], users_count)
 
 
 def remove_user_with_id(id):
@@ -56,10 +75,6 @@ def get_users_strings():
             user_number += 1
 
     return users_strings_list, users_data
-
-
-def get_current_users_data(manager_id):
-    return current_users_data_dict.get(manager_id, [])
 
 
 def prev_user_strings(users_for_print_count, manager_id):
@@ -118,6 +133,10 @@ def next_user_strings(users_for_print_count, manager_id):
     return strings
 
 
+def get_current_users_data(manager_id):
+    return current_users_data_dict.get(manager_id, [])
+
+
 def has_user_status(id, status):
     data = file_manager.read_file(user_db_path)
     for user in data:
@@ -126,9 +145,9 @@ def has_user_status(id, status):
     return False
 
 
-def getUserLanguage(id):
+def get_user_language(id):
     if id in manager_module.managers_id:
-        return manager_module.getManagerLanguage(id)
+        return manager_module.get_manager_language(id)
     else:
         data = file_manager.read_file(user_db_path)
         for user in data:
@@ -136,14 +155,14 @@ def getUserLanguage(id):
                 return user['language']
 
 
-def setUserLanguage(id, newLanguage):
+def set_user_language(id, new_language):
     if id in manager_module.managers_id:
-        manager_module.setManagerLanguage(id, newLanguage)
+        manager_module.set_manager_language(id, new_language)
     else:
         data = file_manager.read_file(user_db_path)
         for user in data:
             if user['id'] == id:
-                 user['language'] = newLanguage
+                 user['language'] = new_language
         file_manager.write_file(user_db_path, data)
 
 
@@ -227,7 +246,7 @@ async def update_status_user(id, status):
     file_manager.write_file(user_db_path, data)
 
 
-async def setUserTag(id, tag):
+async def set_user_tag(id, tag):
     data = file_manager.read_file(user_db_path)
     for user in data:
         found_user = user['id'] == id
@@ -235,7 +254,6 @@ async def setUserTag(id, tag):
             user['tag'] = tag
             break
     file_manager.write_file(user_db_path, data)
-
 
 
 async def get_user_with_status(status):
@@ -256,7 +274,7 @@ def get_user_status(id):
     return None
 
 
-def get_user_Tag(id):
+def get_user_tag(id):
     data = file_manager.read_file(user_db_path)
     for user in data:
         if user['id'] == id:

@@ -122,10 +122,6 @@ def analize_currency_data_controller(analize_pairs):
         if main_price_df is None:
             return
 
-        # dt = main_price_df["datetime"][0]
-        # if not unit_pd.is_analize_time(dt):
-        #     return
-
         prices_dfs = []
         for pd in check_pds:
             ch_data = pd.get_chart_data_if_exists()

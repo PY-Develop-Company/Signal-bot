@@ -12,6 +12,14 @@ time_zone = pytz.timezone("Europe/Bucharest")
 origin_date = datetime(1900, 1, 1, tzinfo=time_zone)
 
 
+def get_time():
+    return datetime.now(time_zone)
+
+
+def get_time_in_seconds():
+    return datetime.timestamp(get_time())
+
+
 def secs_to_date(end_date):
     res = datetime.fromtimestamp(end_date) #.strftime("%A, %B %d, %Y %I:%M:%S")
     return res
