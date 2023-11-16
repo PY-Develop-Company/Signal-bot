@@ -104,5 +104,11 @@ def interval_to_int(interval: Interval):
         return 60
     elif interval == Interval.in_2_hour:
         return 120
+    elif interval == Interval.in_daily:
+        return 1440
+    elif interval == Interval.in_weekly:
+        return 1440 * 7
+    elif interval == Interval.in_monthly:
+        return 1440 * 30
     else:
         return None

@@ -9,7 +9,12 @@ max_time_zone_hours = 23
 trial_days = 3
 
 time_zone = pytz.timezone("Europe/Bucharest")
-origin_date = datetime(1900, 1, 1, tzinfo=time_zone)
+origin_date_time_zone = datetime(1900, 1, 1, tzinfo=time_zone)
+origin_date = datetime(1900, 1, 1)
+
+
+def datetime_to_secs(dt):
+    return (dt - origin_date).total_seconds()
 
 
 def secs_to_date(end_date):
