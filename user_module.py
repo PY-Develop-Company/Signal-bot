@@ -4,7 +4,7 @@ import file_manager
 import manager_module
 import market_info
 from manager_module import tester_ids
-from  market_info import get_time_in_seconds
+from datetime import datetime, timedelta
 
 user_db_path = "users/db.txt"
 startLanguage = "none"
@@ -24,19 +24,56 @@ wait_id_input_status = 'status wait input ID'
 wait_deposit_status = 'status wait check Deposit'
 
 
-def get_users_group_ids(users_count, next_signal_delay_in_seconds):
-    curr_time = get_time_in_seconds()
-    next_signal_time = curr_time + next_signal_delay_in_seconds
+def getNowTime():
+    return datetime.now()
 
+def timeConvertToStr(buferTime):
+    return datetime.strftime(buferTime, "%Y-%m-%d %H:%M:%S")
+
+
+def timeStrConvertToTime(buferTime):
+    return datetime.strptime(buferTime, "%Y-%m-%d %H:%M:%S")
+
+
+def getUserTime(id):
+    data = file_manager.read_file(user_db_path)
+    for user in data:
+        if user['id'] == id:
+            return timeStrConvertToTime(user['time'])
+
+
+def setUserTime(id,newtime):
+    data = file_manager.read_file(user_db_path)
+    for user in data:
+        if user['id'] == id:
+            user['time'] = newtime
+            file_manager.write_file(user_db_path, data)
+            return
+
+
+def get_users_group_ids(users_count, delay_second):
     deposit_users = get_users_with_status(deposit_status)
     trial_users = get_users_with_status(trial_status)
     tester_users = tester_ids
 
-    # перевірка часу коли можна буде надсилати наступний сигналу (через next_signal_delay_in_seconds)
-    # Вибір юзерів для відправлення (users_count штук)
-    # запис часу наступного сигналу (аби потім не вибирати тих же самих юзерів)
+    send_signal_time = getNowTime()
+    send_signal_time += timedelta(seconds=delay_second)
 
-    return random.sample([*deposit_users, *trial_users, *tester_users], users_count)
+    DB = file_manager.read_file(user_db_path)
+    signal_users = []
+    for user in DB:
+        if user['id'] in [*deposit_users, *trial_users, *tester_users]:
+            user['time'] = datetime.strptime(user['time'], "%Y-%m-%d %H:%M:%S")
+            signal_users.append(user)
+    sorted_users = sorted(signal_users, key=lambda x: x['time'])
+    result_users = []
+    for i in sorted_users[:users_count]:
+        if i['time']<getNowTime():
+            result_users.append(i["id"])
+            setUserTime(i['id'],timeConvertToStr(send_signal_time))
+    return result_users
+
+
 
 
 def remove_user_with_id(id):
@@ -230,7 +267,8 @@ def add_user(id, first_name, last_name, tag):
             "acount_number": 0,
             "had_trial_status": False,
             "trial_end_date": None,
-            "before_trial_status": "none"
+            "before_trial_status": "none",
+            "time": timeConvertToStr(getNowTime())
         }
         data.append(bufer_user)
         file_manager.write_file(user_db_path, data)

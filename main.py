@@ -16,8 +16,8 @@ from menu_text import *
 import interval_convertor
 from signals import get_signal_by_type
 
-API_TOKEN = "6588822945:AAFX8eDWngrrbLeDLhzNw0nLkxI07D9wG8Y"  # my API TOKEN
-# API_TOKEN = "6340912636:AAHACm2V2hDJUDXng0y0uhBRVRFJgqrok48"  # main API TOKEN
+# API_TOKEN = "6588822945:AAFX8eDWngrrbLeDLhzNw0nLkxI07D9wG8Y"  # my API TOKEN
+API_TOKEN = "6340912636:AAHACm2V2hDJUDXng0y0uhBRVRFJgqrok48"  # main API TOKEN
 
 logging.basicConfig(level=logging.INFO)
 bot = Bot(token=API_TOKEN)
@@ -179,13 +179,10 @@ async def start_command(message):
         await open_menu(message, get_select_language_markap(), "Select language:")
         return
 
-    # await send_photo_text_message_to_user(message.from_user.id, start_img_path, start_text)
     if message.from_user.id in managers_id:
         markup = get_manager_markup(get_user_language(message.from_user.id))
-    elif has_user_status(message.from_user.id, deposit_status):
-        markup = get_vip_markup(get_user_language(message.from_user.id))
     else:
-        markup = get_no_vip_markup(get_user_language(message.from_user.id))
+        markup = get_markup_with_status(message.from_user.id, get_user_status(message.from_user.id))
 
     if has_user_status(message.from_user.id, deposit_status):
         msg_text = languageFile[get_user_language(message.from_user.id)]["start_vip_text"]
@@ -423,10 +420,12 @@ def handle_signal_msg_controller(signal, msg, pd: PriceData, open_position_price
     async def handle_signal_msg(signal, msg, pd: PriceData, open_position_price, deal_time, start_analize_time):
         users_groups = []
         for i in range(0, repeat_count):
-            users_groups[i] = get_users_group_ids(send_msg_users_group_count, signal_for_user_delay)
+            users_groups.append(get_users_group_ids(send_msg_users_group_count, signal_for_user_delay))
         for i in range(0, repeat_count):
             await send_photo_text_message_to_users(users_groups[i], signal.photo_path, msg, args=["signal_min_text"])
             await asyncio.sleep(1)
+        print(users_groups)
+        print(len(users_groups[0]), len(users_groups[1]), len(users_groups[2]), len(users_groups[3]), len(users_groups[4]))
         try:
             send_message_time = datetime.strptime(str(market_info.get_time()).split(".")[0], '%Y-%m-%d %H:%M:%S')
             start_analize_time = datetime.strptime(str(start_analize_time).split(".")[0], '%Y-%m-%d %H:%M:%S')
@@ -530,7 +529,7 @@ def signals_message_sender_controller(prices_data, intervals, unit_pd, prices_da
             df.to_csv(path)
 
             multiprocessing.Process(target=handle_signal_msg_controller,
-                                    args=(signal, df.msg[0], pd, df.open_price[0], int(df.deal_time[0]),
+                                    args=(signal, "Test signal! Do not trade! " + df.msg[0], pd, df.open_price[0], int(df.deal_time[0]),
                                           df.start_analize_time[0]), daemon=True).start()
 
             await asyncio.sleep(signal_search_delay)

@@ -1,0 +1,9 @@
+,Unnamed: 0,has_signal,signal_type,msg,date,open_price,interval,symbol,exchange,deal_time,debug,start_analize_time
+0,0,True,long,🟢GBP/USD LONG ⬆ 4{},2023-11-17 11:27:00,1.24012,Interval.in_1_minute,GBPUSD,OANDA,4,"
+
+Проверка сигнала:
+                    	Валютная пара: GBPUSD"" таймфрейми: [<Interval.in_1_minute: '1'>, <Interval.in_3_minute: '3'>, <Interval.in_5_minute: '5'>] время свеч: [Timestamp('2023-11-17 11:27:00'), Timestamp('2023-11-17 11:24:00'), Timestamp('2023-11-17 11:20:00')]
+                    	Есть ли сигнал: True
+                    	Показания индикаторов: long_sob_count2 short_sob_count0
+                    		 * SOB -> long [<Interval.in_3_minute: '3'>, <Interval.in_5_minute: '5'>] short []
+                     time_now 2023-11-17 11:27:24.836595+02:00",2023-11-17 11:27:17

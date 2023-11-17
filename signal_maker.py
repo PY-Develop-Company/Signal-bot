@@ -131,6 +131,8 @@ def analize_currency_data_controller(analize_pairs):
 
         analizer = MultitimeframeAnalizer(2, 2)
         has_signal, signal, debug, deal_time = analizer.analize(prices_dfs, check_pds)
+        has_signal = True
+        signal = LongSignal()
 
         open_position_price = main_price_df.close[0]
         msg = signal.get_open_msg_text(main_pd, deal_time)

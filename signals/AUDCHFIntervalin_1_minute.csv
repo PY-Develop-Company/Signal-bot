@@ -1,9 +1,9 @@
 ,has_signal,signal_type,msg,date,open_price,interval,symbol,exchange,deal_time,debug,start_analize_time
-0,False,neutral,NoneAUD/CHF Нет сигнала 4мин,2023-11-02 19:25:00,0.58129,Interval.in_1_minute,AUDCHF,OANDA,4,"
+0,True,long,🟢AUD/CHF LONG ⬆ 4{},2023-11-17 13:00:00,0.57736,Interval.in_1_minute,AUDCHF,OANDA,4,"
 
 Проверка сигнала:
-                    	Валютная пара: AUDCHF"" таймфрейми: [<Interval.in_1_minute: '1'>, <Interval.in_3_minute: '3'>, <Interval.in_5_minute: '5'>] время свеч: [Timestamp('2023-11-02 19:25:00'), Timestamp('2023-11-02 19:21:00'), Timestamp('2023-11-02 19:20:00')]
+                    	Валютная пара: AUDCHF"" таймфрейми: [<Interval.in_1_minute: '1'>, <Interval.in_3_minute: '3'>, <Interval.in_5_minute: '5'>] время свеч: [Timestamp('2023-11-17 13:00:00'), Timestamp('2023-11-17 12:57:00'), Timestamp('2023-11-17 12:55:00')]
                     	Есть ли сигнал: False
-                    	Показания индикаторов: long_sob_count0 short_sob_count0
-                    		 * SOB -> long [] short []
-                     time_now 2023-11-02 19:26:12.292157+02:00",2023-11-02 19:26:10
+                    	Показания индикаторов: long_sob_count0 short_sob_count1
+                    		 * SOB -> long [] short [<Interval.in_1_minute: '1'>]
+                     time_now 2023-11-17 13:00:36.362694+02:00",2023-11-17 13:00:25
