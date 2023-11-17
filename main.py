@@ -28,7 +28,9 @@ signal_for_user_delay = 300
 callbacks_wait_time = 600
 
 users_for_print_count = 15
-repeat_count = 5
+
+send_msg_delay = 0.1
+repeat_count = 50
 send_msg_users_group_count = 20
 
 last_user_list_message = dict()
@@ -423,9 +425,9 @@ def handle_signal_msg_controller(signal, msg, pd: PriceData, open_position_price
             users_groups.append(get_users_group_ids(send_msg_users_group_count, signal_for_user_delay))
         for i in range(0, repeat_count):
             await send_photo_text_message_to_users(users_groups[i], signal.photo_path, msg, args=["signal_min_text"])
-            await asyncio.sleep(1)
-        print(users_groups)
-        print(len(users_groups[0]), len(users_groups[1]), len(users_groups[2]), len(users_groups[3]), len(users_groups[4]))
+            await asyncio.sleep(send_msg_delay)
+        # print(users_groups)
+        print([len(users_groups[i]) for i in range(repeat_count)])
         try:
             send_message_time = datetime.strptime(str(market_info.get_time()).split(".")[0], '%Y-%m-%d %H:%M:%S')
             start_analize_time = datetime.strptime(str(start_analize_time).split(".")[0], '%Y-%m-%d %H:%M:%S')
@@ -441,7 +443,7 @@ def handle_signal_msg_controller(signal, msg, pd: PriceData, open_position_price
 
         for i in range(0, repeat_count):
             await send_photo_text_message_to_users(users_groups[i], img_path, close_signal_message, args=["signal_deal_text", "signal_min_text"])
-            await asyncio.sleep(1)
+            await asyncio.sleep(send_msg_delay)
 
     asyncio.run(handle_signal_msg(signal, msg, pd, open_position_price, deal_time, start_analize_time))
 
@@ -529,7 +531,7 @@ def signals_message_sender_controller(prices_data, intervals, unit_pd, prices_da
             df.to_csv(path)
 
             multiprocessing.Process(target=handle_signal_msg_controller,
-                                    args=(signal, "Test signal! Do not trade! " + df.msg[0], pd, df.open_price[0], int(df.deal_time[0]),
+                                    args=(signal, df.msg[0], pd, df.open_price[0], int(df.deal_time[0]),
                                           df.start_analize_time[0]), daemon=True).start()
 
             await asyncio.sleep(signal_search_delay)
