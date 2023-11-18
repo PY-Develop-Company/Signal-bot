@@ -16,63 +16,100 @@ sob_dict = {
         Interval.in_3_minute: 70,
         Interval.in_5_minute: 110,
         Interval.in_15_minute: 155,
-        Interval.in_30_minute: 210
+        Interval.in_30_minute: 210,
+        Interval.in_45_minute: 0,
+        Interval.in_1_hour: 0,
+        Interval.in_2_hour: 0
     },
     "AUDUSD": {
         Interval.in_1_minute: 35,
         Interval.in_3_minute: 75,
         Interval.in_5_minute: 120,
         Interval.in_15_minute: 150,
-        Interval.in_30_minute: 220
+        Interval.in_30_minute: 220,
+        Interval.in_45_minute: 0,
+        Interval.in_1_hour: 0,
+        Interval.in_2_hour: 0
     },
     "AUDCAD": {
         Interval.in_1_minute: 40,
         Interval.in_3_minute: 94,
         Interval.in_5_minute: 145,
         Interval.in_15_minute: 150,
-        Interval.in_30_minute: 200
+        Interval.in_30_minute: 200,
+        Interval.in_45_minute: 0,
+        Interval.in_1_hour: 0,
+        Interval.in_2_hour: 0
     },
     "EURJPY": {
         Interval.in_1_minute: 40,
         Interval.in_3_minute: 90,
         Interval.in_5_minute: 124,
         Interval.in_15_minute: 155,
-        Interval.in_30_minute: 199
+        Interval.in_30_minute: 199,
+        Interval.in_45_minute: 0,
+        Interval.in_1_hour: 0,
+        Interval.in_2_hour: 0
     },
     "EURCAD": {
         Interval.in_1_minute: 85,
         Interval.in_3_minute: 146,
         Interval.in_5_minute: 178,
         Interval.in_15_minute: 235,
-        Interval.in_30_minute: 270
+        Interval.in_30_minute: 270,
+        Interval.in_45_minute: 0,
+        Interval.in_1_hour: 0,
+        Interval.in_2_hour: 0
     },
     "AUDCHF": {
         Interval.in_1_minute: 30,
         Interval.in_3_minute: 79,
         Interval.in_5_minute: 125,
         Interval.in_15_minute: 170,
-        Interval.in_30_minute: 200
+        Interval.in_30_minute: 200,
+        Interval.in_45_minute: 0,
+        Interval.in_1_hour: 0,
+        Interval.in_2_hour: 0
     },
     "GBPUSD": {
         Interval.in_1_minute: 85,
         Interval.in_3_minute: 99,
         Interval.in_5_minute: 125,
         Interval.in_15_minute: 185,
-        Interval.in_30_minute: 220
+        Interval.in_30_minute: 220,
+        Interval.in_45_minute: 0,
+        Interval.in_1_hour: 0,
+        Interval.in_2_hour: 0
     },
     "AUDJPY": {
         Interval.in_1_minute: 50,
         Interval.in_3_minute: 120,
         Interval.in_5_minute: 170,
         Interval.in_15_minute: 220,
-        Interval.in_30_minute: 240
+        Interval.in_30_minute: 240,
+        Interval.in_45_minute: 0,
+        Interval.in_1_hour: 0,
+        Interval.in_2_hour: 0
     },
     "GBPAUD": {
         Interval.in_1_minute: 77,
         Interval.in_3_minute: 155,
         Interval.in_5_minute: 215,
         Interval.in_15_minute: 320,
-        Interval.in_30_minute: 370
+        Interval.in_30_minute: 370,
+        Interval.in_45_minute: 0,
+        Interval.in_1_hour: 0,
+        Interval.in_2_hour: 0
+    },
+    "BTCUSD": {
+        Interval.in_1_minute: 0,
+        Interval.in_3_minute: 0,
+        Interval.in_5_minute: 0,
+        Interval.in_15_minute: 0,
+        Interval.in_30_minute: 0,
+        Interval.in_45_minute: 0,
+        Interval.in_1_hour: 0,
+        Interval.in_2_hour: 0
     }
 }
 
@@ -145,7 +182,8 @@ class SuperOrderBlockIndicator(Indicator):
             print("Created box: ", self.left, self.top, self.right, self.bottom)
 
         def check_signal(self, bar_low, bar_high, bar_date):
-            is_price_in_box = (self.top > bar_high > self.bottom) or (self.top > bar_low > self.bottom)
+            is_price_in_box = (self.top > bar_high > self.bottom) or (self.top > bar_low > self.bottom) #(bar_high > self.top > bar_low) or (bar_high > self.bottom > bar_low)
+            #
             is_date_range_in_box = self.left <= bar_date <= self.right
             return self.signal if (is_price_in_box and is_date_range_in_box) else NeutralSignal()
 

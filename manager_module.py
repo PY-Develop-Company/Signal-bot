@@ -3,7 +3,8 @@ import user_module
 from user_module import *
 
 manager_username = "@NoMeFU"
-tester_ids = [741867026, 693562775, 5359645780]
+
+tester_ids = [741867026, 693562775]
 managers_id = [741867026, 693562775]
 manager_url = f"https://t.me/{manager_username[1:]}"
 

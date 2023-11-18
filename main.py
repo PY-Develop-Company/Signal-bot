@@ -19,6 +19,9 @@ from signals import get_signal_by_type
 # API_TOKEN = "6588822945:AAFX8eDWngrrbLeDLhzNw0nLkxI07D9wG8Y"  # my API TOKEN
 API_TOKEN = "6538527964:AAHUUHZHYVnNFbYAPoMn4bRUMASKR0h9qfA"  # main API TOKEN
 
+manager = None
+shared_list = None
+
 logging.basicConfig(level=logging.INFO)
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot)
@@ -418,8 +421,8 @@ async def manage_user_callback(call: types.CallbackQuery):
     await call.answer(call.data)
 
 
-def handle_signal_msg_controller(signal, msg, pd: PriceData, open_position_price, deal_time, start_analize_time):
-    async def handle_signal_msg(signal, msg, pd: PriceData, open_position_price, deal_time, start_analize_time):
+def handle_signal_msg_controller(signal, msg, pd: PriceData, open_position_price, deal_time, start_analize_time, shared_list):
+    async def handle_signal_msg(signal, msg, pd: PriceData, open_position_price, deal_time, start_analize_time, shared_list):
         users_groups = []
         for i in range(0, repeat_count):
             users_groups.append(get_users_group_ids(send_msg_users_group_count, signal_for_user_delay))
@@ -438,14 +441,24 @@ def handle_signal_msg_controller(signal, msg, pd: PriceData, open_position_price
         except Exception as e:
             print(e)
 
-        close_signal_message, is_profit = await signal_maker.close_position(open_position_price, signal, pd, deal_time)
+        close_signal_message, is_profit = await signal_maker.close_position(open_position_price, signal, pd, bars_count=deal_time)
+        shared_list[is_profit] += 1
         img_path = "./img/profit.jpg" if is_profit else "./img/loss.jpg"
 
         for i in range(0, repeat_count):
             await send_photo_text_message_to_users(users_groups[i], img_path, close_signal_message, args=["signal_deal_text", "signal_min_text"])
             await asyncio.sleep(send_msg_delay)
 
-    asyncio.run(handle_signal_msg(signal, msg, pd, open_position_price, deal_time, start_analize_time))
+    asyncio.run(handle_signal_msg(signal, msg, pd, open_position_price, deal_time, start_analize_time, shared_list))
+
+
+async def try_send_day_profit(shared_list):
+    time_zone = pytz.timezone("Europe/Bucharest")
+    time_now = datetime.now(time_zone)
+    if (shared_list[1] > 0 or shared_list[0] > 0) and time_now.hour == 0:
+        text = f"Total day statistics:\n\tprofits: {shared_list[1]};\n\tloses: {shared_list[0]};\n"
+        await send_message_to_users(get_deposit_users_ids(), text)
+        print(text)
 
 
 async def check_trial_users():
@@ -460,8 +473,8 @@ async def check_trial_users():
             await send_message_to_user(user_id, languageFile[userLanguage]["for_vip_text"])
 
 
-def signals_message_sender_controller(prices_data, intervals, unit_pd, prices_data_all):
-    async def signals_message_sender_function(main_prices_data, intervals, unit_pd, prices_data_all):
+def signals_message_sender_controller(prices_data, intervals, unit_pd, prices_data_all, shared_list):
+    async def signals_message_sender_function(main_prices_data, intervals, unit_pd, prices_data_all, shared_list):
         price_parser.create_parce_currencies_with_intervals_callbacks(prices_data_all)
         last_send_message_check = time.time()
         for pd in prices_data_all:
@@ -476,7 +489,8 @@ def signals_message_sender_controller(prices_data, intervals, unit_pd, prices_da
                 await check_trial_users()
             except Exception as e:
                 print("check_trial_users_ERROR", e)
-
+            await try_send_day_profit(shared_list)
+            # need_to_reset_seis = time.time() - last_callback_update_time > callbacks_wait_time
             need_to_reset_seis = last_send_message_check + reset_seis_wait_time < time.time()
             if need_to_reset_seis:
                 price_parser.create_parce_currencies_with_intervals_callbacks(prices_data_all)
@@ -494,7 +508,7 @@ def signals_message_sender_controller(prices_data, intervals, unit_pd, prices_da
                             print("wait for signal", cont, time.time())
                             continue
             except Exception as e:
-                print("Error", e)
+                print("4Error", e)
             print("search signals to send...")
             if not market_info.is_market_working():
                 continue
@@ -532,27 +546,33 @@ def signals_message_sender_controller(prices_data, intervals, unit_pd, prices_da
 
             multiprocessing.Process(target=handle_signal_msg_controller,
                                     args=(signal, df.msg[0], pd, df.open_price[0], int(df.deal_time[0]),
-                                          df.start_analize_time[0]), daemon=True).start()
+                                          df.start_analize_time[0], shared_list), daemon=True).start()
 
             await asyncio.sleep(signal_search_delay)
 
             signal_maker.reset_signals_files(main_prices_data)
 
-    asyncio.run(signals_message_sender_function(prices_data, intervals, unit_pd, prices_data_all))
+    asyncio.run(signals_message_sender_function(prices_data, intervals, unit_pd, prices_data_all, shared_list))
 
 
 if __name__ == '__main__':
     from aiogram import executor
 
     multiprocessing.freeze_support()
+
+    manager = multiprocessing.Manager()
+    shared_list = manager.list()
+    shared_list.append(0)
+    shared_list.append(0)
+
     currencies = price_parser.get_currencies()
 
-    intervals = [Interval.in_1_minute, Interval.in_3_minute, Interval.in_5_minute, Interval.in_15_minute, Interval.in_30_minute]
-    main_intervals = [Interval.in_1_minute, Interval.in_3_minute, Interval.in_5_minute]
+    intervals = [Interval.in_1_minute, Interval.in_3_minute, Interval.in_5_minute, Interval.in_15_minute] #, Interval.in_30_minute]
+    main_intervals = [Interval.in_1_minute, Interval.in_3_minute] #, Interval.in_5_minute]
     parent_intervals = [
         [Interval.in_3_minute, Interval.in_5_minute],
-        [Interval.in_5_minute, Interval.in_15_minute],
-        [Interval.in_15_minute, Interval.in_30_minute]
+        [Interval.in_5_minute, Interval.in_15_minute]
+        # [Interval.in_15_minute, Interval.in_30_minute]
     ]
     prices_data = []
 
@@ -577,7 +597,7 @@ if __name__ == '__main__':
         pd.remove_chart_data()
 
     unit_pd = main_pds[0]
-    multiprocessing.Process(target=signals_message_sender_controller, args=(main_pds, main_intervals, unit_pd, prices_data)).start()
+    multiprocessing.Process(target=signals_message_sender_controller, args=(main_pds, main_intervals, unit_pd, prices_data, shared_list, )).start()
 
     analize_pairs = []
     for i in range(len(main_pds)):
