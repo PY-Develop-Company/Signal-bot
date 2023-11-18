@@ -13,7 +13,7 @@ neutral_signal_text = "Нет сигнала"
 profit_smile = "✅"
 loss_smile = "❌"
 
-puncts_pohibka = 5
+puncts_pohibka = 0
 
 
 class Signal:
