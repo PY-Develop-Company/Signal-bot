@@ -14,17 +14,19 @@ def upgrade():
     count=0
     nowTime = timeConvertToStr(getNowTime()-timedelta(seconds=7200))
     for user in oldDB:
-
+        status = user['status']
+        if status == trial_status:
+            status = none_status
         bufer_user = {
                     "id": user["id"],
                     "name": user["name"],
                     "tag": user["tag"],
                     "language": user["language"],
-                    "status": user['status'],
+                    "status": status,
                     "acount_number": user["acount_number"],
-                    "had_trial_status": user["had_trial_status"],
-                    "trial_end_date": user["trial_end_date"],
-                    "before_trial_status": user["before_trial_status"],
+                    "had_trial_status": False,
+                    "trial_end_date": None,
+                    "before_trial_status": none_status,
                     "time": nowTime,
                     "get_next_signal": False
                 }

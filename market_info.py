@@ -52,8 +52,7 @@ def get_trial_end_date():
 
 def is_trial_ended(trial_end_date):
     time_now = datetime.now(time_zone)
-    time_difference = (time_now - origin_date).total_seconds()
-    return time_difference > trial_end_date
+    return datetime.timestamp(time_now) > trial_end_date
 
 
 def is_market_working():
@@ -62,5 +61,6 @@ def is_market_working():
 
 
 if __name__ == "__main__":
-    res = secs_to_date(user_module.get_user_trial_end_date(6916117863))
+    # res = secs_to_date(get_trial_end_date())
+    res = secs_to_date(user_module.get_user_trial_end_date(5359645780))
     print(res)
