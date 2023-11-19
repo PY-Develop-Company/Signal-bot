@@ -5,103 +5,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c8e52443-fb39-41fa-9e09-4877251a22f1" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/Signal-bot.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Signal-bot.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/AUDCADIntervalin_15_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/AUDCADIntervalin_1_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/AUDCADIntervalin_30_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/AUDCADIntervalin_3_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/AUDCADIntervalin_5_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/AUDCHFIntervalin_15_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/AUDCHFIntervalin_1_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/AUDCHFIntervalin_30_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/AUDCHFIntervalin_3_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/AUDCHFIntervalin_5_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/AUDJPYIntervalin_15_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/AUDJPYIntervalin_1_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/AUDJPYIntervalin_30_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/AUDJPYIntervalin_3_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/AUDJPYIntervalin_5_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/AUDUSDIntervalin_15_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/AUDUSDIntervalin_1_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/AUDUSDIntervalin_30_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/AUDUSDIntervalin_3_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/AUDUSDIntervalin_5_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/EURCADIntervalin_15_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/EURCADIntervalin_1_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/EURCADIntervalin_30_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/EURCADIntervalin_3_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/EURCADIntervalin_5_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/EURJPYIntervalin_15_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/EURJPYIntervalin_1_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/EURJPYIntervalin_30_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/EURJPYIntervalin_3_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/EURJPYIntervalin_5_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/EURUSDIntervalin_15_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/EURUSDIntervalin_1_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/EURUSDIntervalin_30_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/EURUSDIntervalin_3_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/EURUSDIntervalin_5_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/GBPAUDIntervalin_15_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/GBPAUDIntervalin_1_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/GBPAUDIntervalin_30_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/GBPAUDIntervalin_3_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/GBPAUDIntervalin_5_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/GBPUSDIntervalin_15_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/GBPUSDIntervalin_1_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/GBPUSDIntervalin_30_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/GBPUSDIntervalin_3_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/GBPUSDIntervalin_5_minute.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/check_ended/AUDCADIntervalin_15_minute.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/check_ended/AUDCADIntervalin_1_minute.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/check_ended/AUDCADIntervalin_30_minute.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/check_ended/AUDCADIntervalin_3_minute.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/check_ended/AUDCADIntervalin_5_minute.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/check_ended/AUDCHFIntervalin_15_minute.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/check_ended/AUDCHFIntervalin_1_minute.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/check_ended/AUDCHFIntervalin_30_minute.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/check_ended/AUDCHFIntervalin_3_minute.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/check_ended/AUDCHFIntervalin_5_minute.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/check_ended/AUDJPYIntervalin_15_minute.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/check_ended/AUDJPYIntervalin_1_minute.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/check_ended/AUDJPYIntervalin_30_minute.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/check_ended/AUDJPYIntervalin_3_minute.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/check_ended/AUDJPYIntervalin_5_minute.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/check_ended/AUDUSDIntervalin_15_minute.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/check_ended/AUDUSDIntervalin_1_minute.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/check_ended/AUDUSDIntervalin_30_minute.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/check_ended/AUDUSDIntervalin_3_minute.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/check_ended/AUDUSDIntervalin_5_minute.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/check_ended/EURCADIntervalin_15_minute.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/check_ended/EURCADIntervalin_1_minute.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/check_ended/EURCADIntervalin_30_minute.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/check_ended/EURCADIntervalin_3_minute.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/check_ended/EURCADIntervalin_5_minute.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/check_ended/EURJPYIntervalin_15_minute.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/check_ended/EURJPYIntervalin_1_minute.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/check_ended/EURJPYIntervalin_30_minute.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/check_ended/EURJPYIntervalin_3_minute.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/check_ended/EURJPYIntervalin_5_minute.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/check_ended/EURUSDIntervalin_15_minute.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/check_ended/EURUSDIntervalin_1_minute.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/check_ended/EURUSDIntervalin_30_minute.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/check_ended/EURUSDIntervalin_3_minute.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/check_ended/EURUSDIntervalin_5_minute.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/check_ended/GBPAUDIntervalin_15_minute.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/check_ended/GBPAUDIntervalin_1_minute.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/check_ended/GBPAUDIntervalin_30_minute.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/check_ended/GBPAUDIntervalin_3_minute.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/check_ended/GBPAUDIntervalin_5_minute.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/check_ended/GBPUSDIntervalin_15_minute.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/check_ended/GBPUSDIntervalin_1_minute.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/check_ended/GBPUSDIntervalin_30_minute.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/check_ended/GBPUSDIntervalin_3_minute.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/check_ended/GBPUSDIntervalin_5_minute.txt" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/db_upgrade.py" beforeDir="false" afterPath="$PROJECT_DIR$/db_upgrade.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/language.json" beforeDir="false" afterPath="$PROJECT_DIR$/language.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/market_info.py" beforeDir="false" afterPath="$PROJECT_DIR$/market_info.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu_text.py" beforeDir="false" afterPath="$PROJECT_DIR$/menu_text.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user_module.py" beforeDir="false" afterPath="$PROJECT_DIR$/user_module.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/users/db.txt" beforeDir="false" afterPath="$PROJECT_DIR$/users/db.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/users/old_db.txt" beforeDir="false" afterPath="$PROJECT_DIR$/users/old_db.txt" afterDir="false" />
     </list>
     <list id="cbe571c8-b52a-4250-a9e3-ad1313cd5330" name="Changes by Alex" comment="" />
     <list id="73f4a095-b29f-44b3-9e91-c0cf90404a0a" name="Changes by Roma lox" comment="" />

@@ -58,6 +58,7 @@ def get_half_vip_markup(languageCode):
 
 def get_vip_markup(languageCode):
     vip_markup = types.ReplyKeyboardMarkup(resize_keyboard=True, keyboard=[
+        [types.KeyboardButton(languageFile[languageCode]["get_signal_button_text"])],
         [types.KeyboardButton(languageFile[languageCode]["contact_manager"])]
     ])
     return vip_markup

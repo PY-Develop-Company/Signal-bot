@@ -25,7 +25,8 @@ def upgrade():
                     "had_trial_status": user["had_trial_status"],
                     "trial_end_date": user["trial_end_date"],
                     "before_trial_status": user["before_trial_status"],
-                    "time": nowTime
+                    "time": nowTime,
+                    "get_next_signal": False
                 }
         newDB.append(bufer_user)
         count += 1

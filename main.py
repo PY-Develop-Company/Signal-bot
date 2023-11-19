@@ -376,6 +376,12 @@ async def handle_media(message: types.Message):
             else:
                 await update_status_user(user_id, wait_id_input_status)
                 await open_menu(message, get_empty_markup(), languageFile[user_language]["wait_id_text"])
+        elif message.text == languageFile[user_language]["get_signal_button_text"]:
+            if get_next_signal_status(user_id)==False:
+                set_next_signal_status(user_id, True)
+                await message.answer(languageFile[user_language]["start_searching_signal_text"])
+            else:
+                await message.answer(languageFile[user_language]["already_waiting_signal_text"])
 
 
 @dp.callback_query_handler(text="next_users")
@@ -444,7 +450,9 @@ def handle_signal_msg_controller(signal, msg, pd: PriceData, open_position_price
         for i in range(0, repeat_count):
             await send_photo_text_message_to_users(users_groups[i], img_path, close_signal_message, args=["signal_deal_text", "signal_min_text"])
             await asyncio.sleep(send_msg_delay)
-
+        for group in users_groups:
+            for user in group:
+                set_next_signal_status(user,False)
     asyncio.run(handle_signal_msg(signal, msg, pd, open_position_price, deal_time, start_analize_time))
 
 

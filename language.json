@@ -50,7 +50,10 @@
     "ended_trial_text": "3 test days have passed. To trade with GoldenBot in the future, fulfill the following conditions \uD83D\uDC47",
     "signal_min_text": "min",
     "signal_deal_text": "Deal in",
-    "cant_remove_trial_user_text": "Unable to delete a user with a trial version"
+    "cant_remove_trial_user_text": "Unable to delete a user with a trial version",
+    "get_signal_button_text": "search for a new signal \uD83D\uDD0D",
+    "start_searching_signal_text": "\uD83D\uDD0D start of signal search...",
+    "already_waiting_signal_text": "⚠\uFE0F you are already waiting for the signal ⚠\uFE0F"
   },
   "русский": {
     "language_name": "русский\uD83C\uDDF7\uD83C\uDDFA",
@@ -103,7 +106,10 @@
     "ended_trial_text": "Время 3 тестовых дней прошло. Для торговли в дальнейшем с GoldenBot выполни следующие условия \uD83D\uDC47",
     "signal_min_text": "мин",
     "signal_deal_text": "Сделка в",
-    "cant_remove_trial_user_text": "Невозможно удалить пользователя с пробной версией"
+    "cant_remove_trial_user_text": "Невозможно удалить пользователя с пробной версией",
+    "get_signal_button_text": "поиск нового сигнала \uD83D\uDD0D",
+    "start_searching_signal_text": "\uD83D\uDD0D начало поиска сигнала...",
+    "already_waiting_signal_text": "⚠\uFE0F вы уже ждете сигнала ⚠\uFE0F"
   },
   "हिंदी": {
     "language_name": "हिंदी\uD83C\uDDEE\uD83C\uDDF3",
@@ -156,6 +162,9 @@
     "ended_trial_text": "3 परीक्षण दिन बीत चुके हैं. भविष्य में गोल्डनबॉट के साथ व्यापार करने के लिए, निम्नलिखित शर्तों को पूरा करें \uD83D\uDC47",
     "signal_min_text": "मिनट",
     "signal_deal_text": "में सौदा करें",
-    "cant_remove_trial_user_text": "परीक्षण संस्करण वाले उपयोगकर्ता को हटाना असंभव है।"
+    "cant_remove_trial_user_text": "परीक्षण संस्करण वाले उपयोगकर्ता को हटाना असंभव है।",
+    "get_signal_button_text": "नया सिग्नल खोजें \uD83D\uDD0D",
+    "start_searching_signal_text": "\uD83D\uDD0D सिग्नल खोज की शुरुआत...",
+    "already_waiting_signal_text": "⚠\uFE0F आप पहले से ही सिग्नल का इंतजार कर रहे हैं ⚠\uFE0F"
   }
 }

@@ -62,7 +62,7 @@ def get_users_group_ids(users_count, delay_second):
     DB = file_manager.read_file(user_db_path)
     signal_users = []
     for user in DB:
-        if user['id'] in [*deposit_users, *trial_users, *tester_users]:
+        if user['id'] in [*deposit_users, *trial_users, *tester_users] and user['get_next_signal']==True:
             user['time'] = datetime.strptime(user['time'], "%Y-%m-%d %H:%M:%S")
             signal_users.append(user)
     sorted_users = sorted(signal_users, key=lambda x: x['time'])
@@ -203,6 +203,22 @@ def set_user_language(id, new_language):
         file_manager.write_file(user_db_path, data)
 
 
+def set_next_signal_status(id, flag):
+    data = file_manager.read_file(user_db_path)
+    for user in data:
+        if user['id'] == id:
+             user['get_next_signal'] = flag
+    file_manager.write_file(user_db_path, data)
+
+def get_next_signal_status(id):
+    data = file_manager.read_file(user_db_path)
+    for user in data:
+        if user['id'] == id:
+            return user['get_next_signal']
+    return None
+
+
+
 def get_users_with_status(status):
     data = file_manager.read_file(user_db_path)
     users_with_status = []
@@ -268,7 +284,8 @@ def add_user(id, first_name, last_name, tag):
             "had_trial_status": False,
             "trial_end_date": None,
             "before_trial_status": "none",
-            "time": timeConvertToStr(getNowTime())
+            "time": timeConvertToStr(getNowTime()),
+            "get_next_signal": False
         }
         data.append(bufer_user)
         file_manager.write_file(user_db_path, data)
