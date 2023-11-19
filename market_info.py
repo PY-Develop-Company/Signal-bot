@@ -52,7 +52,8 @@ def get_trial_end_date():
 
 def is_trial_ended(trial_end_date):
     time_now = datetime.now(time_zone)
-    return datetime.timestamp(time_now) > trial_end_date
+    time_difference = (time_now - origin_date).total_seconds()
+    return time_difference > trial_end_date
 
 
 def is_market_working():

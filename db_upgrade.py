@@ -34,8 +34,7 @@ def upgrade():
     print(count)
 
 # printDb()
-upgrade()
-
+# upgrade()
 
 # get_users_group_ids(5,300)
 # oldDB = read_file("users/old_db.txt")
