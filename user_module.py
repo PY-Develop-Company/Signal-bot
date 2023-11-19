@@ -3,7 +3,6 @@ import random
 import file_manager
 import manager_module
 import market_info
-from manager_module import tester_ids
 from datetime import datetime, timedelta
 
 user_db_path = "users/db.txt"
@@ -54,7 +53,7 @@ def setUserTime(id,newtime):
 def get_users_group_ids(users_count, delay_second):
     deposit_users = get_users_with_status(deposit_status)
     trial_users = get_users_with_status(trial_status)
-    tester_users = tester_ids
+    tester_users = manager_module.tester_ids
 
     send_signal_time = getNowTime()
     send_signal_time += timedelta(seconds=delay_second)

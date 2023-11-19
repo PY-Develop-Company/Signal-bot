@@ -1,5 +1,4 @@
 import os
-import user_module
 from user_module import *
 
 manager_username = "@NoMeFU"
@@ -62,7 +61,7 @@ def get_manager_do(manager_id):
 def get_manager_user_acount(manager_id):
     url = get_url(manager_id)
     manager = file_manager.read_file(url)
-    return user_module.get_user_account_number(int(manager["do"]))
+    return get_user_account_number(int(manager["do"]))
 
 
 def is_manager_status(manager_id, status):

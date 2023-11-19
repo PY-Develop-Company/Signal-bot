@@ -10,21 +10,20 @@ def printDb():
 
 def upgrade():
     oldDB = read_file("users/old_db.txt")
-    newDB=[]
-    count=0
+    newDB = []
+    count = 0
     nowTime = timeConvertToStr(getNowTime()-timedelta(seconds=7200))
     for user in oldDB:
-
         bufer_user = {
                     "id": user["id"],
                     "name": user["name"],
-                    "tag": user["tag"],
-                    "language": user["language"],
+                    "tag": "none",
+                    "language": startLanguage,
                     "status": user['status'],
                     "acount_number": user["acount_number"],
-                    "had_trial_status": user["had_trial_status"],
-                    "trial_end_date": user["trial_end_date"],
-                    "before_trial_status": user["before_trial_status"],
+                    "had_trial_status": False,
+                    "trial_end_date": None,
+                    "before_trial_status": "none",
                     "time": nowTime
                 }
         newDB.append(bufer_user)

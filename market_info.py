@@ -1,8 +1,6 @@
 import pytz
 from datetime import datetime, timedelta
 
-import user_module
-
 min_time_zone_hours = 10
 max_time_zone_hours = 23
 
@@ -13,7 +11,7 @@ origin_date = datetime(1900, 1, 1, tzinfo=time_zone)
 
 
 def get_time():
-    return datetime.now(time_zone)
+    return datetime.strptime(str(datetime.now(time_zone)).split(".")[0], '%Y-%m-%d %H:%M:%S')
 
 
 def get_time_in_seconds():
@@ -58,8 +56,3 @@ def is_trial_ended(trial_end_date):
 def is_market_working():
     time_now = datetime.now(time_zone)
     return min_time_zone_hours <= time_now.hour < max_time_zone_hours
-
-
-if __name__ == "__main__":
-    res = secs_to_date(user_module.get_user_trial_end_date(6916117863))
-    print(res)

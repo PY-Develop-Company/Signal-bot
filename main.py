@@ -1,7 +1,5 @@
 import random
 import time
-from datetime import datetime
-import pytz
 from aiogram import Bot, Dispatcher, types
 import logging
 import price_parser
@@ -15,9 +13,10 @@ from manager_module import *
 from menu_text import *
 import interval_convertor
 from signals import get_signal_by_type
+from pandas import DataFrame, read_csv, to_datetime, concat
 
-# API_TOKEN = "6588822945:AAFX8eDWngrrbLeDLhzNw0nLkxI07D9wG8Y"  # my API TOKEN
-API_TOKEN = "6538527964:AAHUUHZHYVnNFbYAPoMn4bRUMASKR0h9qfA"  # main API TOKEN
+# API_TOKEN = "6588822945:AAFX8eDWngrrbLeDLhzNw0nLkxI07D9wG8Y"  # еуіе API TOKEN
+API_TOKEN = "6538527964:AAF2sblcgdx9dyVo1jcyGLCFhoIRa9-3N_A"  # main API TOKEN
 
 manager = None
 shared_list = None
@@ -39,7 +38,10 @@ send_msg_users_group_count = 20
 last_user_list_message = dict()
 last_user_manage_message = dict()
 
+signals_stats_path = "signals/signals.csv"
 start_img_path = "img/logo.jpg"
+
+last_check_time = market_info.get_time()
 
 
 def update_last_user_list_message(message):
@@ -429,19 +431,20 @@ def handle_signal_msg_controller(signal, msg, pd: PriceData, open_position_price
         for i in range(0, repeat_count):
             await send_photo_text_message_to_users(users_groups[i], signal.photo_path, msg, args=["signal_min_text"])
             await asyncio.sleep(send_msg_delay)
-        # print(users_groups)
+
         print([len(users_groups[i]) for i in range(repeat_count)])
+
+        send_open_message_time = market_info.get_time()
+        start_analize_time = datetime.strptime(start_analize_time, '%Y-%m-%d %H:%M:%S')
+        delay = send_open_message_time - start_analize_time
+        debug_msg = "delay: " + str(delay) + "; analize_time: " + str(start_analize_time) + "; send_msg_time: " + str(send_open_message_time)
+
         try:
-            send_message_time = datetime.strptime(str(market_info.get_time()).split(".")[0], '%Y-%m-%d %H:%M:%S')
-            start_analize_time = datetime.strptime(str(start_analize_time).split(".")[0], '%Y-%m-%d %H:%M:%S')
-            delay = send_message_time - start_analize_time
-            print("delay", delay)
-            await send_message_to_users(managers_id, "delay: " + str(delay) + "; analize_time: " + str(
-                start_analize_time) + "; send_msg_time: " + str(send_message_time))
+            await send_message_to_users(managers_id, debug_msg)
         except Exception as e:
             print(e)
 
-        close_signal_message, is_profit = await signal_maker.close_position(open_position_price, signal, pd, bars_count=deal_time)
+        close_signal_message, is_profit, open_price, close_price = await signal_maker.close_position(open_position_price, signal, pd, bars_count=deal_time)
         shared_list[is_profit] += 1
         img_path = "./img/profit.jpg" if is_profit else "./img/loss.jpg"
 
@@ -449,16 +452,64 @@ def handle_signal_msg_controller(signal, msg, pd: PriceData, open_position_price
             await send_photo_text_message_to_users(users_groups[i], img_path, close_signal_message, args=["signal_deal_text", "signal_min_text"])
             await asyncio.sleep(send_msg_delay)
 
+        while True:
+            send_close_message_time = market_info.get_time()
+            columns = ["currency", "interval", "open_time", "close_time", "signal_type", "open_price", "close_price", "is_profit"]
+            data = [[pd.symbol, pd.interval, send_open_message_time, send_close_message_time, signal.type, open_price, close_price, is_profit]]
+            try:
+                if not os.path.exists(signals_stats_path):
+                    df = DataFrame(data=[], columns=columns)
+                    df.to_csv(signals_stats_path)
+                df = read_csv(signals_stats_path, index_col=[0])
+                df_new = DataFrame(data=data, columns=columns)
+                df = concat([df, df_new], axis=0, ignore_index=True)
+                df.to_csv(signals_stats_path)
+                break
+            except Exception as e:
+                await asyncio.sleep(10)
+                print(f"ERROR Can`t write signal result to {signals_stats_path}", e)
+
     asyncio.run(handle_signal_msg(signal, msg, pd, open_position_price, deal_time, start_analize_time, shared_list))
 
 
-async def try_send_day_profit(shared_list):
-    time_zone = pytz.timezone("Europe/Bucharest")
-    time_now = datetime.now(time_zone)
-    if (shared_list[1] > 0 or shared_list[0] > 0) and time_now.hour == 0:
-        text = f"Total day statistics:\n\tprofits: {shared_list[1]};\n\tloses: {shared_list[0]};\n"
-        await send_message_to_users(get_deposit_users_ids(), text)
-        print(text)
+async def print_stats(df, stats_name):
+    profit_count = len(df[df["is_profit"] == True])
+    lose_count = len(df[df["is_profit"] == False])
+    text = f"Total {stats_name} statistics:\n\tprofits: {profit_count};\n\tloses: {lose_count};\n"
+    await send_message_to_users(managers_id, text)
+
+
+async def try_send_stats():
+    global last_check_time
+    try:
+        time_now = market_info.get_time() + timedelta(days=1)
+        df = read_csv(signals_stats_path)
+        df["close_time"] = to_datetime(df["close_time"])
+        df["close_time_year"] = df["close_time"].apply(lambda row: row.year)
+        df["close_time_week"] = df["close_time"].apply(lambda row: row.isocalendar()[1])
+        df["close_time_date"] = df["close_time"].apply(lambda row: row.date())
+        df["close_time_hour"] = df["close_time"].apply(lambda row: row.hour)
+
+        if time_now.day != last_check_time.day and time_now.hour != last_check_time.hour:
+            print("send hour stats")
+            hour_df = df[(df["close_time_date"] == last_check_time.date()) & (df["close_time_hour"] == last_check_time.hour)]
+            if len(hour_df) > 0:
+                await print_stats(hour_df, f"day ({last_check_time.date()}) hour ({last_check_time.hour})")
+        if time_now.day != last_check_time.day:
+            print("send day stats")
+            day_df = df[df["close_time_date"] == last_check_time.date()]
+            if len(day_df) > 0:
+                await print_stats(day_df, f"day ({last_check_time.date()})")
+        if time_now.isocalendar()[1] != last_check_time.isocalendar()[1]:
+            print("send week stats", last_check_time.isocalendar()[1])
+            week_df = df[(df["close_time_week"] == last_check_time.isocalendar()[1]) & (df["close_time_year"] == last_check_time.year)]
+            if len(week_df) > 0:
+                start_week_day = last_check_time.date() - timedelta(days=6)
+                await print_stats(week_df, f"week ({start_week_day} to {last_check_time.date()})")
+
+        last_check_time = time_now
+    except Exception as e:
+        print("Error while sending stats", e)
 
 
 async def check_trial_users():
@@ -489,7 +540,7 @@ def signals_message_sender_controller(prices_data, intervals, unit_pd, prices_da
                 await check_trial_users()
             except Exception as e:
                 print("check_trial_users_ERROR", e)
-            await try_send_day_profit(shared_list)
+            await try_send_stats()
             # need_to_reset_seis = time.time() - last_callback_update_time > callbacks_wait_time
             need_to_reset_seis = last_send_message_check + reset_seis_wait_time < time.time()
             if need_to_reset_seis:
@@ -538,8 +589,7 @@ def signals_message_sender_controller(prices_data, intervals, unit_pd, prices_da
             df = random.choice(dfs_with_signals)
             signal = get_signal_by_type(df.signal_type[0])
 
-            time_zone = pytz.timezone("Europe/Bucharest")
-            time_now = datetime.now(time_zone)
+            time_now = market_info.get_time()
             pd = PriceData(df.symbol[0], df.exchange[0], interval_convertor.str_to_interval(df.interval[0]))
             path = f"sended_signals/time{time_now.hour}_{time_now.minute}_{pd.symbol}_{interval_convertor.interval_to_string(pd.interval).replace('.', '')}"
             df.to_csv(path)
@@ -567,12 +617,12 @@ if __name__ == '__main__':
 
     currencies = price_parser.get_currencies()
 
-    intervals = [Interval.in_1_minute, Interval.in_3_minute, Interval.in_5_minute, Interval.in_15_minute] #, Interval.in_30_minute]
-    main_intervals = [Interval.in_1_minute, Interval.in_3_minute] #, Interval.in_5_minute]
+    intervals = [Interval.in_1_minute, Interval.in_3_minute, Interval.in_5_minute, Interval.in_15_minute, Interval.in_30_minute]
+    main_intervals = [Interval.in_1_minute, Interval.in_3_minute, Interval.in_5_minute]
     parent_intervals = [
         [Interval.in_3_minute, Interval.in_5_minute],
-        [Interval.in_5_minute, Interval.in_15_minute]
-        # [Interval.in_15_minute, Interval.in_30_minute]
+        [Interval.in_5_minute, Interval.in_15_minute],
+        [Interval.in_15_minute, Interval.in_30_minute]
     ]
     prices_data = []
 
