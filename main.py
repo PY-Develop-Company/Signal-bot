@@ -15,6 +15,7 @@ from manager_module import *
 from menu_text import *
 import interval_convertor
 from signals import get_signal_by_type
+import time
 
 # API_TOKEN = "6588822945:AAFX8eDWngrrbLeDLhzNw0nLkxI07D9wG8Y"  # my API TOKEN
 API_TOKEN = "6340912636:AAHACm2V2hDJUDXng0y0uhBRVRFJgqrok48"  # main API TOKEN
@@ -23,7 +24,6 @@ logging.basicConfig(level=logging.INFO)
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot)
 signal_search_delay = 60
-signal_for_user_delay = 300
 
 callbacks_wait_time = 600
 
@@ -130,6 +130,7 @@ async def send_photo_text_message_to_users(users_ids: [], img_path, text=" ", ar
     send_signal_message_tasks = []
     for user_id in users_ids:
         t = asyncio.create_task(send_photo_text_message_to_user(user_id, img_path, text, args=args))
+
         send_signal_message_tasks.append(t)
 
     await asyncio.gather(*send_signal_message_tasks)
@@ -426,21 +427,24 @@ async def manage_user_callback(call: types.CallbackQuery):
 
 def handle_signal_msg_controller(signal, msg, pd: PriceData, open_position_price, deal_time, start_analize_time):
     async def handle_signal_msg(signal, msg, pd: PriceData, open_position_price, deal_time, start_analize_time):
-        users_groups = []
-        for i in range(0, repeat_count):
-            users_groups.append(get_users_group_ids(send_msg_users_group_count, signal_for_user_delay))
+        t1 = datetime.strptime(str(start_analize_time).split(".")[0], '%Y-%m-%d %H:%M:%S')
+        t2 = datetime.strptime(str(market_info.get_time()).split(".")[0], '%Y-%m-%d %H:%M:%S')
+        print("before_send_delay", t2-t1)
+        user_signal_delay = (deal_time + 3) * 60
+        users_groups = await get_users_groups_ids(repeat_count, send_msg_users_group_count, user_signal_delay)
+        t2 = datetime.strptime(str(market_info.get_time()).split(".")[0], '%Y-%m-%d %H:%M:%S')
+        print("created_users_delay", t2-t1)
         for i in range(0, repeat_count):
             await send_photo_text_message_to_users(users_groups[i], signal.photo_path, msg, args=["signal_min_text"])
             await asyncio.sleep(send_msg_delay)
         # print(users_groups)
         print([len(users_groups[i]) for i in range(repeat_count)])
         try:
-            send_message_time = datetime.strptime(str(market_info.get_time()).split(".")[0], '%Y-%m-%d %H:%M:%S')
-            start_analize_time = datetime.strptime(str(start_analize_time).split(".")[0], '%Y-%m-%d %H:%M:%S')
-            delay = send_message_time - start_analize_time
-            print("delay", delay)
+            t2 = datetime.strptime(str(market_info.get_time()).split(".")[0], '%Y-%m-%d %H:%M:%S')
+            delay = t2 - t1
+            print("after_send_delay", delay)
             await send_message_to_users(managers_id, "delay: " + str(delay) + "; analize_time: " + str(
-                start_analize_time) + "; send_msg_time: " + str(send_message_time))
+                start_analize_time) + "; send_msg_time: " + str(t1))
         except Exception as e:
             print(e)
 
@@ -480,11 +484,13 @@ def signals_message_sender_controller(prices_data, intervals, unit_pd, prices_da
         reset_seis_wait_time = 600
 
         while True:
+            t1 = time.perf_counter()
             try:
                 await check_trial_users()
             except Exception as e:
                 print("check_trial_users_ERROR", e)
-
+            t2 = time.perf_counter()
+            print("new delay", t2-t1)
             need_to_reset_seis = last_send_message_check + reset_seis_wait_time < time.time()
             if need_to_reset_seis:
                 price_parser.create_parce_currencies_with_intervals_callbacks(prices_data_all)

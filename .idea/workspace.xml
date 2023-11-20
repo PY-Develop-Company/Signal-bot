@@ -5,54 +5,17 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c8e52443-fb39-41fa-9e09-4877251a22f1" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/Signal-bot.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Signal-bot.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/db_upgrade.py" beforeDir="false" afterPath="$PROJECT_DIR$/db_upgrade.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/AUDCADIntervalin_1_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/signals/AUDCADIntervalin_1_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/AUDCADIntervalin_3_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/signals/AUDCADIntervalin_3_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/AUDCADIntervalin_5_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/signals/AUDCADIntervalin_5_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/AUDCHFIntervalin_1_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/signals/AUDCHFIntervalin_1_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/AUDCHFIntervalin_3_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/signals/AUDCHFIntervalin_3_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/AUDCHFIntervalin_5_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/signals/AUDCHFIntervalin_5_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/AUDJPYIntervalin_1_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/signals/AUDJPYIntervalin_1_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/AUDJPYIntervalin_3_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/signals/AUDJPYIntervalin_3_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/AUDJPYIntervalin_5_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/signals/AUDJPYIntervalin_5_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/AUDUSDIntervalin_1_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/signals/AUDUSDIntervalin_1_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/AUDUSDIntervalin_3_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/signals/AUDUSDIntervalin_3_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/AUDUSDIntervalin_5_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/signals/AUDUSDIntervalin_5_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/EURCADIntervalin_1_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/signals/EURCADIntervalin_1_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/EURCADIntervalin_3_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/signals/EURCADIntervalin_3_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/EURCADIntervalin_5_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/signals/EURCADIntervalin_5_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/EURJPYIntervalin_1_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/signals/EURJPYIntervalin_1_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/EURJPYIntervalin_3_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/signals/EURJPYIntervalin_3_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/EURJPYIntervalin_5_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/signals/EURJPYIntervalin_5_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/EURUSDIntervalin_1_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/signals/EURUSDIntervalin_1_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/EURUSDIntervalin_3_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/signals/EURUSDIntervalin_3_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/EURUSDIntervalin_5_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/signals/EURUSDIntervalin_5_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/GBPAUDIntervalin_1_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/signals/GBPAUDIntervalin_1_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/GBPAUDIntervalin_3_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/signals/GBPAUDIntervalin_3_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/GBPAUDIntervalin_5_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/signals/GBPAUDIntervalin_5_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/GBPUSDIntervalin_1_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/signals/GBPUSDIntervalin_1_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/GBPUSDIntervalin_3_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/signals/GBPUSDIntervalin_3_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/GBPUSDIntervalin_5_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/signals/GBPUSDIntervalin_5_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/check_ended/AUDCADIntervalin_5_minute.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/check_ended/AUDCHFIntervalin_5_minute.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/check_ended/AUDJPYIntervalin_5_minute.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/check_ended/AUDUSDIntervalin_1_minute.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/check_ended/AUDUSDIntervalin_5_minute.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/check_ended/EURCADIntervalin_5_minute.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/check_ended/EURJPYIntervalin_5_minute.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/check_ended/EURUSDIntervalin_5_minute.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/check_ended/GBPUSDIntervalin_5_minute.txt" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/user_module.py" beforeDir="false" afterPath="$PROJECT_DIR$/user_module.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/users/db.txt" beforeDir="false" afterPath="$PROJECT_DIR$/users/db.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/users/old_db.txt" beforeDir="false" afterPath="$PROJECT_DIR$/users/old_db.txt" afterDir="false" />
     </list>
     <list id="cbe571c8-b52a-4250-a9e3-ad1313cd5330" name="Changes by Alex" comment="" />
-    <list id="48029012-d7c5-49d8-850d-060bbfa1276c" name="Changes by Roma lox" comment="">
-      <change beforePath="$PROJECT_DIR$/db_upgrade.py" beforeDir="false" afterPath="$PROJECT_DIR$/db_upgrade.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/market_info.py" beforeDir="false" afterPath="$PROJECT_DIR$/market_info.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user_module.py" beforeDir="false" afterPath="$PROJECT_DIR$/user_module.py" afterDir="false" />
-    </list>
+    <list id="48029012-d7c5-49d8-850d-060bbfa1276c" name="Changes by Roma lox" comment="" />
     <list id="7fa9b9cd-5f0a-41aa-bb8c-dd6d412d680c" name="Changes by SIRIUS" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -71,23 +34,6 @@
   </component>
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$PROJECT_DIR$/users/db.txt" root0="SKIP_HIGHLIGHTING" />
-  </component>
-  <component name="LineStatusTrackerManager">
-    <file path="$PROJECT_DIR$/db_upgrade.py">
-      <ranges>
-        <range start1="16" end1="17" start2="16" end2="19" changelist="48029012-d7c5-49d8-850d-060bbfa1276c" />
-        <range start1="22" end1="23" start2="24" end2="25" changelist="48029012-d7c5-49d8-850d-060bbfa1276c" />
-        <range start1="24" end1="27" start2="26" end2="29" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
-      </ranges>
-    </file>
-    <file path="$PROJECT_DIR$/user_module.py">
-      <ranges>
-        <range start1="5" end1="6" start2="5" end2="5" changelist="48029012-d7c5-49d8-850d-060bbfa1276c" />
-        <range start1="56" end1="57" start2="55" end2="56" changelist="48029012-d7c5-49d8-850d-060bbfa1276c" />
-        <range start1="74" end1="76" start2="73" end2="73" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
-        <range start1="353" end1="354" start2="350" end2="350" changelist="48029012-d7c5-49d8-850d-060bbfa1276c" />
-      </ranges>
-    </file>
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
