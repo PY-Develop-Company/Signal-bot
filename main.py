@@ -443,8 +443,7 @@ def handle_signal_msg_controller(signal, msg, pd: PriceData, open_position_price
             t2 = datetime.strptime(str(market_info.get_time()).split(".")[0], '%Y-%m-%d %H:%M:%S')
             delay = t2 - t1
             print("after_send_delay", delay)
-            await send_message_to_users(managers_id, "delay: " + str(delay) + "; analize_time: " + str(
-                start_analize_time) + "; send_msg_time: " + str(t1))
+            await send_message_to_users(managers_id, "delay: " + str(delay) + "; analize_time: " + str(t1) + "; send_msg_time: " + str(t2))
         except Exception as e:
             print(e)
 
