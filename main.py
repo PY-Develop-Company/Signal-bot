@@ -486,7 +486,7 @@ async def print_stats(df, stats_name):
 async def try_send_stats():
     global last_check_time
     try:
-        time_now = market_info.get_time() + timedelta(days=1)
+        time_now = market_info.get_time()
         df = read_csv(signals_stats_path)
         df["close_time"] = to_datetime(df["close_time"])
         df["close_time_year"] = df["close_time"].apply(lambda row: row.year)

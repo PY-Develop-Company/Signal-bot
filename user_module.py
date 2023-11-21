@@ -83,6 +83,7 @@ async def get_users_group_ids(groups_count, users_in_group_count, delay_second):
     all_users_count = groups_count * users_in_group_count
     if len(sorted_users) > all_users_count:
         sorted_users = sorted_users[:all_users_count]
+    print("sorted", sorted_users)
 
     result_users_groups = []
     group = []
@@ -100,8 +101,10 @@ async def get_users_group_ids(groups_count, users_in_group_count, delay_second):
     if len(group) > 0:
         result_users_groups.append(group)
 
+    print("result_users_groups 1", result_users_groups)
     for i in range(len(result_users_groups), groups_count):
         result_users_groups.append([])
+    print("result_users_groups 2", result_users_groups)
     return result_users_groups
 
 
@@ -360,3 +363,10 @@ def find_user_with_id(id):
             return True
     return False
 
+
+async def main():
+    a = await get_users_group_ids(50, 20, 300)
+    print(a)
+
+if __name__ == "__main__":
+    asyncio.run(main())

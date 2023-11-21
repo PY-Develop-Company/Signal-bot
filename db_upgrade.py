@@ -14,16 +14,19 @@ def upgrade():
     count = 0
     nowTime = timeConvertToStr(getNowTime()-timedelta(seconds=7200))
     for user in oldDB:
+        status = user['status']
+        if status == "status ДЕПОЗИТ":
+            status = deposit_status
         bufer_user = {
                     "id": user["id"],
                     "name": user["name"],
                     "tag": "none",
                     "language": startLanguage,
-                    "status": user['status'],
+                    "status": status,
                     "acount_number": user["acount_number"],
                     "had_trial_status": False,
                     "trial_end_date": None,
-                    "before_trial_status": "none",
+                    "before_trial_status": none_status,
                     "time": nowTime
                 }
         newDB.append(bufer_user)

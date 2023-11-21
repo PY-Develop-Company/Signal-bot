@@ -1,1 +1,3 @@
 ,currency,interval,open_time,close_time,signal_type,open_price,close_price,is_profit
+0,EURCAD,Interval.in_1_minute,2023-11-21 20:23:23,2023-11-21 20:27:29,short,1.49474,1.49445,True
+1,EURJPY,Interval.in_1_minute,2023-11-21 21:25:32,2023-11-21 21:29:41,long,161.916,161.878,False
