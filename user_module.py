@@ -1,3 +1,4 @@
+import asyncio
 import random
 
 import file_manager
@@ -50,29 +51,58 @@ def setUserTime(id,newtime):
             return
 
 
-def get_users_group_ids(users_count, delay_second):
-    deposit_users = get_users_with_status(deposit_status)
-    trial_users = get_users_with_status(trial_status)
-    tester_users = manager_module.tester_ids
+async def get_users_group_ids(groups_count, users_in_group_count, delay_second):
+    while True:
+        try:
+            deposit_users = get_users_with_status(deposit_status)
+            trial_users = get_users_with_status(trial_status)
+            tester_users = manager_module.tester_ids
+            break
+        except Exception as e:
+            print("Error", e)
+            await asyncio.sleep(0.5)
 
     send_signal_time = getNowTime()
     send_signal_time += timedelta(seconds=delay_second)
 
-    DB = file_manager.read_file(user_db_path)
+    while True:
+        try:
+            DB = file_manager.read_file(user_db_path)
+            break
+        except Exception as e:
+            print("Error", e)
+            await asyncio.sleep(0.5)
+
     signal_users = []
     for user in DB:
         if user['id'] in [*deposit_users, *trial_users, *tester_users]:
             user['time'] = datetime.strptime(user['time'], "%Y-%m-%d %H:%M:%S")
             signal_users.append(user)
     sorted_users = sorted(signal_users, key=lambda x: x['time'])
-    result_users = []
-    for i in sorted_users[:users_count]:
-        if i['time']<getNowTime():
-            result_users.append(i["id"])
-            setUserTime(i['id'],timeConvertToStr(send_signal_time))
-    return result_users
 
+    all_users_count = groups_count * users_in_group_count
+    if len(sorted_users) > all_users_count:
+        sorted_users = sorted_users[:all_users_count]
 
+    result_users_groups = []
+    group = []
+    for user in sorted_users:
+        if len(group) >= users_in_group_count:
+            result_users_groups.append(group)
+            group = []
+        if len(result_users_groups) >= groups_count:
+            break
+
+        if user['time'] < getNowTime():
+            group.append(user['id'])
+            setUserTime(user['id'], timeConvertToStr(send_signal_time))
+
+    if len(group) > 0:
+        result_users_groups.append(group)
+
+    for i in range(len(result_users_groups), groups_count):
+        result_users_groups.append([])
+    return result_users_groups
 
 
 def remove_user_with_id(id):
@@ -89,7 +119,6 @@ def remove_user_with_id(id):
 
 def get_users_strings():
     data = file_manager.read_file(user_db_path)
-    print(data)
     users_strings_list = []
     user_number = 1
 
@@ -145,15 +174,12 @@ def next_user_strings(users_for_print_count, manager_id):
     global current_users_pointer_max_dict, current_users_pointer_min_dict, current_users_data_dict
     users_strings_list, users_data = get_users_strings()
 
-    print("user_strs", users_strings_list)
-
     counter = 1
     strings = []
 
     if current_users_pointer_max_dict.get(manager_id, -1) + 1 >= len(users_strings_list):
         current_users_pointer_max_dict.update({manager_id: -1})
     range_val = range(current_users_pointer_max_dict.get(manager_id, -1) + 1, len(users_strings_list))
-    print(range_val)
     current_users_pointer_min_dict.update({manager_id: current_users_pointer_max_dict.get(manager_id, -1) + 1})
     new_current_users_data = []
     for i in range_val:
