@@ -1,9 +1,9 @@
 ,has_signal,signal_type,msg,date,open_price,interval,symbol,exchange,deal_time,debug,start_analize_time
-0,False,neutral,NoneEUR/JPY Нет сигнала 12{},2023-11-20 00:39:00,163.297,Interval.in_3_minute,EURJPY,OANDA,12,"
+0,False,neutral,NoneEUR/JPY Нет сигнала 12{},2023-11-22 21:27:00,162.901,Interval.in_3_minute,EURJPY,OANDA,12,"
 
 Проверка сигнала:
-                    	Валютная пара: EURJPY"" таймфрейми: [<Interval.in_3_minute: '3'>, <Interval.in_5_minute: '5'>, <Interval.in_15_minute: '15'>] время свеч: [Timestamp('2023-11-20 00:39:00'), Timestamp('2023-11-20 00:35:00'), Timestamp('2023-11-20 00:15:00')]
+                    	Валютная пара: EURJPY"" таймфрейми: [<Interval.in_3_minute: '3'>, <Interval.in_5_minute: '5'>, <Interval.in_15_minute: '15'>] время свеч: [Timestamp('2023-11-22 21:27:00'), Timestamp('2023-11-22 21:25:00'), Timestamp('2023-11-22 21:15:00')]
                     	Есть ли сигнал: False
-                    	Показания индикаторов: long_sob_count0 short_sob_count1
-                    		 * SOB -> long [] short [<Interval.in_15_minute: '15'>]
-                     time_now 2023-11-20 00:42:38.780424+02:00",2023-11-20 00:42:35
+                    	Показания индикаторов: long_sob_count0 short_sob_count0
+                    		 * SOB -> long [] short []
+                     time_now 2023-11-22 21:30:55.259991+02:00",2023-11-22 21:30:41

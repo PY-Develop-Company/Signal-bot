@@ -182,6 +182,9 @@ async def start_command(message):
         await open_menu(message, get_select_language_markap(), "Select language:")
         return
 
+    if get_user_status(message.from_user.id) == wait_id_input_status:
+        await update_status_user(message.from_user.id, none_status)
+
     if message.from_user.id in managers_id:
         markup = get_manager_markup(get_user_language(message.from_user.id))
     else:
@@ -191,11 +194,14 @@ async def start_command(message):
         msg_text = languageFile[get_user_language(message.from_user.id)]["start_vip_text"]
     else:
         msg_text = languageFile[get_user_language(message.from_user.id)]["start_text"]
+
     await send_photo_text_message_to_user(message.from_user.id, start_img_path, msg_text, markup)
 
 
 @dp.message_handler(commands="language")
 async def open_language_command(message):
+    if get_user_status(message.from_user.id) == wait_id_input_status:
+        await update_status_user(message.from_user.id, none_status)
     set_user_language(message.from_user.id, startLanguage)
     await open_menu(message, get_select_language_markap(), "Select language:")
 

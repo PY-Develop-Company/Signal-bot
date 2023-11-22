@@ -1,9 +1,9 @@
 ,has_signal,signal_type,msg,date,open_price,interval,symbol,exchange,deal_time,debug,start_analize_time
-0,False,neutral,NoneEUR/USD Нет сигнала 12{},2023-11-20 00:39:00,1.09098,Interval.in_3_minute,EURUSD,OANDA,12,"
+0,False,neutral,NoneEUR/USD Нет сигнала 12{},2023-11-22 21:30:00,1.08867,Interval.in_3_minute,EURUSD,OANDA,12,"
 
 Проверка сигнала:
-                    	Валютная пара: EURUSD"" таймфрейми: [<Interval.in_3_minute: '3'>, <Interval.in_5_minute: '5'>, <Interval.in_15_minute: '15'>] время свеч: [Timestamp('2023-11-20 00:39:00'), Timestamp('2023-11-20 00:35:00'), Timestamp('2023-11-20 00:15:00')]
+                    	Валютная пара: EURUSD"" таймфрейми: [<Interval.in_3_minute: '3'>, <Interval.in_5_minute: '5'>, <Interval.in_15_minute: '15'>] время свеч: [Timestamp('2023-11-22 21:30:00'), Timestamp('2023-11-22 21:25:00'), Timestamp('2023-11-22 21:15:00')]
                     	Есть ли сигнал: False
                     	Показания индикаторов: long_sob_count0 short_sob_count0
                     		 * SOB -> long [] short []
-                     time_now 2023-11-20 00:42:33.917164+02:00",2023-11-20 00:42:32
+                     time_now 2023-11-22 21:33:01.518760+02:00",2023-11-22 21:32:57

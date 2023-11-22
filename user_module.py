@@ -234,6 +234,7 @@ def set_next_signal_status(id, flag):
              user['get_next_signal'] = flag
     file_manager.write_file(user_db_path, data)
 
+
 def get_next_signal_status(id):
     data = file_manager.read_file(user_db_path)
     for user in data:
@@ -242,14 +243,9 @@ def get_next_signal_status(id):
     return None
 
 
-
 def get_users_with_status(status):
     data = file_manager.read_file(user_db_path)
-    users_with_status = []
-    for user in data:
-        id = user['id']
-        if has_user_status(id, status):
-            users_with_status.append(id)
+    users_with_status = [user["id"] for user in data if user["status"] == status]
     return users_with_status
 
 
