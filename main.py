@@ -17,15 +17,16 @@ import interval_convertor
 from signals import get_signal_by_type
 import time
 
-# API_TOKEN = "6588822945:AAFX8eDWngrrbLeDLhzNw0nLkxI07D9wG8Y"  # my API TOKEN
-API_TOKEN = "6340912636:AAHACm2V2hDJUDXng0y0uhBRVRFJgqrok48"  # main API TOKEN
+API_TOKEN = "6588822945:AAFX8eDWngrrbLeDLhzNw0nLkxI07D9wG8Y"  # my API TOKEN
+# API_TOKEN = "6340912636:AAHACm2V2hDJUDXng0y0uhBRVRFJgqrok48"  # main API TOKEN
 
 logging.basicConfig(level=logging.INFO)
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot)
 signal_search_delay = 60
 
-callbacks_wait_time = 600
+callbacks_wait_time = 300
+reset_seis_wait_time = 300
 
 users_for_print_count = 15
 
@@ -486,7 +487,6 @@ def signals_message_sender_controller(prices_data, intervals, unit_pd, prices_da
         signal_maker.reset_signals_files(main_prices_data)
 
         need_to_reset_seis = False
-        reset_seis_wait_time = 600
 
         while True:
             t1 = time.perf_counter()
