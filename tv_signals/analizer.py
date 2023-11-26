@@ -100,9 +100,12 @@ class NewMultitimeframeAnalizer(Analizer):
         short_intervals = []
         long_signals_count = 0
         short_signals_count = 0
-
+        debugs = []
         for parent_df in pds_dfs.items():
             has_signal, signal, debug = analizer.analize(parent_df[1], parent_df[0])
+            debugs.append(debug)
+            if analizer is VOBAnalizer and has_signal:
+                print(debug)
 
             if has_signal:
                 if signal.type == LongSignal().type:
@@ -112,20 +115,23 @@ class NewMultitimeframeAnalizer(Analizer):
                     short_intervals.append(parent_df[0].interval)
                     short_signals_count += 1
 
-        return long_signals_count, short_signals_count, long_intervals, short_intervals
+        return long_signals_count, short_signals_count, long_intervals, short_intervals, debugs
 
     def analize_func(self, parent_dfs, pds) -> (bool, Signal, str, int):
         pds_dfs = dict(zip(pds, parent_dfs))
-        sob_long_count, sob_short_count, sob_long_intervals, sob_short_intervals = self.analize_multitimeframe(pds_dfs, self.sob)
-        vob_long_count, vob_short_count, vob_long_intervals, vob_short_intervals = self.analize_multitimeframe(pds_dfs, self.vob)
+        sob_long_count, sob_short_count, sob_long_intervals, sob_short_intervals, sob_debugs = self.analize_multitimeframe(pds_dfs, self.sob)
+        vob_long_count, vob_short_count, vob_long_intervals, vob_short_intervals, vob_debugs = self.analize_multitimeframe(pds_dfs, self.vob)
         has_signal = False
         signal = NeutralSignal()
 
         sob_is_long, sob_is_short = has_multitimeframe_signal(self.sob_count, sob_long_count, sob_short_count)
         vob_is_long, vob_is_short = has_multitimeframe_signal(self.vob_count, vob_long_count, vob_short_count)
-        if (sob_is_long and vob_is_long) or (sob_is_short and vob_is_short):
+        # if (sob_is_long and vob_is_long) or (sob_is_short and vob_is_short):
+        #     has_signal = True
+        #     signal = LongSignal() if sob_long_count > sob_short_count else ShortSignal()
+        if vob_is_long or vob_is_short:
             has_signal = True
-            signal = LongSignal() if sob_long_count > sob_short_count else ShortSignal()
+            signal = LongSignal() if vob_long_count > vob_short_count else ShortSignal()
 
         deal_time = get_deal_time(pds)
 
@@ -135,7 +141,7 @@ class NewMultitimeframeAnalizer(Analizer):
                             \tПоказания индикаторов: long_sob_count{sob_long_count} short_sob_count{sob_short_count} long_vob_count{vob_long_count} short_vob_count{vob_short_count}
                             \t\t * SOB -> long {sob_long_intervals} short {sob_short_intervals}
                             \t\t * VOB -> long {vob_long_intervals} short {vob_short_intervals}
-                            """
+                            \n vob debugs{vob_debugs}"""
 
         return has_signal, signal, debug_text, deal_time
 
@@ -214,9 +220,9 @@ class VOBAnalizer(Analizer):
         alt_df = alt_pd.get_chart_data_if_exists()
         vob_ind = OBVolumeIndicator(df, alt_df, df.open, df.close, df.high, df.low, pd)
 
-        signal = vob_ind.get_signal()
+        signal, debug = vob_ind.get_signal()
         has_signal = not(signal.type == NeutralSignal())
-        return has_signal, signal, "no debug"
+        return has_signal, signal, debug
 
     def analize(self, df, pd) -> (bool, Signal, str):
         return self.analize_func(df, pd)

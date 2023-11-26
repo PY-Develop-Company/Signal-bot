@@ -26,6 +26,7 @@ dp = Dispatcher(bot)
 signal_delay = 300
 
 callbacks_wait_time = 600
+reset_seis_wait_time = 600
 
 users_for_print_count = 15
 
@@ -457,8 +458,11 @@ async def check_trial_users():
 def signals_message_sender_controller(prices_data, prices_data_all):
     async def signals_message_sender_function(signal_prices_data, all_prices_data):
         last_send_message_check = datetime_to_secs(now_time())
+        price_parser.create_parce_currencies_with_intervals_callbacks(all_prices_data)
+        signal_maker.reset_signals_files(signal_prices_data)
+        for pd in all_prices_data:
+            pd.reset_chart_data()
         need_to_reset_seis = False
-        reset_seis_wait_time = 600
 
         while True:
             try:
@@ -469,8 +473,10 @@ def signals_message_sender_controller(prices_data, prices_data_all):
             need_to_reset_seis = last_send_message_check + reset_seis_wait_time < datetime_to_secs(now_time())
             if need_to_reset_seis:
                 price_parser.create_parce_currencies_with_intervals_callbacks(all_prices_data)
-                last_send_message_check = datetime_to_secs(now_time())
+                for pd in prices_data:
+                    pd.reset_chart_data()
                 signal_maker.reset_signals_files(signal_prices_data)
+                last_send_message_check = datetime_to_secs(now_time())
                 continue
 
             await asyncio.sleep(3)
@@ -519,7 +525,7 @@ def signals_message_sender_controller(prices_data, prices_data_all):
             df.to_csv(path)
 
             multiprocessing.Process(target=handle_signal_msg_controller,
-                                    args=(signal, df.msg[0], pd, df.open_price[0], int(df.deal_time[0]),
+                                    args=(signal, df.msg[0] + df.debug[0], pd, df.open_price[0], int(df.deal_time[0]),
                                           df.start_analize_time[0]), daemon=True).start()
 
             await asyncio.sleep(signal_delay)
@@ -564,10 +570,6 @@ if __name__ == '__main__':
     # reset chart and signal files
     for pd in prices_data:
         pd.remove_chart_data()
-    signal_maker.reset_signals_files(main_pds)
-    price_parser.create_parce_currencies_with_intervals_callbacks(prices_data)
-    for pd in prices_data:
-        pd.reset_chart_data()
 
     multiprocessing.Process(target=signals_message_sender_controller, args=(main_pds, prices_data)).start()
     multiprocessing.Process(target=signal_maker.analize_currency_data_controller, args=(analize_pairs, vob_pds, )).start()

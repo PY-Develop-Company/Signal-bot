@@ -26,7 +26,8 @@ currencies_puncts = {
     "AUDCHF": 0.00001,
     "GBPUSD": 0.00001,
     "AUDJPY": 0.001,
-    "GBPAUD": 0.00001
+    "GBPAUD": 0.00001,
+    "BTCUSD": 0.01
 }
 
 
@@ -135,7 +136,8 @@ class PriceData:
         main_minutes = interval_convertor.interval_to_int(main_signal_interval)
 
         chart_bar = chart_bar + timedelta(minutes=main_minutes)
-        return chart_bar - timedelta(minutes=chart_bar.minute % minutes) - timedelta(minutes=minutes)
+        res = chart_bar - timedelta(minutes=chart_bar.minute % minutes) - timedelta(minutes=minutes)
+        return res
 
 
 def get_currencies():

@@ -84,6 +84,14 @@ blocks_delta = {
         Interval.in_15_minute: 320,
         Interval.in_30_minute: 370,
         Interval.in_45_minute: 370
+    },
+    "BTCUSD": {
+        Interval.in_1_minute: 0,
+        Interval.in_3_minute: 0,
+        Interval.in_5_minute: 0,
+        Interval.in_15_minute: 0,
+        Interval.in_30_minute: 0,
+        Interval.in_45_minute: 0
     }
 }
 
@@ -92,7 +100,8 @@ min_sob_size = {
     Interval.in_3_minute: 27,
     Interval.in_5_minute: 44,
     Interval.in_15_minute: 60,
-    Interval.in_30_minute: 75
+    Interval.in_30_minute: 75,
+    Interval.in_45_minute: 75
 }
 
 
@@ -838,8 +847,8 @@ class OBVolumeIndicator(Indicator):
         maxBlocks = math.floor(500 / self.amount_of_boxes)
 
         order_blocks = []
-        for i in range(len(self.src.index)+1, -1, -1):
-            if self.tuning - 1 + i < len(self.src):
+        for i in range(len(self.src.index) + 1, -1, -1):
+            if len(v) > self.tuning - 1 + i < len(self.src):
                 is_bear, is_bull = self.check_ob_condition(i)
 
                 if (is_bull or is_bear) and (i < len(v) and i < len(h) and i < len(l)):
@@ -891,6 +900,7 @@ class OBVolumeIndicator(Indicator):
                     and order_blocks[j].signal.type == ShortSignal().type:
                 return_signal = order_blocks[j].signal
 
+        print("blocks_count", len(order_blocks))
         # opposite signal до блока
         if return_signal.type == NeutralSignal().type:
             bull_count = 0
@@ -903,16 +913,16 @@ class OBVolumeIndicator(Indicator):
 
                 if bull_count > 0 and bear_count > 0:
                     break
-            print(bull_count, bear_count)
+            print("bull blocks_count", bull_count, "bear blocks_count", bear_count)
             if bull_count > 0 and bear_count == 0:
-                return ShortSignal()
+                return ShortSignal(), "oposite"
             elif bull_count == 0 and bear_count > 0:
-                return LongSignal()
+                return LongSignal(), "oposite"
 
         elif self.is_closing_block_nearby(return_signal, order_blocks):
-            return NeutralSignal()
+            return NeutralSignal(), "none"
 
-        return return_signal
+        return return_signal, "main"
 
     def graph(self, blocks):
         unclosed_boxes_scatter = []
