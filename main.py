@@ -16,8 +16,7 @@ from menu_text import *
 import interval_convertor
 from signals import get_signal_by_type
 
-API_TOKEN = "6588822945:AAFX8eDWngrrbLeDLhzNw0nLkxI07D9wG8Y"  # my API TOKEN
-# API_TOKEN = "6340912636:AAHACm2V2hDJUDXng0y0uhBRVRFJgqrok48"  # main API TOKEN
+API_TOKEN = "6968124123:AAFIKs0fp6v3xd7RJGSDNoJWUgZZX7GcvnI"  # main API TOKEN
 
 logging.basicConfig(level=logging.INFO)
 bot = Bot(token=API_TOKEN)
@@ -454,8 +453,8 @@ async def check_trial_users():
             await send_message_to_user(user_id, languageFile[userLanguage]["for_vip_text"])
 
 
-def signals_message_sender_controller(prices_data, intervals, unit_pd, prices_data_all):
-    async def signals_message_sender_function(main_prices_data, intervals, unit_pd, prices_data_all):
+def signals_message_sender_controller(prices_data, prices_data_all):
+    async def signals_message_sender_function(main_prices_data, prices_data_all):
         price_parser.create_parce_currencies_with_intervals_callbacks(prices_data_all)
         last_send_message_check = time.time()
         for pd in prices_data_all:
@@ -532,7 +531,7 @@ def signals_message_sender_controller(prices_data, intervals, unit_pd, prices_da
 
             signal_maker.reset_signals_files(main_prices_data)
 
-    asyncio.run(signals_message_sender_function(prices_data, intervals, unit_pd, prices_data_all))
+    asyncio.run(signals_message_sender_function(prices_data, prices_data_all))
 
 
 if __name__ == '__main__':
@@ -541,43 +540,40 @@ if __name__ == '__main__':
     multiprocessing.freeze_support()
     currencies = price_parser.get_currencies()
 
-    intervals = [Interval.in_1_minute, Interval.in_3_minute, Interval.in_5_minute, Interval.in_15_minute, Interval.in_30_minute]
-    main_intervals = [Interval.in_1_minute, Interval.in_3_minute, Interval.in_5_minute]
+    intervals = [Interval.in_1_minute, Interval.in_3_minute, Interval.in_5_minute, Interval.in_15_minute, Interval.in_45_minute]
+    main_intervals = [Interval.in_5_minute]
     parent_intervals = [
-        [Interval.in_3_minute, Interval.in_5_minute],
-        [Interval.in_5_minute, Interval.in_15_minute],
-        [Interval.in_15_minute, Interval.in_30_minute]
+        [Interval.in_15_minute, Interval.in_45_minute]
     ]
+
+
     prices_data = []
-
-    main_pds = []
-    parent_pds = []
-
     for currency in currencies:
         for interval in intervals:
             prices_data.append(PriceData(currency[0], currency[1], interval))
 
     ind = -1
-    for currency_index in range(len(currencies)):
+    main_pds = []
+    parent_pds = []
+    for currency in currencies:
         for main_interval_index in range(len(main_intervals)):
-            main_pd = PriceData(currencies[currency_index][0], currencies[currency_index][1], main_intervals[main_interval_index])
+            main_pd = PriceData(currency[0], currency[1], main_intervals[main_interval_index])
             main_pds.append(main_pd)
             parent_pds.append([])
             ind += 1
             for p_i in parent_intervals[main_interval_index]:
-                parent_pds[ind].append(PriceData(currencies[currency_index][0], currencies[currency_index][1], p_i))
+                parent_pds[ind].append(PriceData(currency[0], currency[1], p_i))
 
     for pd in prices_data:
         pd.remove_chart_data()
 
-    unit_pd = main_pds[0]
-    multiprocessing.Process(target=signals_message_sender_controller, args=(main_pds, main_intervals, unit_pd, prices_data)).start()
+    multiprocessing.Process(target=signals_message_sender_controller, args=(main_pds, prices_data)).start()
 
     analize_pairs = []
     for i in range(len(main_pds)):
         i_main_pd = main_pds[i]
         i_parent_pds = parent_pds[i]
-        analize_pair = (i_main_pd, i_parent_pds, unit_pd)
+        analize_pair = (i_main_pd, i_parent_pds)
         analize_pairs.append(analize_pair)
     multiprocessing.Process(target=signal_maker.analize_currency_data_controller, args=(analize_pairs, )).start()
 

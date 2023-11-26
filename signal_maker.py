@@ -2,7 +2,7 @@ from pandas import DataFrame, Timedelta, read_csv
 from datetime import datetime
 from tvDatafeed import Interval
 import file_manager
-from analizer import MultitimeframeAnalizer
+from analizer import NewMultitimeframeAnalizer
 import interval_convertor
 from price_parser import PriceData
 import asyncio
@@ -111,7 +111,7 @@ def is_all_charts_collected(main_pd: PriceData, parent_pds: [PriceData]):
 
 
 def analize_currency_data_controller(analize_pairs):
-    async def analize_currency_data_function(check_pds: [PriceData], unit_pd: PriceData):
+    async def analize_currency_data_function(check_pds: [PriceData]):
         main_pd = check_pds[0]
         start_analize_time = check_pds[0].get_chart_download_time()
 
@@ -122,10 +122,6 @@ def analize_currency_data_controller(analize_pairs):
         if main_price_df is None:
             return
 
-        # dt = main_price_df["datetime"][0]
-        # if not unit_pd.is_analize_time(dt):
-        #     return
-
         prices_dfs = []
         for pd in check_pds:
             ch_data = pd.get_chart_data_if_exists()
@@ -133,7 +129,7 @@ def analize_currency_data_controller(analize_pairs):
                 continue
             prices_dfs.append(ch_data)
 
-        analizer = MultitimeframeAnalizer(2, 2)
+        analizer = NewMultitimeframeAnalizer(1, 1)
         has_signal, signal, debug, deal_time = analizer.analize(prices_dfs, check_pds)
 
         open_position_price = main_price_df.close[0]
@@ -153,57 +149,9 @@ def analize_currency_data_controller(analize_pairs):
             print("analize_loop")
             tasks = []
             for analize_pair in analize_pairs:
-                task = asyncio.create_task(
-                    analize_currency_data_function([analize_pair[0], *analize_pair[1]], analize_pair[2]))
+                task = asyncio.create_task(analize_currency_data_function([analize_pair[0], *analize_pair[1]]))
                 tasks.append(task)
             await asyncio.gather(*tasks)
             await asyncio.sleep(3)
 
     asyncio.run(analize_currency_data_loop(analize_pairs))
-
-
-# test
-
-
-# def analize_controller(pds, dfs, bars_to_analize):
-#     async def analize_func(pds, dfs, bars_to_analize):
-#         analize_count = len(dfs[0].index) - bars_to_analize
-#         analizer = MultitimeframeAnalizer(2, 2)
-#         analzie_dfs = []
-#         for i in range(analize_count):
-#             analzie_dfs[0] = dfs[0].loc[i + 1:i + bars_to_analize].reset_index(drop=True)
-#             #other dfs selection
-#             has_signal, signal, debug, deal_time = analizer.analize(dfs, pds)
-#     asyncio.run(analize_func(pds, dfs, bars_to_analize))
-#
-#
-# if __name__ == "__main__":
-#     curs = price_parser.get_currencies()
-#     intervals = [Interval.in_1_minute, Interval.in_3_minute, Interval.in_5_minute, Interval.in_15_minute, Interval.in_30_minute]
-#
-#     intervals_group = [
-#         [Interval.in_1_minute, Interval.in_3_minute, Interval.in_5_minute],
-#         [Interval.in_3_minute, Interval.in_5_minute, Interval.in_15_minute],
-#         [Interval.in_5_minute, Interval.in_15_minute, Interval.in_30_minute]
-#     ]
-#
-#     pds_group = []
-#     tv = TvDatafeed()
-#     # for cur in curs:
-#     #     for interval in intervals:
-#     #         pds.append(PriceData(cur[0], cur[1], interval))
-#     for interval_group in intervals_group:
-#         for cur in curs:
-#             pd_group = []
-#             for interval in interval_group:
-#                 pd_group.append(PriceData(cur[0], cur[1], interval))
-#             pds_group.append(pd_group)
-#
-#     for pd_group in pds_group:
-#         analize_dfs = []
-#         for pd in pd_group:
-#             path = f"{pd.symbol}{str(pd.interval).replace('.', '')}.csv"
-#             analize_dfs.append(read_csv(path))
-#         multiprocessing.Process(target=analize_controller, args=(pd_group, analize_dfs, bars_to_analize, )).start()
-#         # df = tv.get_hist(pd.symbol, pd.exchange, pd.interval, n_bars=5000)
-#         # df.to_csv(path)

@@ -831,15 +831,17 @@ class OBVolumeIndicator(Indicator):
 
         return is_bear, is_bull
 
-    def get_signal(self, interval: Interval) -> Signal:
+    def get_signal(self) -> Signal:
         bull_realtime_touch = False
         bear_realtime_touch = False
         bullish_rejection = False
         bearish_rejection = False
         new_bull = False
         new_bear = False
+        return_signal = NeutralSignal()
 
         h, l, v = self.get_timeframe_data()
+        maxBlocks = math.floor(500 / self.amount_of_boxes)
         print(len(h), len(l), len(v))
 
         order_blocks = []
@@ -865,7 +867,6 @@ class OBVolumeIndicator(Indicator):
                     if not(vol == 0):
                         order_blocks.append(new_order_block)
 
-            maxBlocks = math.floor(500 / self.amount_of_boxes)
             if len(order_blocks) > maxBlocks:
                 del order_blocks[0]
             if len(order_blocks) == 0:
@@ -873,18 +874,6 @@ class OBVolumeIndicator(Indicator):
 
             for j in range(len(order_blocks) - 1, -1, -1):
                 order_blocks[j].update_boxes(self.src["datetime"][i])
-                if order_blocks[j].highest_top >= self.close[i] >= order_blocks[j].highest_bot:
-                    if order_blocks[j].direction == "Bull":
-                        bull_realtime_touch = True
-                    elif order_blocks[j].direction == "Bear":
-                        bear_realtime_touch = True
-
-                if self.low[i] <= order_blocks[j].highest_bot <= self.close[i] and order_blocks[j].direction == "Bull":
-                    bullish_rejection = True
-
-                if self.high[i] >= order_blocks[j].highest_top >= self.close[i] and order_blocks[j].direction == "Bear":
-                    bearish_rejection = True
-
                 blockDifference = order_blocks[j].top_value - order_blocks[j].bot_value
                 startingValue = order_blocks[j].top_value if order_blocks[j].direction == "Bull" else order_blocks[j].bot_value
                 sourceToUse = self.close[i] if "Close" in self.mitigation_method else (self.low[i] if order_blocks[j].direction == "Bull" else self.high[i])
@@ -901,10 +890,27 @@ class OBVolumeIndicator(Indicator):
                 if bullBreak or bearBreak or j < (len(order_blocks) - 1 - maxBlocks):
                     del order_blocks[j]
 
-        print(len(order_blocks))
-        self.graph(order_blocks)
+        for j in range(len(order_blocks) - 1, -1, -1):
+            if order_blocks[j].highest_top >= self.close[0] >= order_blocks[j].highest_bot:
+                if order_blocks[j].direction == "Bull":
+                    return_signal = LongSignal()
+                    bull_realtime_touch = True
+                elif order_blocks[j].direction == "Bear":
+                    return_signal = ShortSignal()
+                    bear_realtime_touch = True
 
-        return NeutralSignal()
+            if self.low[0] <= order_blocks[j].highest_bot <= self.close[0] and order_blocks[j].direction == "Bull":
+                return_signal = LongSignal()
+                bullish_rejection = True
+
+            if self.high[0] >= order_blocks[j].highest_top >= self.close[0] and order_blocks[j].direction == "Bear":
+                return_signal = ShortSignal()
+                bearish_rejection = True
+
+        # print(len(order_blocks))
+        # self.graph(order_blocks)
+
+        return return_signal
 
     def graph(self, blocks):
         unclosed_boxes_scatter = []
