@@ -20,4 +20,3 @@ def is_file_exists(url):
 def delete_file_if_exists(url):
     if is_file_exists(url):
         os.remove(url)
-

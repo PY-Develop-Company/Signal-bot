@@ -1,7 +1,7 @@
-from price_parser import PriceData
+from tv_signals.price_parser import PriceData
 
-photo_long_path = "img/long.jpg"
-photo_short_path = "img/short.jpg"
+photo_long_path = "../img/long.jpg"
+photo_short_path = "../img/short.jpg"
 
 long_signal_smile = "🟢"
 short_signal_smile = "🔴"

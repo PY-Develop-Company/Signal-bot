@@ -1,9 +1,12 @@
 import pandas as pd
 from pandas import Timedelta
-from signals import *
+
 from datetime import timedelta, datetime
-from interval_convertor import interval_to_int, str_to_interval, interval_to_string
-from signals import get_signal_by_type
+
+from tv_signals.signal_types import *
+
+from utils.interval_convertor import interval_to_int, str_to_interval, interval_to_string
+
 
 def income_percent_diff(df1, df2):
     if len(df1) > 0 and len(df2) > 0:

@@ -1,78 +1,89 @@
 import numpy as np
 import pandas
-import math
-from tvDatafeed import Interval, TvDatafeed
 from pandas import Series
+from tvDatafeed import Interval, TvDatafeed
 import plotly.graph_objects as go
-from signals import *
-from price_parser import PriceData
-import interval_convertor
-from datetime import timedelta, datetime
-from market_info import datetime_to_secs
 
-sob_dict = {
+import math
+
+from tv_signals.signal_types import *
+from tv_signals.price_parser import PriceData
+
+from utils import interval_convertor, clamp
+
+
+blocks_delta = {
     "EURUSD": {
         Interval.in_1_minute: 35,
         Interval.in_3_minute: 70,
         Interval.in_5_minute: 110,
         Interval.in_15_minute: 155,
-        Interval.in_30_minute: 210
+        Interval.in_30_minute: 210,
+        Interval.in_45_minute: 210
     },
     "AUDUSD": {
         Interval.in_1_minute: 35,
         Interval.in_3_minute: 75,
         Interval.in_5_minute: 120,
         Interval.in_15_minute: 150,
-        Interval.in_30_minute: 220
+        Interval.in_30_minute: 220,
+        Interval.in_45_minute: 220
     },
     "AUDCAD": {
         Interval.in_1_minute: 40,
         Interval.in_3_minute: 94,
         Interval.in_5_minute: 145,
         Interval.in_15_minute: 150,
-        Interval.in_30_minute: 200
+        Interval.in_30_minute: 200,
+        Interval.in_45_minute: 200
     },
     "EURJPY": {
         Interval.in_1_minute: 40,
         Interval.in_3_minute: 90,
         Interval.in_5_minute: 124,
         Interval.in_15_minute: 155,
-        Interval.in_30_minute: 199
+        Interval.in_30_minute: 199,
+        Interval.in_45_minute: 199
     },
     "EURCAD": {
         Interval.in_1_minute: 85,
         Interval.in_3_minute: 146,
         Interval.in_5_minute: 178,
         Interval.in_15_minute: 235,
-        Interval.in_30_minute: 270
+        Interval.in_30_minute: 270,
+        Interval.in_45_minute: 270
     },
     "AUDCHF": {
         Interval.in_1_minute: 30,
         Interval.in_3_minute: 79,
         Interval.in_5_minute: 125,
         Interval.in_15_minute: 170,
-        Interval.in_30_minute: 200
+        Interval.in_30_minute: 200,
+        Interval.in_45_minute: 200
     },
     "GBPUSD": {
         Interval.in_1_minute: 85,
         Interval.in_3_minute: 99,
         Interval.in_5_minute: 125,
         Interval.in_15_minute: 185,
-        Interval.in_30_minute: 220
+        Interval.in_30_minute: 220,
+        Interval.in_45_minute: 220
     },
     "AUDJPY": {
         Interval.in_1_minute: 50,
         Interval.in_3_minute: 120,
         Interval.in_5_minute: 170,
         Interval.in_15_minute: 220,
-        Interval.in_30_minute: 240
+        Interval.in_30_minute: 240,
+        Interval.in_45_minute: 240
     },
     "GBPAUD": {
         Interval.in_1_minute: 77,
         Interval.in_3_minute: 155,
         Interval.in_5_minute: 215,
         Interval.in_15_minute: 320,
-        Interval.in_30_minute: 370
+        Interval.in_30_minute: 370,
+        Interval.in_45_minute: 370
     }
 }
 
@@ -103,17 +114,17 @@ class Indicator:
 
 
 class SuperOrderBlockIndicator(Indicator):
-    def __init__(self, src, open, close, high, low, price_data: PriceData, includeDelta=True, obMaxBoxSet=100,
-                 fvgMaxBoxSet=100):
+    def __init__(self, src, open, close, high, low, price_data: PriceData, include_delta=True, ob_max_box_set=100,
+                 fvg_max_box_set=100):
         super().__init__(src, open, close, high, low)
         self.src.datetime = pandas.to_datetime(self.src.datetime)
         self.interval = interval_convertor.interval_to_datetime(price_data.interval)
-        self.obMaxBoxSet = clamp(obMaxBoxSet, 1, 100)
-        self.fvgMaxBoxSet = clamp(fvgMaxBoxSet, 1, 100)
-        self.analize_block_delta = price_data.get_real_puncts(sob_dict.get(price_data.symbol).get(price_data.interval))
+        self.obMaxBoxSet = clamp(ob_max_box_set, 1, 100)
+        self.fvgMaxBoxSet = clamp(fvg_max_box_set, 1, 100)
+        self.analize_block_delta = price_data.get_real_puncts(blocks_delta.get(price_data.symbol).get(price_data.interval))
         self.min_sob_size = price_data.get_real_puncts(min_sob_size.get(price_data.interval))
         self.name = "SuperOrderBlock"
-        self.includeDelta = includeDelta
+        self.include_delta = include_delta
 
     def is_up_bar(self, index):
         return self.close[index] > self.open[index]
@@ -313,7 +324,7 @@ class SuperOrderBlockIndicator(Indicator):
                         biggest_box_height = biggest_box.top - biggest_box.bottom
             return_signal = biggest_box.signal
 
-        if self.includeDelta and self.is_closing_block_nearby(return_signal, not_closed_boxes):
+        if self.include_delta and self.is_closing_block_nearby(return_signal, not_closed_boxes):
             return NeutralSignal()
 
         # self.graph(boxes)
@@ -325,26 +336,6 @@ class SuperOrderBlockIndicator(Indicator):
             unclosed_boxes_scatter.append(go.Scatter(x=[box.left, box.left, box.right, box.right, box.left],
                                                      y=[box.bottom, box.top, box.top, box.bottom, box.bottom],
                                                      fill="toself", fillcolor='rgba(0, 255, 0,0.1)'))
-        # scatters1 = []
-        # scatters2 = []
-        # scatters3 = []
-        # scatters4 = []
-        # for box in _bullBoxesOB:
-        #     scatters1.append(go.Scatter(x=[box.left, box.left, box.right, box.right, box.left],
-        #                                 y=[box.bottom, box.top, box.top, box.bottom, box.bottom],
-        #                                 fill="toself", fillcolor='rgba(0, 255, 0,0.1)'))
-        # for box in _bearBoxesOB:
-        #     scatters2.append(go.Scatter(x=[box.left, box.left, box.right, box.right, box.left],
-        #                                 y=[box.bottom, box.top, box.top, box.bottom, box.bottom],
-        #                                 fill="toself", fillcolor='rgba(255, 0, 0,0.1)'))
-        # for box in _bullBoxesFVG:
-        #     scatters3.append(go.Scatter(x=[box.left, box.left, box.right, box.right, box.left],
-        #                                 y=[box.bottom, box.top, box.top, box.bottom, box.bottom],
-        #                                 fill="toself", fillcolor='rgba(0, 255, 0,0.1)'))
-        # for box in _bearBoxesFVG:
-        #     scatters4.append(go.Scatter(x=[box.left, box.left, box.right, box.right, box.left],
-        #                                 y=[box.bottom, box.top, box.top, box.bottom, box.bottom],
-        #                                 fill="toself", fillcolor='rgba(255, 0, 0,0.1)'))
         fig = go.Figure(
             data=[
                 go.Candlestick(
@@ -645,8 +636,8 @@ class NadarayaWatsonIndicator(Indicator):
         fig.show()
 
 
-class Box():
-    def __init__(self, left, top, right, bottom, border_color, border_width, xloc, bgcolor, extend):
+class Box:
+    def __init__(self, left, top, right, bottom):
         self.top = top
         self.bottom = bottom
         self.left = left
@@ -657,14 +648,17 @@ class Box():
 
 
 class OBVolumeIndicator(Indicator):
-    def __init__(self, src, alt_src, open, close, high, low, price_data: PriceData, tuning=7, amount_of_boxes=10,
+    def __init__(self, src, alt_src, open, close, high, low, pd: PriceData, tuning=7, amount_of_boxes=10,
                  mitigation_method="Close Engulfs 100% Of Order Block"):
         super().__init__(src, open, close, high, low)
         self.tuning = tuning
         self.amount_of_boxes = amount_of_boxes
         self.mitigation_method = mitigation_method
         self.alt_src = alt_src
-        self.price_data = price_data
+        self.price_data = pd
+
+        self.analize_block_delta = pd.get_real_puncts(blocks_delta.get(pd.symbol).get(pd.interval))
+        self.name = "OBVolumeIndicator"
 
     @staticmethod
     def get_alt_interval(interval):
@@ -672,7 +666,7 @@ class OBVolumeIndicator(Indicator):
         tmp = round(raw_timeframe / 15)
         fixed_timeframe = 1 if tmp < 1 else tmp
         alt_interval = interval_convertor.int_to_interval(fixed_timeframe)
-        print(fixed_timeframe, alt_interval)
+
         return alt_interval
 
     def get_timeframe_data(self):
@@ -696,7 +690,6 @@ class OBVolumeIndicator(Indicator):
                 h_group.append(self.alt_src["high"][ind])
                 l_group.append(self.alt_src["low"][ind])
                 v_group.append(self.alt_src["volume"][ind])
-            # print(self.alt_src["datetime"][ind], self.src["datetime"][i])
         return h_full_group, l_full_group, v_full_group
 
     class OrderBlock:
@@ -707,21 +700,20 @@ class OBVolumeIndicator(Indicator):
         highest_top = None
         highest_bot = None
 
-        def __init__(self, amount_of_boxes, top_value, bot_value, left_time, right_time, box_volume, direction, interval):
+        def __init__(self, amount_of_boxes, top_value, bot_value, left_time, right_time, box_volume, signal, interval):
             self.amount_of_boxes = amount_of_boxes
-            self.top_value = top_value
-            self.bot_value = bot_value
+            self.top = top_value
+            self.bottom = bot_value
             self.left_time = left_time
             self.right_time = right_time
             self.boxes_volumes = box_volume
-            self.direction = direction
+            self.signal = signal
             self.interval = interval
 
         def generate_volume(self, v_array, h_array, l_array):
             new_boxes_volumes = self.boxes_volumes
-            starting_value = self.top_value
-            increment = (self.top_value - self.bot_value) / self.amount_of_boxes
-            print(sum(v_array))
+            starting_value = self.top
+            increment = (self.top - self.bottom) / self.amount_of_boxes
             for i in range(0, self.amount_of_boxes):
                 if len(v_array) == 0 or len(h_array) == 0 or len(l_array) == 0:
                     break
@@ -745,11 +737,7 @@ class OBVolumeIndicator(Indicator):
                             tmp = register_volume * candle_volume
 
                         new_boxes_volumes[i] += tmp
-                    else:
-                        # print("problem")
-                        pass
             self.boxes_volumes = new_boxes_volumes
-            print(new_boxes_volumes)
             return sum(new_boxes_volumes)
 
         def get_time_ratio(self):
@@ -761,25 +749,18 @@ class OBVolumeIndicator(Indicator):
         def generate_boxes(self, current_time):
             new_boxes_array = []
 
-            highest_volume = max(self.boxes_volumes)
-            lowest_volume = min(self.boxes_volumes)
             time_ratio = self.get_time_ratio()
 
-            starting_value = self.top_value
-            increment = (self.top_value - self.bot_value) / self.amount_of_boxes
+            starting_value = self.top
+            increment = (self.top - self.bottom) / self.amount_of_boxes
             for i in range(0, self.amount_of_boxes):
                 box_top = starting_value - (increment * i)
                 box_bot = box_top - increment
 
-                # label
-                color_ = None  # color.from_gradient(self.boxes_volumes[i], lowest_volume, highest_volume, obLowVolumeColor, obHighVolumeColor)
-                bar_time = None  # xloc.bar_time
-                extend = None  # extend.none
                 right = self.left_time + interval_convertor.interval_to_datetime(self.interval) * math.ceil(self.boxes_volumes[i] * time_ratio)
                 if right > current_time:
                     right -= interval_convertor.interval_to_datetime(self.interval)
-                new_box = Box(left=self.left_time, top=box_top, right=right, bottom=box_bot,
-                              border_color=color_, border_width=2, xloc=bar_time, bgcolor=color_, extend=extend)
+                new_box = Box(left=self.left_time, top=box_top, right=right, bottom=box_bot)
                 new_boxes_array.append(new_box)
 
             self.boxes = new_boxes_array
@@ -788,7 +769,6 @@ class OBVolumeIndicator(Indicator):
             self.right_time = current_time
 
             highest_volume = max(self.boxes_volumes)
-            lowest_volume = min(self.boxes_volumes)
             time_ratio = self.get_time_ratio()
 
             for i in range(0, self.amount_of_boxes):
@@ -826,23 +806,36 @@ class OBVolumeIndicator(Indicator):
                 if i == j:
                     is_bull = True
 
-        if is_bull or is_bear:
-            print("worked at", self.src["datetime"][j])
-
         return is_bear, is_bull
 
+    @staticmethod
+    def is_block_in_range(block, low_price, high_price):
+        return (block.top >= low_price) and (high_price >= block.bottom)
+
+    def is_closing_block_nearby(self, signal, unclosed_blocks):
+        if signal.type == NeutralSignal().type:
+            return False
+        elif signal.type == LongSignal().type:
+            analize_range = self.close[0] + self.analize_block_delta
+            for block in unclosed_blocks:
+                if not (block.signal.type == ShortSignal().type):
+                    continue
+                if OBVolumeIndicator.is_block_in_range(block, self.close[0], analize_range):
+                    return True
+        elif signal.type == ShortSignal().type:
+            analize_range = self.close[0] - self.analize_block_delta
+            for block in unclosed_blocks:
+                if not (block.signal.type == LongSignal().type):
+                    continue
+                if OBVolumeIndicator.is_block_in_range(block, analize_range, self.close[0]):
+                    return True
+        return False
+
     def get_signal(self) -> Signal:
-        bull_realtime_touch = False
-        bear_realtime_touch = False
-        bullish_rejection = False
-        bearish_rejection = False
-        new_bull = False
-        new_bear = False
         return_signal = NeutralSignal()
 
         h, l, v = self.get_timeframe_data()
         maxBlocks = math.floor(500 / self.amount_of_boxes)
-        print(len(h), len(l), len(v))
 
         order_blocks = []
         for i in range(len(self.src.index)+1, -1, -1):
@@ -855,12 +848,9 @@ class OBVolumeIndicator(Indicator):
                     left_value = self.src["datetime"][self.tuning - 1 + i]
                     right_value = self.src["datetime"][i]
 
-                    new_bull = True if is_bull else new_bull
-                    new_bear = True if is_bear else new_bear
-
                     new_order_block = self.OrderBlock(self.amount_of_boxes, top_value, bot_value, left_value, right_value,
                                                       [0 for _ in range(self.amount_of_boxes)],
-                                                      "Bull" if is_bull else "Bear", self.price_data.interval)
+                                                      LongSignal() if is_bull else ShortSignal(), self.price_data.interval)
 
                     vol = new_order_block.generate_volume(v[self.tuning - 1 + i], h[self.tuning - 1 + i], l[self.tuning - 1 + i])
                     new_order_block.generate_boxes(right_value)
@@ -874,41 +864,53 @@ class OBVolumeIndicator(Indicator):
 
             for j in range(len(order_blocks) - 1, -1, -1):
                 order_blocks[j].update_boxes(self.src["datetime"][i])
-                blockDifference = order_blocks[j].top_value - order_blocks[j].bot_value
-                startingValue = order_blocks[j].top_value if order_blocks[j].direction == "Bull" else order_blocks[j].bot_value
-                sourceToUse = self.close[i] if "Close" in self.mitigation_method else (self.low[i] if order_blocks[j].direction == "Bull" else self.high[i])
+                blockDifference = order_blocks[j].top - order_blocks[j].bottom
+                startingValue = order_blocks[j].top if order_blocks[j].signal.type == LongSignal().type else order_blocks[j].bottom
+                sourceToUse = self.close[i] if "Close" in self.mitigation_method else (self.low[i] if order_blocks[j].signal.type == ShortSignal().type else self.high[i])
                 incrementMultiplier = abs(blockDifference * 1) if "100%" in self.mitigation_method else \
                     (abs(blockDifference * .75) if "75%" in self.mitigation_method else
                      (abs(blockDifference * .50) if "50%" in self.mitigation_method else
                       abs(blockDifference * .25)))
 
-                incrementMultiplier *= -1 if order_blocks[j].direction == "Bull" else 1
+                incrementMultiplier *= -1 if order_blocks[j].signal.type == LongSignal().type else 1
                 breakValue = startingValue + incrementMultiplier
 
-                bullBreak = order_blocks[j].direction == "Bull" and sourceToUse < breakValue
-                bearBreak = order_blocks[j].direction == "Bear" and sourceToUse > breakValue
+                bullBreak = order_blocks[j].signal.type == LongSignal().type and sourceToUse < breakValue
+                bearBreak = order_blocks[j].signal.type == ShortSignal().type and sourceToUse > breakValue
                 if bullBreak or bearBreak or j < (len(order_blocks) - 1 - maxBlocks):
                     del order_blocks[j]
 
+        # main signal від блока
         for j in range(len(order_blocks) - 1, -1, -1):
             if order_blocks[j].highest_top >= self.close[0] >= order_blocks[j].highest_bot:
-                if order_blocks[j].direction == "Bull":
-                    return_signal = LongSignal()
-                    bull_realtime_touch = True
-                elif order_blocks[j].direction == "Bear":
-                    return_signal = ShortSignal()
-                    bear_realtime_touch = True
+                return_signal = order_blocks[j].signal
+            elif self.close[0] >= order_blocks[j].highest_bot >= self.low[0] > order_blocks[j].bottom \
+                    and order_blocks[j].signal.type == LongSignal().type:
+                return_signal = order_blocks[j].signal
+            elif order_blocks[j].top > self.high[0] >= order_blocks[j].highest_top >= self.close[0] \
+                    and order_blocks[j].signal.type == ShortSignal().type:
+                return_signal = order_blocks[j].signal
 
-            if self.low[0] <= order_blocks[j].highest_bot <= self.close[0] and order_blocks[j].direction == "Bull":
-                return_signal = LongSignal()
-                bullish_rejection = True
+        # opposite signal до блока
+        if return_signal.type == NeutralSignal().type:
+            bull_count = 0
+            bear_count = 0
+            for block in order_blocks:
+                if block.signal.type == LongSignal().type:
+                    bull_count += 1
+                elif block.signal.type == ShortSignal().type:
+                    bear_count += 1
 
-            if self.high[0] >= order_blocks[j].highest_top >= self.close[0] and order_blocks[j].direction == "Bear":
-                return_signal = ShortSignal()
-                bearish_rejection = True
+                if bull_count > 0 and bear_count > 0:
+                    break
+            print(bull_count, bear_count)
+            if bull_count > 0 and bear_count == 0:
+                return ShortSignal()
+            elif bull_count == 0 and bear_count > 0:
+                return LongSignal()
 
-        # print(len(order_blocks))
-        # self.graph(order_blocks)
+        elif self.is_closing_block_nearby(return_signal, order_blocks):
+            return NeutralSignal()
 
         return return_signal
 
@@ -917,7 +919,7 @@ class OBVolumeIndicator(Indicator):
         for block in blocks:
             unclosed_boxes_scatter.append(
                 go.Scatter(x=[block.left_time, block.left_time, block.right_time, block.right_time, block.left_time],
-                           y=[block.bot_value, block.top_value, block.top_value, block.bot_value, block.bot_value],
+                           y=[block.bottom, block.top, block.top, block.bottom, block.bottom],
                            fill="toself", fillcolor='rgba(0, 255, 0,0.1)'))
             for box in block.boxes:
                 unclosed_boxes_scatter.append(
@@ -946,10 +948,6 @@ class OBVolumeIndicator(Indicator):
         fig.show()
 
 
-def clamp(value, min_value, max_value):
-    return max(min(value, max_value), min_value)
-
-
 if __name__ == "__main__":
     tv = TvDatafeed()
     pd = PriceData("EURUSD", "OANDA", Interval.in_15_minute)
@@ -960,4 +958,5 @@ if __name__ == "__main__":
     alt_data = tv.get_hist(pd.symbol, pd.exchange, interval=alt_interval, n_bars=5000)
     alt_data = alt_data.reindex(index=alt_data.index[::-1]).iloc[0:].reset_index()
     obv = OBVolumeIndicator(data, alt_data, data["open"], data["close"], data["high"], data["low"], pd)
-    res = obv.get_signal(pd.interval)
+    res = obv.get_signal()
+    print(res)

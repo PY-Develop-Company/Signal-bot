@@ -1,9 +1,11 @@
-import file_manager
+from utils import file_manager
 import manager_module
-import market_info
+from market_info import get_trial_end_date
+
+from utils.time import secs_to_date
 
 user_db_path = "users/db.txt"
-startLanguage="none"
+startLanguage = "none"
 
 current_users_pointer_max_dict = dict()
 current_users_pointer_min_dict = dict()
@@ -52,7 +54,7 @@ def get_users_strings():
         elif status == trial_status:
             end_date = user['trial_end_date']
             users_data.append((telegram_id, telegram_name, account_number))
-            users_strings_list.append(f"{user_number}. @{tag} | {telegram_name} | {account_number} | {status} | {market_info.secs_to_date(end_date)}")
+            users_strings_list.append(f"{user_number}. @{tag} | {telegram_name} | {account_number} | {status} | {secs_to_date(end_date)}")
             user_number += 1
 
     return users_strings_list, users_data
@@ -172,7 +174,7 @@ def set_trial_to_user(id):
             user["had_trial_status"] = True
             user['before_trial_status'] = user['status']
             user['status'] = trial_status
-            user['trial_end_date'] = market_info.get_trial_end_date()
+            user['trial_end_date'] = get_trial_end_date()
             break
     file_manager.write_file(user_db_path, data)
 

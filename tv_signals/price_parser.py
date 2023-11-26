@@ -1,15 +1,16 @@
-from datetime import datetime, timedelta
 from tvDatafeed import TvDatafeed, TvDatafeedLive, Interval
 from tvDatafeed.seis import Seis
 from pandas import DataFrame, read_csv
-import file_manager
-import interval_convertor
 import pytz
+
+from datetime import datetime, timedelta
+
+from utils import file_manager, interval_convertor
 
 trade_pause_wait_time = 600
 
-currencies_path = "users/currencies.txt"
-currencies_data_path = "currencies_data/"
+currencies_path = "./users/currencies.txt"
+currencies_data_path = "./currencies_data/"
 currency_check_ended = "currencies_data/check_ended/"
 
 currencies_last_analize_date = {}
@@ -97,7 +98,6 @@ class PriceData:
         df = self.get_price_data(500)
         if df is None:
             print("ERROR: No df")
-            pass
         else:
             print("updated pd")
             path = currency_check_ended + self.symbol + interval + ".txt"
