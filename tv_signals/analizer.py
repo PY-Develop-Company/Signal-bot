@@ -104,8 +104,6 @@ class NewMultitimeframeAnalizer(Analizer):
         for parent_df in pds_dfs.items():
             has_signal, signal, debug = analizer.analize(parent_df[1], parent_df[0])
             debugs.append(debug)
-            if analizer is VOBAnalizer and has_signal:
-                print(debug)
 
             if has_signal:
                 if signal.type == LongSignal().type:
@@ -126,12 +124,12 @@ class NewMultitimeframeAnalizer(Analizer):
 
         sob_is_long, sob_is_short = has_multitimeframe_signal(self.sob_count, sob_long_count, sob_short_count)
         vob_is_long, vob_is_short = has_multitimeframe_signal(self.vob_count, vob_long_count, vob_short_count)
-        # if (sob_is_long and vob_is_long) or (sob_is_short and vob_is_short):
-        #     has_signal = True
-        #     signal = LongSignal() if sob_long_count > sob_short_count else ShortSignal()
-        if vob_is_long or vob_is_short:
+        if (sob_is_long and vob_is_long) or (sob_is_short and vob_is_short):
             has_signal = True
-            signal = LongSignal() if vob_long_count > vob_short_count else ShortSignal()
+            signal = LongSignal() if sob_long_count > sob_short_count else ShortSignal()
+        # if vob_is_long or vob_is_short:
+        #     has_signal = True
+        #     signal = LongSignal() if vob_long_count > vob_short_count else ShortSignal()
 
         deal_time = get_deal_time(pds)
 
@@ -147,6 +145,7 @@ class NewMultitimeframeAnalizer(Analizer):
 
     def analize(self, parent_dfs, pds) -> (bool, Signal, str, int):
         has_signal, signal, debug_text, deal_time = self.analize_func(parent_dfs, pds)
+        print(debug_text)
         return has_signal, signal, debug_text, deal_time
 
 
@@ -219,6 +218,8 @@ class VOBAnalizer(Analizer):
         alt_pd = PriceData(pd.symbol, pd.exchange, OBVolumeIndicator.get_alt_interval(pd.interval))
         alt_df = alt_pd.get_chart_data_if_exists()
         vob_ind = OBVolumeIndicator(df, alt_df, df.open, df.close, df.high, df.low, pd)
+        # if alt_df is not None:
+        #     print("vob analize", pd.symbol, pd.interval, alt_pd.interval, len(alt_df))
 
         signal, debug = vob_ind.get_signal()
         has_signal = not(signal.type == NeutralSignal())

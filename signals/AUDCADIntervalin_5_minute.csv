@@ -1,9 +1,11 @@
 ,has_signal,signal_type,msg,date,open_price,interval,symbol,exchange,deal_time,debug,start_analize_time
-0,False,neutral,NoneAUD/CAD Нет сигнала 25мин,2023-11-02 19:20:00,0.88416,Interval.in_5_minute,AUDCAD,OANDA,25,"
+0,False,neutral,NoneAUD/CAD Нет сигнала 32{},2023-11-29 18:00:00,0.89968,Interval.in_5_minute,AUDCAD,OANDA,32,"
 
 Проверка сигнала:
-                    	Валютная пара: AUDCAD"" таймфрейми: [<Interval.in_5_minute: '5'>, <Interval.in_15_minute: '15'>, <Interval.in_30_minute: '30'>] время свеч: [Timestamp('2023-11-02 19:20:00'), Timestamp('2023-11-02 19:00:00'), Timestamp('2023-11-02 18:30:00')]
-                    	Есть ли сигнал: False
-                    	Показания индикаторов: long_sob_count0 short_sob_count0
-                    		 * SOB -> long [] short []
-                     time_now 2023-11-02 19:25:20.400878+02:00",2023-11-02 19:25:19
+                            	Валютная пара: AUDCAD"" таймфрейми: [<Interval.in_5_minute: '5'>, <Interval.in_15_minute: '15'>, <Interval.in_45_minute: '45'>] время свеч: [Timestamp('2023-11-29 18:00:00'), Timestamp('2023-11-29 17:45:00'), Timestamp('2023-11-29 17:15:00')]
+                            	Есть ли сигнал: False
+                            	Показания индикаторов: long_sob_count1 short_sob_count0 long_vob_count0 short_vob_count0
+                            		 * SOB -> long [<Interval.in_15_minute: '15'>] short []
+                            		 * VOB -> long [] short []
+                            
+ vob debugs['none bull : 3 | bear: 1count: 5\n first bar index 999', 'none bull : 1 | bear: 1count: 2\n first bar index 328', 'none bull : 3 | bear: 1count: 4\n first bar index 327']",2023-11-29 18:05:22

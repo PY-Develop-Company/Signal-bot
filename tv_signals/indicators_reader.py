@@ -96,10 +96,10 @@ blocks_delta = {
 }
 
 min_sob_size = {
-    Interval.in_1_minute: 12,
-    Interval.in_3_minute: 27,
-    Interval.in_5_minute: 44,
-    Interval.in_15_minute: 60,
+    Interval.in_1_minute: 8,
+    Interval.in_3_minute: 17,
+    Interval.in_5_minute: 30,
+    Interval.in_15_minute: 55,
     Interval.in_30_minute: 75,
     Interval.in_45_minute: 75
 }
@@ -842,13 +842,21 @@ class OBVolumeIndicator(Indicator):
 
     def get_signal(self) -> Signal:
         return_signal = NeutralSignal()
-
+        text = ""
+        return_debug = "none"
+        if self.alt_src is None:
+            return NeutralSignal(), "self.alt_src is None"
         h, l, v = self.get_timeframe_data()
         maxBlocks = math.floor(500 / self.amount_of_boxes)
 
         order_blocks = []
+        bol = True
         for i in range(len(self.src.index) + 1, -1, -1):
+
             if len(v) > self.tuning - 1 + i < len(self.src):
+                if bol:
+                    text = f"first bar index {i}"
+                    bol = False
                 is_bear, is_bull = self.check_ob_condition(i)
 
                 if (is_bull or is_bear) and (i < len(v) and i < len(h) and i < len(l)):
@@ -893,14 +901,16 @@ class OBVolumeIndicator(Indicator):
         for j in range(len(order_blocks) - 1, -1, -1):
             if order_blocks[j].highest_top >= self.close[0] >= order_blocks[j].highest_bot:
                 return_signal = order_blocks[j].signal
+                return_debug = "main"
             elif self.close[0] >= order_blocks[j].highest_bot >= self.low[0] > order_blocks[j].bottom \
                     and order_blocks[j].signal.type == LongSignal().type:
                 return_signal = order_blocks[j].signal
+                return_debug = "main"
             elif order_blocks[j].top > self.high[0] >= order_blocks[j].highest_top >= self.close[0] \
                     and order_blocks[j].signal.type == ShortSignal().type:
                 return_signal = order_blocks[j].signal
+                return_debug = "main"
 
-        print("blocks_count", len(order_blocks))
         # opposite signal до блока
         if return_signal.type == NeutralSignal().type:
             bull_count = 0
@@ -913,16 +923,20 @@ class OBVolumeIndicator(Indicator):
 
                 if bull_count > 0 and bear_count > 0:
                     break
-            print("bull blocks_count", bull_count, "bear blocks_count", bear_count)
             if bull_count > 0 and bear_count == 0:
-                return ShortSignal(), "oposite"
+                return_signal = ShortSignal()
+                return_debug = "oposite"
             elif bull_count == 0 and bear_count > 0:
-                return LongSignal(), "oposite"
+                return_signal = LongSignal()
+                return_debug = "oposite"
+            return_debug += f" bull : {bull_count} | bear: {bear_count}"
 
-        elif self.is_closing_block_nearby(return_signal, order_blocks):
-            return NeutralSignal(), "none"
+        if self.is_closing_block_nearby(return_signal, order_blocks):
+            return_signal = NeutralSignal()
+            return_debug = "closing_block_nearby"
 
-        return return_signal, "main"
+        return_debug += f"count: {len(order_blocks)}\n "
+        return return_signal, return_debug + text
 
     def graph(self, blocks):
         unclosed_boxes_scatter = []
@@ -960,8 +974,8 @@ class OBVolumeIndicator(Indicator):
 
 if __name__ == "__main__":
     tv = TvDatafeed()
-    pd = PriceData("EURUSD", "OANDA", Interval.in_15_minute)
-    data = tv.get_hist(pd.symbol, pd.exchange, interval=pd.interval, n_bars=500)
+    pd = PriceData("AUDCAD", "OANDA", Interval.in_45_minute)
+    data = tv.get_hist(pd.symbol, pd.exchange, interval=pd.interval, n_bars=5000)
     data = data.reindex(index=data.index[::-1]).iloc[0:].reset_index()
 
     alt_interval = OBVolumeIndicator.get_alt_interval(pd.interval)

@@ -96,17 +96,19 @@ class PriceData:
     def reset_chart_data(self):
         interval = str(self.interval).replace(".", "")
 
-        df = self.get_price_data(500)
+        df = self.get_price_data(5000)
         if df is None:
             print("ERROR: No df")
         else:
-            print("updated pd")
-            path = currency_check_ended + self.symbol + interval + ".txt"
-            file_manager.delete_file_if_exists(path)
-            path = currencies_data_path + self.symbol + interval + ".csv"
-            file_manager.delete_file_if_exists(path)
-            self.save_chart_data(df)
-
+            try:
+                print("updated pd")
+                path = currency_check_ended + self.symbol + interval + ".txt"
+                file_manager.delete_file_if_exists(path)
+                path = currencies_data_path + self.symbol + interval + ".csv"
+                file_manager.delete_file_if_exists(path)
+                self.save_chart_data(df)
+            except:
+                pass
     def remove_chart_data(self):
         interval = str(self.interval).replace(".", "")
 
@@ -135,8 +137,14 @@ class PriceData:
         minutes = interval_convertor.interval_to_int(self.interval)
         main_minutes = interval_convertor.interval_to_int(main_signal_interval)
 
+        tmp = chart_bar + timedelta(minutes=main_minutes)
+        # print("needed bar check", main_signal_interval, minutes, chart_bar, main_minutes, "\n",
+        #       tmp, timedelta(minutes=(tmp.hour*60 + tmp.minute) % minutes), timedelta(minutes=minutes), "\n",
+        #       tmp - timedelta(minutes=(tmp.hour*60 + tmp.minute) % minutes) - timedelta(minutes=minutes))
+
         chart_bar = chart_bar + timedelta(minutes=main_minutes)
-        res = chart_bar - timedelta(minutes=chart_bar.minute % minutes) - timedelta(minutes=minutes)
+        res = chart_bar - timedelta(minutes=(chart_bar.hour*60 + chart_bar.minute) % minutes) - timedelta(minutes=minutes)
+
         return res
 
 
@@ -150,7 +158,7 @@ def get_currencies():
     return currencies
 
 
-def get_price_data_frame_seis(seis, bars_count=500):
+def get_price_data_frame_seis(seis, bars_count=5000):
     price_df = seis.get_hist(n_bars=bars_count)
     price_df = price_df.drop(price_df.index[len(price_df) - 1])
     price_df = price_df.reindex(index=price_df.index[::-1]).reset_index()

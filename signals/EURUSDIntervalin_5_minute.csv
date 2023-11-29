@@ -1,9 +1,11 @@
 ,has_signal,signal_type,msg,date,open_price,interval,symbol,exchange,deal_time,debug,start_analize_time
-0,False,neutral,NoneEUR/USD Нет сигнала 25мин,2023-11-02 19:20:00,1.06251,Interval.in_5_minute,EURUSD,OANDA,25,"
+0,False,neutral,NoneEUR/USD Нет сигнала 32{},2023-11-29 18:00:00,1.09761,Interval.in_5_minute,EURUSD,OANDA,32,"
 
 Проверка сигнала:
-                    	Валютная пара: EURUSD"" таймфрейми: [<Interval.in_5_minute: '5'>, <Interval.in_15_minute: '15'>, <Interval.in_30_minute: '30'>] время свеч: [Timestamp('2023-11-02 19:20:00'), Timestamp('2023-11-02 19:00:00'), Timestamp('2023-11-02 18:30:00')]
-                    	Есть ли сигнал: False
-                    	Показания индикаторов: long_sob_count0 short_sob_count0
-                    		 * SOB -> long [] short []
-                     time_now 2023-11-02 19:25:19.883849+02:00",2023-11-02 19:25:18
+                            	Валютная пара: EURUSD"" таймфрейми: [<Interval.in_5_minute: '5'>, <Interval.in_15_minute: '15'>, <Interval.in_45_minute: '45'>] время свеч: [Timestamp('2023-11-29 18:00:00'), Timestamp('2023-11-29 17:45:00'), Timestamp('2023-11-29 17:15:00')]
+                            	Есть ли сигнал: False
+                            	Показания индикаторов: long_sob_count1 short_sob_count1 long_vob_count0 short_vob_count2
+                            		 * SOB -> long [<Interval.in_15_minute: '15'>] short [<Interval.in_5_minute: '5'>]
+                            		 * VOB -> long [] short [<Interval.in_15_minute: '15'>, <Interval.in_45_minute: '45'>]
+                            
+ vob debugs['none bull : 3 | bear: 1count: 6\n first bar index 1001', 'oposite bull : 2 | bear: 0count: 2\n first bar index 328', 'oposite bull : 1 | bear: 0count: 1\n first bar index 327']",2023-11-29 18:05:21

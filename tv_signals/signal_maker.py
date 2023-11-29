@@ -4,7 +4,7 @@ import asyncio
 
 from datetime import datetime
 
-from tv_signals.analizer import NewMultitimeframeAnalizer
+from tv_signals.analizer import NewMultitimeframeAnalizer, VOBAnalizer
 from tv_signals.signal_types import *
 
 from utils import file_manager, interval_convertor
@@ -113,8 +113,6 @@ def is_all_charts_collected(main_pd: PriceData, parent_pds: [PriceData]):
         if not (parent_df_last_bar_checked == needed_bar):
             res = False
             break
-    print("r", real_bars)
-    print("e", expected_bars)
     return res
 
 
@@ -137,7 +135,7 @@ def analize_currency_data_controller(analize_pds, additional_pds):
                 continue
             prices_dfs.append(ch_data)
 
-        analizer = NewMultitimeframeAnalizer(1, 1)
+        analizer = NewMultitimeframeAnalizer(2, 2)
         has_signal, signal, debug, deal_time = analizer.analize(prices_dfs, check_pds)
 
         open_position_price = main_price_df.close[0]
