@@ -542,9 +542,9 @@ if __name__ == '__main__':
     currencies = price_parser.get_currencies()
 
     intervals = [Interval.in_1_minute, Interval.in_3_minute, Interval.in_5_minute, Interval.in_15_minute, Interval.in_45_minute]
-    main_intervals = [Interval.in_5_minute]
-    parent_intervals = [[Interval.in_15_minute, Interval.in_45_minute]]
-    vob_intervals = [[Interval.in_1_minute, Interval.in_3_minute]]
+    main_intervals = [Interval.in_5_minute, Interval.in_15_minute, Interval.in_45_minute]
+    parent_intervals = [[], [], []]
+    vob_intervals = [[Interval.in_1_minute, Interval.in_3_minute], [Interval.in_1_minute, Interval.in_3_minute], [Interval.in_1_minute, Interval.in_3_minute]]
 
     # prices data creation
     prices_data = [PriceData(currency[0], currency[1], interval) for currency in currencies for interval in intervals]
@@ -565,7 +565,7 @@ if __name__ == '__main__':
         for intervals in vob_intervals:
             for interval in intervals:
                 pds.append(PriceData(currency[0], currency[1], interval))
-        vob_pds.append(pds)
+            vob_pds.append(pds)
 
     # reset chart and signal files
     for pd in prices_data:

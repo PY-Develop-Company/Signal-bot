@@ -135,9 +135,9 @@ def analize_currency_data_controller(analize_pds, additional_pds):
                 continue
             prices_dfs.append(ch_data)
 
-        analizer = NewMultitimeframeAnalizer(2, 2)
-        has_signal, signal, debug, deal_time = analizer.analize(prices_dfs, check_pds)
-
+        analizer = VOBAnalizer() # NewMultitimeframeAnalizer(2, 2)
+        has_signal, signal, debug = analizer.analize(prices_dfs[0], check_pds[0])
+        deal_time = 30
         open_position_price = main_price_df.close[0]
         msg = signal.get_open_msg_text(main_pd, deal_time)
 

@@ -222,7 +222,7 @@ class VOBAnalizer(Analizer):
         #     print("vob analize", pd.symbol, pd.interval, alt_pd.interval, len(alt_df))
 
         signal, debug = vob_ind.get_signal()
-        has_signal = not(signal.type == NeutralSignal())
+        has_signal = not(signal.type == NeutralSignal().type)
         return has_signal, signal, debug
 
     def analize(self, df, pd) -> (bool, Signal, str):

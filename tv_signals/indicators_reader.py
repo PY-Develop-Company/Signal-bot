@@ -912,24 +912,24 @@ class OBVolumeIndicator(Indicator):
                 return_debug = "main"
 
         # opposite signal до блока
-        if return_signal.type == NeutralSignal().type:
-            bull_count = 0
-            bear_count = 0
-            for block in order_blocks:
-                if block.signal.type == LongSignal().type:
-                    bull_count += 1
-                elif block.signal.type == ShortSignal().type:
-                    bear_count += 1
-
-                if bull_count > 0 and bear_count > 0:
-                    break
-            if bull_count > 0 and bear_count == 0:
-                return_signal = ShortSignal()
-                return_debug = "oposite"
-            elif bull_count == 0 and bear_count > 0:
-                return_signal = LongSignal()
-                return_debug = "oposite"
-            return_debug += f" bull : {bull_count} | bear: {bear_count}"
+        # if return_signal.type == NeutralSignal().type:
+        #     bull_count = 0
+        #     bear_count = 0
+        #     for block in order_blocks:
+        #         if block.signal.type == LongSignal().type:
+        #             bull_count += 1
+        #         elif block.signal.type == ShortSignal().type:
+        #             bear_count += 1
+        #
+        #         if bull_count > 0 and bear_count > 0:
+        #             break
+        #     if bull_count > 0 and bear_count == 0:
+        #         return_signal = ShortSignal()
+        #         return_debug = "oposite"
+        #     elif bull_count == 0 and bear_count > 0:
+        #         return_signal = LongSignal()
+        #         return_debug = "oposite"
+        #     return_debug += f" bull : {bull_count} | bear: {bear_count}"
 
         if self.is_closing_block_nearby(return_signal, order_blocks):
             return_signal = NeutralSignal()
