@@ -1,5 +1,4 @@
 import os
-
 from user_module import *
 
 manager_username = "@bwg_Golden"
@@ -18,20 +17,20 @@ def get_url(manager_id):
 
 async def add_manager(message):
     url = f"users/{message.from_user.id}.txt"
-    if (f"{message.from_user.id}.txt") in os.listdir("users/"):
+    if f"{message.from_user.id}.txt" in os.listdir("users/"):
         ...
     else:
         data = {"id": message.from_user.id, "status": "none", "do": "none", "language": "none"}
         file_manager.write_file(url, data)
 
 
-def getManagerLanguage(id):
+def get_manager_language(id):
     url = get_url(id)
     manager = file_manager.read_file(url)
     return manager["language"]
 
 
-def setManagerLanguage(id, language):
+def set_manager_language(id, language):
     url = get_url(id)
     manager = file_manager.read_file(url)
     manager["language"] = language

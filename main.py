@@ -1,10 +1,8 @@
 from aiogram import Bot, Dispatcher
 from tvDatafeed import Interval
-import asyncio
 import multiprocessing
 
 import random
-from datetime import datetime
 import logging
 
 from tv_signals.signal_types import get_signal_by_type
@@ -13,6 +11,7 @@ from tv_signals import signal_maker, price_parser
 from manager_module import *
 from menu_text import *
 from market_info import is_market_working, is_trial_ended
+import time
 
 from utils import interval_convertor
 from utils.time import now_time, datetime_to_secs
@@ -23,13 +22,16 @@ API_TOKEN = "6968124123:AAFIKs0fp6v3xd7RJGSDNoJWUgZZX7GcvnI"  # main API TOKEN
 logging.basicConfig(level=logging.INFO)
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot)
-signal_delay = 300
+signal_search_delay = 60
 
 callbacks_wait_time = 600
 reset_seis_wait_time = 600
 
 users_for_print_count = 15
 
+send_msg_delay = 0.1
+repeat_count = 50
+send_msg_users_group_count = 20
 
 last_user_list_message = dict()
 last_user_manage_message = dict()
@@ -106,13 +108,13 @@ async def send_message_to_users(users_ids: [], text):
 async def send_photo_text_message_to_user(user_id, img_path, text=" ", markup=None, args=[]):
     if await get_chat_id(user_id) == 0:
         return
-    if getUserLanguage(user_id) == "none":
+    if get_user_language(user_id) == "none":
         return
 
     if len(args) > 0:
         input_text = args.copy()
         for i, arg in enumerate(args):
-            input_text[i] = languageFile[getUserLanguage(user_id)][arg]
+            input_text[i] = languageFile[get_user_language(user_id)][arg]
         text = text.format(*input_text)
     try:
         with open(img_path, "rb") as file:
@@ -128,6 +130,7 @@ async def send_photo_text_message_to_users(users_ids: [], img_path, text=" ", ar
     send_signal_message_tasks = []
     for user_id in users_ids:
         t = asyncio.create_task(send_photo_text_message_to_user(user_id, img_path, text, args=args))
+
         send_signal_message_tasks.append(t)
 
     await asyncio.gather(*send_signal_message_tasks)
@@ -144,15 +147,15 @@ async def update_account_user(id, account_number):
         if found_user:
             user['acount_number'] = account_number
             if user['status'] == deposit_status:
-                await send_message_to_user(id, languageFile[getUserLanguage(id)]["get_vip_text"])
+                await send_message_to_user(id, languageFile[get_user_language(id)]["get_vip_text"])
             elif account_number == none_status:
-                await send_message_to_user(id, languageFile[getUserLanguage(id)]["reject_vip_text"])
+                await send_message_to_user(id, languageFile[get_user_language(id)]["reject_vip_text"])
             break
     file_manager.write_file(user_db_path, data)
 
 
 async def show_users_list_to_user(user_id, is_next=True):
-    print_str = languageFile[getUserLanguage(user_id)]["users_list_title_text"] + "\n"
+    print_str = languageFile[get_user_language(user_id)]["users_list_title_text"] + "\n"
 
     users_to_show = []
     if is_next:
@@ -164,8 +167,8 @@ async def show_users_list_to_user(user_id, is_next=True):
         print_str += "\n" + user_to_show
 
     if len(users_to_show) == 0:
-        print_str = languageFile[getUserLanguage(user_id)]["no_users_list_title_text"]
-    return await send_message_to_user(user_id, print_str, get_users_markup(getUserLanguage(user_id)))
+        print_str = languageFile[get_user_language(user_id)]["no_users_list_title_text"]
+    return await send_message_to_user(user_id, print_str, get_users_markup(get_user_language(user_id)))
 
 
 @dp.message_handler(commands="start")
@@ -175,28 +178,31 @@ async def start_command(message):
     else:
         add_user(message.from_user.id, message.from_user.first_name, message.from_user.last_name, message.from_user.username)
 
-    if getUserLanguage(message.from_user.id) == startLanguage:
+    if get_user_language(message.from_user.id) == startLanguage:
         await open_menu(message, get_select_language_markup(), "Select language:")
         return
 
-    # await send_photo_text_message_to_user(message.from_user.id, start_img_path, start_text)
+    if get_user_status(message.from_user.id) == wait_id_input_status:
+        await update_status_user(message.from_user.id, none_status)
+
     if message.from_user.id in managers_id:
-        markup = get_manager_markup(getUserLanguage(message.from_user.id))
-    elif has_user_status(message.from_user.id, deposit_status):
-        markup = get_vip_markup(getUserLanguage(message.from_user.id))
+        markup = get_manager_markup(get_user_language(message.from_user.id))
     else:
-        markup = get_no_vip_markup(getUserLanguage(message.from_user.id))
+        markup = get_markup_with_status(message.from_user.id, get_user_status(message.from_user.id))
 
     if has_user_status(message.from_user.id, deposit_status):
-        msg_text = languageFile[getUserLanguage(message.from_user.id)]["start_vip_text"]
+        msg_text = languageFile[get_user_language(message.from_user.id)]["start_vip_text"]
     else:
-        msg_text = languageFile[getUserLanguage(message.from_user.id)]["start_text"]
+        msg_text = languageFile[get_user_language(message.from_user.id)]["start_text"]
+
     await send_photo_text_message_to_user(message.from_user.id, start_img_path, msg_text, markup)
 
 
 @dp.message_handler(commands="language")
-async def openLanguageComand(message):
-    setUserLanguage(message.from_user.id,startLanguage)
+async def open_language_command(message):
+    if get_user_status(message.from_user.id) == wait_id_input_status:
+        await update_status_user(message.from_user.id, none_status)
+    set_user_language(message.from_user.id, startLanguage)
     await open_menu(message, get_select_language_markup(), "Select language:")
 
 
@@ -223,7 +229,7 @@ async def check_deposit_command(message):
         return
 
     if has_user_status(message.from_user.id, id_status):
-        await message.answer(languageFile[getUserLanguage(message.from_user.id)]["wait_deposit_status"])
+        await message.answer(languageFile[get_user_language(message.from_user.id)]["wait_deposit_status"])
         await update_status_user(message.from_user.id, wait_deposit_status)
 
 
@@ -237,17 +243,17 @@ async def remove_user_command(call: types.CallbackQuery):
     if have_user_with_id:
         status = get_user_status(user_id)
         if status == trial_status:
-            await bot.send_message(call.message.chat.id, languageFile[getUserLanguage(call.message.chat.id)]["cant_remove_trial_user_text"])
+            await bot.send_message(call.message.chat.id, languageFile[get_user_language(call.message.chat.id)]["cant_remove_trial_user_text"])
         else:
             is_user_removed, user_string = remove_user_with_id(user_id)
             if is_user_removed:
-                await bot.send_message(call.message.chat.id, languageFile[getUserLanguage(call.message.chat.id)]["removed_user_text"] + f"\n " + user_string)
-                await bot.send_message(user_id, text=languageFile[getUserLanguage(user_id)]["delete_vip_user_text"], reply_markup=get_no_vip_markup(getUserLanguage(user_id)))
-                await bot.send_message(user_id, text=languageFile[getUserLanguage(user_id)]["contact_manager_text"] + "\n" + manager_url)
+                await bot.send_message(call.message.chat.id, languageFile[get_user_language(call.message.chat.id)]["removed_user_text"] + f"\n " + user_string)
+                await bot.send_message(user_id, text=languageFile[get_user_language(user_id)]["delete_vip_user_text"], reply_markup=get_no_vip_markup(get_user_language(user_id)))
+                await bot.send_message(user_id, text=languageFile[get_user_language(user_id)]["contact_manager_text"] + "\n" + manager_url)
             else:
-                await bot.send_message(call.message.chat.id, languageFile[getUserLanguage(call.message.chat.id)]["cant_remove_user_text"])
+                await bot.send_message(call.message.chat.id, languageFile[get_user_language(call.message.chat.id)]["cant_remove_user_text"])
     else:
-        await bot.send_message(call.message.chat.id, languageFile[getUserLanguage(call.message.chat.id)]["error_no_user"])
+        await bot.send_message(call.message.chat.id, languageFile[get_user_language(call.message.chat.id)]["error_no_user"])
 
     await call.answer(call.data)
     await remove_last_user_manage_message(call.message.chat.id)
@@ -255,7 +261,7 @@ async def remove_user_command(call: types.CallbackQuery):
 
 @dp.message_handler(commands="trial")
 async def get_trial_command(message):
-    userLanguage = getUserLanguage(message.from_user.id)
+    userLanguage = get_user_language(message.from_user.id)
     if has_user_status(message.from_user.id, deposit_status) or message.from_user.id in managers_id:
         await send_message_to_user(message.from_user.id, languageFile[userLanguage]["cant_get_trial_error_text"])
         return
@@ -282,17 +288,17 @@ async def users_list_command(message):
 @dp.message_handler(content_types=["text"])
 async def handle_media(message: types.Message):
     user_id = message.from_user.id
-    user_language = getUserLanguage(user_id)
-    if get_user_Tag(message.from_user.id) == "none":
-        await setUserTag(message.from_user.id,message.from_user.username)
+    user_language = get_user_language(user_id)
+    if get_user_tag(message.from_user.id) == "none":
+        await set_user_tag(message.from_user.id, message.from_user.username)
 
     # LANGUAGE
     if message.text not in [select_language_eng, select_language_ru, select_language_hin] and user_language == "none":
-        await openLanguageComand(message)
+        await open_language_command(message)
         return
     if message.text in [select_language_eng, select_language_ru, select_language_hin] and user_language == "none":
-        setUserLanguage(user_id, message.text)
-        user_language = getUserLanguage(user_id)
+        set_user_language(user_id, message.text)
+        user_language = get_user_language(user_id)
         markup = get_markup_with_status(user_id, get_user_status(user_id))
 
         await open_menu(message, markup, languageFile[user_language]["selected_language_success_text"])
@@ -337,16 +343,16 @@ async def handle_media(message: types.Message):
 
                 if is_accept_button and is_search_id_status:
                     status = id_status
-                    message_to_user = languageFile[getUserLanguage(user_under_do)]["accept_id_message_text"]
+                    message_to_user = languageFile[get_user_language(user_under_do)]["accept_id_message_text"]
                 elif is_reject_button and is_search_id_status:
                     status = none_status
-                    message_to_user = languageFile[getUserLanguage(user_under_do)]["reject_id_message_text"]
+                    message_to_user = languageFile[get_user_language(user_under_do)]["reject_id_message_text"]
                 elif is_accept_button and is_search_deposit_status:
                     status = deposit_status
-                    message_to_user = languageFile[getUserLanguage(user_under_do)]["accept_deposit_message_text"]
+                    message_to_user = languageFile[get_user_language(user_under_do)]["accept_deposit_message_text"]
                 elif is_reject_button and is_search_deposit_status:
                     status = id_status
-                    message_to_user = languageFile[getUserLanguage(user_under_do)]["reject_deposit_message_text"]
+                    message_to_user = languageFile[get_user_language(user_under_do)]["reject_deposit_message_text"]
 
                 await update_status_user(user_under_do, status)
                 await send_message_to_user(user_under_do, message_to_user, get_markup_with_status(user_under_do, status))
@@ -377,6 +383,12 @@ async def handle_media(message: types.Message):
             else:
                 await update_status_user(user_id, wait_id_input_status)
                 await open_menu(message, get_empty_markup(), languageFile[user_language]["wait_id_text"])
+        elif message.text == languageFile[user_language]["get_signal_button_text"]:
+            if get_next_signal_status(user_id) == False:
+                set_next_signal_status(user_id, True)
+                await message.answer(languageFile[user_language]["start_searching_signal_text"])
+            else:
+                await message.answer(languageFile[user_language]["already_waiting_signal_text"])
 
 
 @dp.callback_query_handler(text="next_users")
@@ -413,7 +425,7 @@ async def manage_user_callback(call: types.CallbackQuery):
         buttons.append(types.InlineKeyboardButton(text=user_data[0], callback_data=f"removeuser_{user_data[1]}"))
 
     keyboard = types.InlineKeyboardMarkup(row_width=5).add(*buttons)
-    sent_msg = await bot.send_message(call.message.chat.id, text=languageFile[getUserLanguage(call.message.chat.id)]["select_user_id_to_ban_text"], reply_markup=keyboard)
+    sent_msg = await bot.send_message(call.message.chat.id, text=languageFile[get_user_language(call.message.chat.id)]["select_user_id_to_ban_text"], reply_markup=keyboard)
 
     update_last_user_manage_message(sent_msg)
     await call.answer(call.data)
@@ -421,32 +433,42 @@ async def manage_user_callback(call: types.CallbackQuery):
 
 def handle_signal_msg_controller(signal, msg, pd: PriceData, open_position_price, deal_time, start_analize_time):
     async def handle_signal_msg(signal, msg, pd: PriceData, open_position_price, deal_time, start_analize_time):
-        deposit_user_ids = get_users_with_status(deposit_status)
-        trial_user_ids = get_users_with_status(trial_status)
-        users = [*deposit_user_ids, *trial_user_ids, *tester_ids]
-        await send_photo_text_message_to_users(users, signal.photo_path, msg, args=["signal_min_text"])
-
+        t1 = datetime.strptime(str(start_analize_time).split(".")[0], '%Y-%m-%d %H:%M:%S')
+        t2 = now_time()
+        print("before_send_delay", t2-t1)
+        user_signal_delay = (deal_time + 3) * 60
+        users_groups = await get_users_groups_ids(repeat_count, send_msg_users_group_count, user_signal_delay)
+        t2 = now_time()
+        print("created_users_delay", t2-t1)
+        for i in range(0, repeat_count):
+            await send_photo_text_message_to_users(users_groups[i], signal.photo_path, msg, args=["signal_min_text"])
+            await asyncio.sleep(send_msg_delay)
+        # print(users_groups)
+        print([len(users_groups[i]) for i in range(repeat_count)])
         try:
-            send_message_time = now_time()
-            start_analize_time = datetime.strptime(str(start_analize_time).split(".")[0], '%Y-%m-%d %H:%M:%S')
-            delay = send_message_time - start_analize_time
-            print("delay", delay)
-            await send_message_to_users(managers_id, "delay: " + str(delay) + "; analize_time: " + str(
-                start_analize_time) + "; send_msg_time: " + str(send_message_time))
+            t2 = now_time()
+            delay = t2 - t1
+            print("after_send_delay", delay)
+            await send_message_to_users(managers_id, "delay: " + str(delay) + "; analize_time: " + str(t1) + "; send_msg_time: " + str(t2))
         except Exception as e:
             print(e)
 
         close_signal_message, is_profit = await signal_maker.close_position(open_position_price, signal, pd, deal_time)
         img_path = "./img/profit.jpg" if is_profit else "./img/loss.jpg"
-        await send_photo_text_message_to_users(users, img_path, close_signal_message, args=["signal_deal_text", "signal_min_text"])
 
+        for i in range(0, repeat_count):
+            await send_photo_text_message_to_users(users_groups[i], img_path, close_signal_message, args=["signal_deal_text", "signal_min_text"])
+            await asyncio.sleep(send_msg_delay)
+        for group in users_groups:
+            for user in group:
+                set_next_signal_status(user,False)
     asyncio.run(handle_signal_msg(signal, msg, pd, open_position_price, deal_time, start_analize_time))
 
 
 async def check_trial_users():
     users_ids = get_users_with_status(trial_status)
     for user_id in users_ids:
-        userLanguage = getUserLanguage(user_id)
+        userLanguage = get_user_language(user_id)
         if is_trial_ended(get_user_trial_end_date(user_id)):
             remove_trial_from_user(user_id)
 
@@ -465,11 +487,13 @@ def signals_message_sender_controller(prices_data, prices_data_all):
         need_to_reset_seis = False
 
         while True:
+            t1 = time.perf_counter()
             try:
                 await check_trial_users()
             except Exception as e:
                 print("check_trial_users_ERROR", e)
-
+            t2 = time.perf_counter()
+            print("new delay", t2-t1)
             need_to_reset_seis = last_send_message_check + reset_seis_wait_time < datetime_to_secs(now_time())
             if need_to_reset_seis:
                 price_parser.create_parce_currencies_with_intervals_callbacks(all_prices_data)
@@ -528,7 +552,7 @@ def signals_message_sender_controller(prices_data, prices_data_all):
                                     args=(signal, df.msg[0] + df.debug[0], pd, df.open_price[0], int(df.deal_time[0]),
                                           df.start_analize_time[0]), daemon=True).start()
 
-            await asyncio.sleep(signal_delay)
+            await asyncio.sleep(signal_search_delay)
 
             signal_maker.reset_signals_files(signal_prices_data)
 

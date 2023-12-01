@@ -1,8 +1,12 @@
-from utils import file_manager
+
 import manager_module
 from market_info import get_trial_end_date
+import asyncio
 
+from utils import file_manager
 from utils.time import secs_to_date
+
+from datetime import datetime, timedelta
 
 user_db_path = "users/db.txt"
 startLanguage = "none"
@@ -22,6 +26,86 @@ wait_id_input_status = 'status wait input ID'
 wait_deposit_status = 'status wait check Deposit'
 
 
+def getNowTime():
+    return datetime.now()
+
+def timeConvertToStr(buferTime):
+    return datetime.strftime(buferTime, "%Y-%m-%d %H:%M:%S")
+
+
+def timeStrConvertToTime(buferTime):
+    return datetime.strptime(buferTime, "%Y-%m-%d %H:%M:%S")
+
+
+def getUserTime(id):
+    data = file_manager.read_file(user_db_path)
+    for user in data:
+        if user['id'] == id:
+            return timeStrConvertToTime(user['time'])
+
+
+def setUserTime(id,newtime):
+    data = file_manager.read_file(user_db_path)
+    for user in data:
+        if user['id'] == id:
+            user['time'] = newtime
+            file_manager.write_file(user_db_path, data)
+            return
+
+
+async def get_users_groups_ids(groups_count, users_in_group_count, delay_second):
+    while True:
+        try:
+            deposit_users = get_users_with_status(deposit_status)
+            trial_users = get_users_with_status(trial_status)
+            tester_users = manager_module.tester_ids
+            break
+        except Exception as e:
+            print("Error", e)
+            await asyncio.sleep(0.5)
+
+    send_signal_time = getNowTime()
+    send_signal_time += timedelta(seconds=delay_second)
+    while True:
+        try:
+            DB = file_manager.read_file(user_db_path)
+            break
+        except Exception as e:
+            print("Error", e)
+            await asyncio.sleep(0.5)
+
+    signal_users = []
+    for user in DB:
+        if user['id'] in [*deposit_users, *trial_users, *tester_users] and user['get_next_signal']:
+            user['time'] = datetime.strptime(user['time'], "%Y-%m-%d %H:%M:%S")
+            signal_users.append(user)
+    sorted_users = sorted(signal_users, key=lambda x: x['time'])
+    all_users_count = groups_count * users_in_group_count
+    if len(sorted_users) > all_users_count:
+        sorted_users = sorted_users[:all_users_count]
+
+    result_users_groups = []
+    group = []
+    for user in sorted_users:
+        if len(group) >= users_in_group_count:
+            result_users_groups.append(group)
+            group = []
+        if len(result_users_groups) >= groups_count:
+            break
+
+        if user['time'] < getNowTime():
+            group.append(user["id"])
+            setUserTime(user['id'], timeConvertToStr(send_signal_time))
+
+    if len(group) > 0:
+        result_users_groups.append(group)
+
+    for i in range(len(result_users_groups), groups_count):
+        result_users_groups.append([])
+
+    return result_users_groups
+
+
 def remove_user_with_id(id):
     users_data = file_manager.read_file(user_db_path)
     for i, user_data in enumerate(users_data):
@@ -36,7 +120,6 @@ def remove_user_with_id(id):
 
 def get_users_strings():
     data = file_manager.read_file(user_db_path)
-    print(data)
     users_strings_list = []
     user_number = 1
 
@@ -58,10 +141,6 @@ def get_users_strings():
             user_number += 1
 
     return users_strings_list, users_data
-
-
-def get_current_users_data(manager_id):
-    return current_users_data_dict.get(manager_id, [])
 
 
 def prev_user_strings(users_for_print_count, manager_id):
@@ -96,15 +175,12 @@ def next_user_strings(users_for_print_count, manager_id):
     global current_users_pointer_max_dict, current_users_pointer_min_dict, current_users_data_dict
     users_strings_list, users_data = get_users_strings()
 
-    print("user_strs", users_strings_list)
-
     counter = 1
     strings = []
 
     if current_users_pointer_max_dict.get(manager_id, -1) + 1 >= len(users_strings_list):
         current_users_pointer_max_dict.update({manager_id: -1})
     range_val = range(current_users_pointer_max_dict.get(manager_id, -1) + 1, len(users_strings_list))
-    print(range_val)
     current_users_pointer_min_dict.update({manager_id: current_users_pointer_max_dict.get(manager_id, -1) + 1})
     new_current_users_data = []
     for i in range_val:
@@ -120,6 +196,10 @@ def next_user_strings(users_for_print_count, manager_id):
     return strings
 
 
+def get_current_users_data(manager_id):
+    return current_users_data_dict.get(manager_id, [])
+
+
 def has_user_status(id, status):
     data = file_manager.read_file(user_db_path)
     for user in data:
@@ -128,9 +208,9 @@ def has_user_status(id, status):
     return False
 
 
-def getUserLanguage(id):
+def get_user_language(id):
     if id in manager_module.managers_id:
-        return manager_module.getManagerLanguage(id)
+        return manager_module.get_manager_language(id)
     else:
         data = file_manager.read_file(user_db_path)
         for user in data:
@@ -138,24 +218,36 @@ def getUserLanguage(id):
                 return user['language']
 
 
-def setUserLanguage(id, newLanguage):
+def set_user_language(id, new_language):
     if id in manager_module.managers_id:
-        manager_module.setManagerLanguage(id, newLanguage)
+        manager_module.set_manager_language(id, new_language)
     else:
         data = file_manager.read_file(user_db_path)
         for user in data:
             if user['id'] == id:
-                 user['language'] = newLanguage
+                 user['language'] = new_language
         file_manager.write_file(user_db_path, data)
+
+
+def set_next_signal_status(id, flag):
+    data = file_manager.read_file(user_db_path)
+    for user in data:
+        if user['id'] == id:
+             user['get_next_signal'] = flag
+    file_manager.write_file(user_db_path, data)
+
+
+def get_next_signal_status(id):
+    data = file_manager.read_file(user_db_path)
+    for user in data:
+        if user['id'] == id:
+            return user['get_next_signal']
+    return None
 
 
 def get_users_with_status(status):
     data = file_manager.read_file(user_db_path)
-    users_with_status = []
-    for user in data:
-        id = user['id']
-        if has_user_status(id, status):
-            users_with_status.append(id)
+    users_with_status = [user["id"] for user in data if user["status"] == status]
     return users_with_status
 
 
@@ -213,7 +305,9 @@ def add_user(id, first_name, last_name, tag):
             "acount_number": 0,
             "had_trial_status": False,
             "trial_end_date": None,
-            "before_trial_status": "none"
+            "before_trial_status": "none",
+            "time": timeConvertToStr(getNowTime()),
+            "get_next_signal": False
         }
         data.append(bufer_user)
         file_manager.write_file(user_db_path, data)
@@ -229,7 +323,7 @@ async def update_status_user(id, status):
     file_manager.write_file(user_db_path, data)
 
 
-async def setUserTag(id, tag):
+async def set_user_tag(id, tag):
     data = file_manager.read_file(user_db_path)
     for user in data:
         found_user = user['id'] == id
@@ -237,7 +331,6 @@ async def setUserTag(id, tag):
             user['tag'] = tag
             break
     file_manager.write_file(user_db_path, data)
-
 
 
 async def get_user_with_status(status):
@@ -258,7 +351,7 @@ def get_user_status(id):
     return None
 
 
-def get_user_Tag(id):
+def get_user_tag(id):
     data = file_manager.read_file(user_db_path)
     for user in data:
         if user['id'] == id:
@@ -281,3 +374,9 @@ def find_user_with_id(id):
             return True
     return False
 
+async def main():
+    await get_users_groups_ids(50, 20, 60*5)
+
+
+if __name__ == "__main__":
+    asyncio.run(main())

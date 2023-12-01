@@ -1,0 +1,9 @@
+,Unnamed: 0,has_signal,signal_type,msg,date,open_price,interval,symbol,exchange,deal_time,debug,start_analize_time
+0,0,True,long,🟢EUR/CAD LONG ⬆ 4{},2023-11-17 12:46:00,1.49141,Interval.in_1_minute,EURCAD,OANDA,4,"
+
+Проверка сигнала:
+                    	Валютная пара: EURCAD"" таймфрейми: [<Interval.in_1_minute: '1'>, <Interval.in_3_minute: '3'>, <Interval.in_5_minute: '5'>] время свеч: [Timestamp('2023-11-17 12:46:00'), Timestamp('2023-11-17 12:42:00'), Timestamp('2023-11-17 12:40:00')]
+                    	Есть ли сигнал: False
+                    	Показания индикаторов: long_sob_count0 short_sob_count0
+                    		 * SOB -> long [] short []
+                     time_now 2023-11-17 12:46:08.138192+02:00",2023-11-17 12:46:07

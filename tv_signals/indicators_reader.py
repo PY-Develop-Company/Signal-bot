@@ -160,15 +160,19 @@ class SuperOrderBlockIndicator(Indicator):
             self.right = right
             self.bottom = bottom
             self.signal = signal
+            self.is_early_created = False
 
         def print_info(self):
             print("Created box: ", self.left, self.top, self.right, self.bottom)
             print("Created box: ", self.left, self.top, self.right, self.bottom)
 
+        def set_early_created(self):
+            self.is_early_created = True
+
         def check_signal(self, bar_low, bar_high, bar_date):
             is_price_in_box = (self.top > bar_high > self.bottom) or (self.top > bar_low > self.bottom)
             is_date_range_in_box = self.left <= bar_date <= self.right
-            return self.signal if (is_price_in_box and is_date_range_in_box) else NeutralSignal()
+            return self.signal if (is_price_in_box and is_date_range_in_box and not self.is_early_created) else NeutralSignal()
 
     def pivot_high(self, price):
         highs = {}
@@ -239,29 +243,25 @@ class SuperOrderBlockIndicator(Indicator):
             # # # # # # # # # # # Order Block # # # # # # # # #
             right = self.src.datetime[i]
             left = right - self.interval * 2
-            h2 = self.high[i + 2]
-            l2 = self.low[i + 2]
+
+            h2 = self.high[i + 1]
+            l2 = self.low[i + 1]
+            _left = right - self.interval
 
             if self.is_ob_box_up(i) and bull_boxes_index_OB <= self.obMaxBoxSet:
-                left = right - self.interval
-                h2 = self.high[i + 1]
-                l2 = self.low[i + 1]
-                t = h2
-                b = min(l2, self.low[i])
-                if t - b >= self.min_sob_size:
-                    _bullboxOB = self.Box(left=left, top=t, right=right, bottom=b, signal=LongSignal())
+                _t = h2
+                _b = min(l2, self.low[i])
+                if _t-_b >= self.min_sob_size:
+                    _bullboxOB = self.Box(left=_left, top=_t, right=right, bottom=_b, signal=LongSignal())
                     _bullBoxesOB.append(_bullboxOB)
                     bull_boxes_index_OB += 1
                     last_added_box_index = i
 
             if self.is_ob_box_down(i) and bear_boxes_index_OB <= self.obMaxBoxSet:
-                left = right - self.interval
-                h2 = self.high[i + 1]
-                l2 = self.low[i + 1]
-                t = max(h2, self.high[i])
-                b = l2
-                if t - b >= self.min_sob_size:
-                    _bearboxOB = self.Box(left=left, top=t, right=right, bottom=b, signal=ShortSignal())
+                _t = max(h2, self.high[i])
+                _b = l2
+                if _t-_b >= self.min_sob_size:
+                    _bearboxOB = self.Box(left=_left, top=_t, right=right, bottom=_b, signal=ShortSignal())
                     _bearBoxesOB.append(_bearboxOB)
                     bear_boxes_index_OB += 1
                     last_added_box_index = i
@@ -289,12 +289,15 @@ class SuperOrderBlockIndicator(Indicator):
                     last_added_box_index = i
 
         for i, box in enumerate(_bullBoxesOB):
-            if _bullBoxesOB[i].right == self.src.datetime[i]:
+            if _bullBoxesOB[i].right == self.src.datetime[0]:
+                _bullBoxesOB[i].set_early_created()
                 continue
             _bullBoxesOB[i].right += self.interval
         for i, box in enumerate(_bearBoxesOB):
-            if _bearBoxesOB[i].right == self.src.datetime[i]:
+            if _bearBoxesOB[i].right == self.src.datetime[0]:
+                _bearBoxesOB[i].set_early_created()
                 continue
+
             _bearBoxesOB[i].right += self.interval
 
         boxes = _bullBoxesOB + _bearBoxesOB + _bullBoxesFVG + _bearBoxesFVG
