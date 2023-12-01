@@ -1,1 +1,1 @@
-﻿[{"id": 6916117863, "name": "Test Pico", "tag": "test_pico", "language": "english", "status": "status Trial", "acount_number": 0, "had_trial_status": true, "trial_end_date": 1701439114.0, "before_trial_status": "status none"}, {"id": 1698123362, "name": "BW None", "tag": "bggrgg", "language": "русский", "status": "status Trial", "acount_number": 0, "had_trial_status": true, "trial_end_date": 1701685744.0, "before_trial_status": "status none"}]
+﻿[]

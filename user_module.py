@@ -9,7 +9,7 @@ from utils.time import secs_to_date
 from datetime import datetime, timedelta
 
 user_db_path = "users/db.txt"
-startLanguage = "none"
+startLanguage = "english"
 
 current_users_pointer_max_dict = dict()
 current_users_pointer_min_dict = dict()

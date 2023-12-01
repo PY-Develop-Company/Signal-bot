@@ -178,9 +178,9 @@ async def start_command(message):
     else:
         add_user(message.from_user.id, message.from_user.first_name, message.from_user.last_name, message.from_user.username)
 
-    if get_user_language(message.from_user.id) == startLanguage:
-        await open_menu(message, get_select_language_markup(), "Select language:")
-        return
+    # if get_user_language(message.from_user.id) == startLanguage:
+    #     await open_menu(message, get_select_language_markup(), "Select language:")
+    #     return
 
     if get_user_status(message.from_user.id) == wait_id_input_status:
         await update_status_user(message.from_user.id, none_status)
@@ -200,10 +200,11 @@ async def start_command(message):
 
 @dp.message_handler(commands="language")
 async def open_language_command(message):
-    if get_user_status(message.from_user.id) == wait_id_input_status:
-        await update_status_user(message.from_user.id, none_status)
-    set_user_language(message.from_user.id, startLanguage)
-    await open_menu(message, get_select_language_markup(), "Select language:")
+    ...
+    # if get_user_status(message.from_user.id) == wait_id_input_status:
+    #     await update_status_user(message.from_user.id, none_status)
+    # set_user_language(message.from_user.id, startLanguage)
+    # await open_menu(message, get_select_language_markup(), "Select language:")
 
 
 @dp.message_handler(commands="start_test")
@@ -293,17 +294,19 @@ async def handle_media(message: types.Message):
         await set_user_tag(message.from_user.id, message.from_user.username)
 
     # LANGUAGE
-    if message.text not in [select_language_eng, select_language_ru, select_language_hin] and user_language == "none":
-        await open_language_command(message)
-        return
-    if message.text in [select_language_eng, select_language_ru, select_language_hin] and user_language == "none":
-        set_user_language(user_id, message.text)
-        user_language = get_user_language(user_id)
-        markup = get_markup_with_status(user_id, get_user_status(user_id))
-
-        await open_menu(message, markup, languageFile[user_language]["selected_language_success_text"])
-        await start_command(message)
-        return
+    if user_language == "none":
+        set_user_language(user_id,startLanguage)
+    # if message.text not in [select_language_eng, select_language_ru, select_language_hin] and user_language == "none":
+    #     await open_language_command(message)
+    #     return
+    # if message.text in [select_language_eng, select_language_ru, select_language_hin] and user_language == "none":
+    #     set_user_language(user_id, message.text)
+    #     user_language = get_user_language(user_id)
+    #     markup = get_markup_with_status(user_id, get_user_status(user_id))
+    #
+    #     await open_menu(message, markup, languageFile[user_language]["selected_language_success_text"])
+    #     await start_command(message)
+    #     return
 
     # TRIAL
     if message.text == languageFile[user_language]["get_trial_button_text"]:

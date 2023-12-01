@@ -1,2 +1,3 @@
 ,has_signal,signal_type,msg,date,open_price,interval,symbol,exchange,deal_time,debug,start_analize_time
-0,False,neutral,NoneEUR/USD Нет сигнала 30{},2023-12-01 23:30:00,1.08802,Interval.in_5_minute,EURUSD,OANDA,30,self.alt_src is None,2023-12-01 23:38:27
+0,False,neutral,NoneEUR/USD Нет сигнала 30{},2023-12-01 23:50:00,1.08813,Interval.in_5_minute,EURUSD,OANDA,30,"nonecount: 9
+ first bar index 998",2023-12-02 00:27:47
