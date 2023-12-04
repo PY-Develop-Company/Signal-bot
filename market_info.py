@@ -4,7 +4,7 @@ from utils.time import date_by_adding_business_days, now_time, datetime_to_secs
 min_time_zone_hours = 10
 max_time_zone_hours = 23
 
-trial_days = 3
+trial_days = 1
 
 # time_zone = pytz.timezone("Europe/Bucharest")
 # origin_date = datetime(1900, 1, 1, tzinfo=time_zone)
