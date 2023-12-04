@@ -295,7 +295,7 @@ async def handle_media(message: types.Message):
 
     # LANGUAGE
     if user_language == "none":
-        set_user_language(user_id,startLanguage)
+        set_user_language(user_id, startLanguage)
     # if message.text not in [select_language_eng, select_language_ru, select_language_hin] and user_language == "none":
     #     await open_language_command(message)
     #     return
@@ -506,7 +506,7 @@ def signals_message_sender_controller(prices_data, prices_data_all):
                 last_send_message_check = datetime_to_secs(now_time())
                 continue
 
-            await asyncio.sleep(3)
+            await asyncio.sleep(5)
             try:
                 with open("users/test.txt", "r") as file:
                     cont = file.read().split(".")[0]
@@ -569,15 +569,16 @@ if __name__ == '__main__':
     currencies = price_parser.get_currencies()
 
     intervals = [Interval.in_1_minute, Interval.in_3_minute, Interval.in_5_minute, Interval.in_15_minute, Interval.in_45_minute]
-    main_intervals = [Interval.in_5_minute, Interval.in_15_minute, Interval.in_45_minute]
-    parent_intervals = [[], [], []]
-    vob_intervals = [[Interval.in_1_minute, Interval.in_3_minute], [Interval.in_1_minute, Interval.in_3_minute], [Interval.in_1_minute, Interval.in_3_minute]]
+    main_intervals = [Interval.in_5_minute]
+    parent_intervals = [[Interval.in_15_minute, Interval.in_45_minute]]
+    vob_intervals = [[Interval.in_1_minute, Interval.in_3_minute]]
 
     # prices data creation
     prices_data = [PriceData(currency[0], currency[1], interval) for currency in currencies for interval in intervals]
     ind = -1
     main_pds = []
     parent_pds = []
+
     for currency in currencies:
         for main_interval_index in range(len(main_intervals)):
             main_pds.append(PriceData(currency[0], currency[1], main_intervals[main_interval_index]))
@@ -585,6 +586,7 @@ if __name__ == '__main__':
             ind += 1
             for p_i in parent_intervals[main_interval_index]:
                 parent_pds[ind].append(PriceData(currency[0], currency[1], p_i))
+
     analize_pairs = [[main_pds[i], *parent_pds[i]] for i in range(len(main_pds))]
     vob_pds = []
     for currency in currencies:

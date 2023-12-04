@@ -96,12 +96,12 @@ blocks_delta = {
 }
 
 min_sob_size = {
-    Interval.in_1_minute: 8,
-    Interval.in_3_minute: 17,
-    Interval.in_5_minute: 30,
-    Interval.in_15_minute: 55,
-    Interval.in_30_minute: 75,
-    Interval.in_45_minute: 75
+    Interval.in_1_minute: 5,
+    Interval.in_3_minute: 15,
+    Interval.in_5_minute: 20,
+    Interval.in_15_minute: 34,
+    Interval.in_30_minute: 50,
+    Interval.in_45_minute: 55
 }
 
 
@@ -915,24 +915,24 @@ class OBVolumeIndicator(Indicator):
                 return_debug = "main"
 
         # opposite signal до блока
-        # if return_signal.type == NeutralSignal().type:
-        #     bull_count = 0
-        #     bear_count = 0
-        #     for block in order_blocks:
-        #         if block.signal.type == LongSignal().type:
-        #             bull_count += 1
-        #         elif block.signal.type == ShortSignal().type:
-        #             bear_count += 1
-        #
-        #         if bull_count > 0 and bear_count > 0:
-        #             break
-        #     if bull_count > 0 and bear_count == 0:
-        #         return_signal = ShortSignal()
-        #         return_debug = "oposite"
-        #     elif bull_count == 0 and bear_count > 0:
-        #         return_signal = LongSignal()
-        #         return_debug = "oposite"
-        #     return_debug += f" bull : {bull_count} | bear: {bear_count}"
+        if return_signal.type == NeutralSignal().type:
+            bull_count = 0
+            bear_count = 0
+            for block in order_blocks:
+                if block.signal.type == LongSignal().type:
+                    bull_count += 1
+                elif block.signal.type == ShortSignal().type:
+                    bear_count += 1
+
+                if bull_count > 0 and bear_count > 0:
+                    break
+            if bull_count > 0 and bear_count == 0:
+                return_signal = ShortSignal()
+                return_debug = "oposite"
+            elif bull_count == 0 and bear_count > 0:
+                return_signal = LongSignal()
+                return_debug = "oposite"
+            return_debug += f" bull : {bull_count} | bear: {bear_count}"
 
         if self.is_closing_block_nearby(return_signal, order_blocks):
             return_signal = NeutralSignal()
