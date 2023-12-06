@@ -6,30 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="c8e52443-fb39-41fa-9e09-4877251a22f1" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/EURUSDIntervalin_15_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/EURUSDIntervalin_15_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/EURUSDIntervalin_3_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/EURUSDIntervalin_3_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/EURUSDIntervalin_5_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/EURUSDIntervalin_5_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/check_ended/EURUSDIntervalin_15_minute.txt" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/check_ended/EURUSDIntervalin_15_minute.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/check_ended/EURUSDIntervalin_3_minute.txt" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/check_ended/EURUSDIntervalin_3_minute.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/currencies_data/check_ended/EURUSDIntervalin_5_minute.txt" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/check_ended/EURUSDIntervalin_5_minute.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/img/logo.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/img/logo.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/img/long.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/img/long.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/img/loss.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/img/loss.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/img/profit.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/img/profit.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/img/short.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/img/short.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/language.json" beforeDir="false" afterPath="$PROJECT_DIR$/language.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/market_info.py" beforeDir="false" afterPath="$PROJECT_DIR$/market_info.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/AUDCADIntervalin_5_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/signals/AUDCADIntervalin_5_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/AUDCHFIntervalin_5_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/signals/AUDCHFIntervalin_5_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/AUDJPYIntervalin_5_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/signals/AUDJPYIntervalin_5_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/AUDUSDIntervalin_5_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/signals/AUDUSDIntervalin_5_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/EURCADIntervalin_5_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/signals/EURCADIntervalin_5_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/EURJPYIntervalin_5_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/signals/EURJPYIntervalin_5_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/EURUSDIntervalin_5_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/signals/EURUSDIntervalin_5_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/GBPAUDIntervalin_5_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/signals/GBPAUDIntervalin_5_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/GBPUSDIntervalin_5_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/signals/GBPUSDIntervalin_5_minute.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/signals/check_ended/EURUSDIntervalin_5_minute.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/users/db.txt" beforeDir="false" afterPath="$PROJECT_DIR$/users/db.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user_module.py" beforeDir="false" afterPath="$PROJECT_DIR$/user_module.py" afterDir="false" />
     </list>
     <list id="cbe571c8-b52a-4250-a9e3-ad1313cd5330" name="Changes by Alex" comment="" />
     <list id="45a04bb1-6fd8-4553-b69b-26e161c06906" name="Changes by Roma lox" comment="" />

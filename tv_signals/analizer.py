@@ -209,7 +209,7 @@ class SOBAnalizer(Analizer):
         sob_ind = SuperOrderBlockIndicator(df, df.open, df.close, df.high, df.low, pd)
 
         signal = sob_ind.get_signal()
-        has_signal = not(signal.type == NeutralSignal())
+        has_signal = not(signal.type == NeutralSignal().type)
         return has_signal, signal, "no debug"
 
 

@@ -16,74 +16,74 @@ blocks_delta = {
     "EURUSD": {
         Interval.in_1_minute: 35,
         Interval.in_3_minute: 70,
-        Interval.in_5_minute: 110,
-        Interval.in_15_minute: 155,
+        Interval.in_5_minute: 100,
+        Interval.in_15_minute: 140,
         Interval.in_30_minute: 210,
-        Interval.in_45_minute: 210
+        Interval.in_45_minute: 200
     },
     "AUDUSD": {
         Interval.in_1_minute: 35,
         Interval.in_3_minute: 75,
-        Interval.in_5_minute: 120,
-        Interval.in_15_minute: 150,
+        Interval.in_5_minute: 110,
+        Interval.in_15_minute: 140,
         Interval.in_30_minute: 220,
-        Interval.in_45_minute: 220
+        Interval.in_45_minute: 200
     },
     "AUDCAD": {
         Interval.in_1_minute: 40,
         Interval.in_3_minute: 94,
-        Interval.in_5_minute: 145,
-        Interval.in_15_minute: 150,
+        Interval.in_5_minute: 130,
+        Interval.in_15_minute: 140,
         Interval.in_30_minute: 200,
-        Interval.in_45_minute: 200
+        Interval.in_45_minute: 190
     },
     "EURJPY": {
         Interval.in_1_minute: 40,
         Interval.in_3_minute: 90,
-        Interval.in_5_minute: 124,
-        Interval.in_15_minute: 155,
+        Interval.in_5_minute: 110,
+        Interval.in_15_minute: 140,
         Interval.in_30_minute: 199,
-        Interval.in_45_minute: 199
+        Interval.in_45_minute: 190
     },
     "EURCAD": {
         Interval.in_1_minute: 85,
         Interval.in_3_minute: 146,
-        Interval.in_5_minute: 178,
-        Interval.in_15_minute: 235,
-        Interval.in_30_minute: 270,
-        Interval.in_45_minute: 270
+        Interval.in_5_minute: 160,
+        Interval.in_15_minute: 220,
+        Interval.in_30_minute: 260,
+        Interval.in_45_minute: 260
     },
     "AUDCHF": {
         Interval.in_1_minute: 30,
         Interval.in_3_minute: 79,
-        Interval.in_5_minute: 125,
-        Interval.in_15_minute: 170,
-        Interval.in_30_minute: 200,
-        Interval.in_45_minute: 200
+        Interval.in_5_minute: 110,
+        Interval.in_15_minute: 160,
+        Interval.in_30_minute: 190,
+        Interval.in_45_minute: 190
     },
     "GBPUSD": {
         Interval.in_1_minute: 85,
         Interval.in_3_minute: 99,
-        Interval.in_5_minute: 125,
-        Interval.in_15_minute: 185,
-        Interval.in_30_minute: 220,
-        Interval.in_45_minute: 220
+        Interval.in_5_minute: 110,
+        Interval.in_15_minute: 170,
+        Interval.in_30_minute: 200,
+        Interval.in_45_minute: 200
     },
     "AUDJPY": {
         Interval.in_1_minute: 50,
         Interval.in_3_minute: 120,
-        Interval.in_5_minute: 170,
-        Interval.in_15_minute: 220,
-        Interval.in_30_minute: 240,
-        Interval.in_45_minute: 240
+        Interval.in_5_minute: 150,
+        Interval.in_15_minute: 200,
+        Interval.in_30_minute: 220,
+        Interval.in_45_minute: 220
     },
     "GBPAUD": {
         Interval.in_1_minute: 77,
         Interval.in_3_minute: 155,
-        Interval.in_5_minute: 215,
-        Interval.in_15_minute: 320,
-        Interval.in_30_minute: 370,
-        Interval.in_45_minute: 370
+        Interval.in_5_minute: 200,
+        Interval.in_15_minute: 300,
+        Interval.in_30_minute: 350,
+        Interval.in_45_minute: 350
     },
     "BTCUSD": {
         Interval.in_1_minute: 0,
