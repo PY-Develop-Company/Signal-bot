@@ -334,10 +334,8 @@ async def set_user_tag(id, tag):
 async def get_user_with_status(status):
     data = file_manager.read_file(user_db_path)
     for user in data:
-        user_id = user['id']
-        is_status = has_user_status(user_id, status)
-        if is_status:
-            return True, user_id
+        if user['status'] == status:
+            return True, user['id']
     return False, None
 
 
