@@ -94,7 +94,7 @@ class PriceData:
     def reset_chart_data(self):
         interval = str(self.interval).replace(".", "")
 
-        df = self.get_price_data(500)
+        df = self.get_price_data(5000)
         if df is None:
             print("ERROR: No df")
             pass
@@ -114,7 +114,7 @@ class PriceData:
         path = currencies_data_path + self.symbol + interval + ".csv"
         file_manager.delete_file_if_exists(path)
 
-    def get_price_data(self, bars_count=500):
+    def get_price_data(self, bars_count=5000):
         try:
             priceData = tvl.get_hist(symbol=self.symbol, exchange=self.exchange, interval=self.interval, n_bars=bars_count+1)
             priceData = priceData.reindex(index=priceData.index[::-1]).iloc[1:].reset_index()
@@ -148,7 +148,7 @@ def get_currencies():
     return currencies
 
 
-def get_price_data_frame_seis(seis, bars_count=500):
+def get_price_data_frame_seis(seis, bars_count=5000):
     price_df = seis.get_hist(n_bars=bars_count)
     price_df = price_df.drop(price_df.index[len(price_df) - 1])
     price_df = price_df.reindex(index=price_df.index[::-1]).reset_index()

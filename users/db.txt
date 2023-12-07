@@ -1,1 +1,1 @@
-﻿[{"id": 5359645780, "name": "Roman None", "tag": "test_nano", "language": "english", "status": "status none", "acount_number": 0, "had_trial_status": false, "trial_end_date": null, "before_trial_status": "none", "time": "2023-11-22 21:28:09", "get_next_signal": false}]
+﻿[{"id": 6916117863, "name": "Test Pico", "tag": "test_pico", "language": "english", "status": "status Trial", "acount_number": 0, "had_trial_status": true, "trial_end_date": 1702251587.0, "before_trial_status": "status none", "time": "2023-12-08 01:38:05", "get_next_signal": true}]

@@ -1,23 +1,16 @@
-import random
-import time
-from datetime import datetime
-import pytz
 from aiogram import Bot, Dispatcher, types
 import logging
 import price_parser
 from price_parser import PriceData
 import signal_maker
 from tvDatafeed import Interval
-import market_info
-import asyncio
 import multiprocessing
 from manager_module import *
 from menu_text import *
 import interval_convertor
 from signals import get_signal_by_type
-import time
+from my_time import *
 
-# API_TOKEN = "6588822945:AAFX8eDWngrrbLeDLhzNw0nLkxI07D9wG8Y"  # my API TOKEN
 API_TOKEN = "6340912636:AAHACm2V2hDJUDXng0y0uhBRVRFJgqrok48"  # main API TOKEN
 
 logging.basicConfig(level=logging.INFO)
@@ -25,8 +18,8 @@ bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot)
 signal_search_delay = 60
 
-callbacks_wait_time = 300
-reset_seis_wait_time = 300
+callbacks_wait_time = 600
+reset_seis_wait_time = 600
 
 users_for_print_count = 15
 
@@ -180,7 +173,7 @@ async def start_command(message):
         add_user(message.from_user.id, message.from_user.first_name, message.from_user.last_name, message.from_user.username)
 
     if get_user_language(message.from_user.id) == startLanguage:
-        await open_menu(message, get_select_language_markap(), "Select language:")
+        await open_menu(message, get_select_language_markup(), "Select language:")
         return
 
     if get_user_status(message.from_user.id) == wait_id_input_status:
@@ -204,7 +197,7 @@ async def open_language_command(message):
     if get_user_status(message.from_user.id) == wait_id_input_status:
         await update_status_user(message.from_user.id, none_status)
     set_user_language(message.from_user.id, startLanguage)
-    await open_menu(message, get_select_language_markap(), "Select language:")
+    await open_menu(message, get_select_language_markup(), "Select language:")
 
 
 @dp.message_handler(commands="start_test")
@@ -214,7 +207,7 @@ async def start_test_command(message):
             msg = message.text.split(" ")[-1]
             if msg.isdigit():
                 with open("users/test.txt", "w") as file:
-                    file.write(str(float(msg) + time.time()))
+                    file.write(str(float(msg) + datetime_to_secs(now_time())))
 
 
 @dp.message_handler(commands="stop_test")
@@ -385,7 +378,7 @@ async def handle_media(message: types.Message):
                 await update_status_user(user_id, wait_id_input_status)
                 await open_menu(message, get_empty_markup(), languageFile[user_language]["wait_id_text"])
         elif message.text == languageFile[user_language]["get_signal_button_text"]:
-            if get_next_signal_status(user_id)==False:
+            if not get_next_signal_status(user_id):
                 set_next_signal_status(user_id, True)
                 await message.answer(languageFile[user_language]["start_searching_signal_text"])
             else:
@@ -435,11 +428,11 @@ async def manage_user_callback(call: types.CallbackQuery):
 def handle_signal_msg_controller(signal, msg, pd: PriceData, open_position_price, deal_time, start_analize_time):
     async def handle_signal_msg(signal, msg, pd: PriceData, open_position_price, deal_time, start_analize_time):
         t1 = datetime.strptime(str(start_analize_time).split(".")[0], '%Y-%m-%d %H:%M:%S')
-        t2 = datetime.strptime(str(market_info.get_time()).split(".")[0], '%Y-%m-%d %H:%M:%S')
+        t2 = now_time()
         print("before_send_delay", t2-t1)
         user_signal_delay = (deal_time + 3) * 60
         users_groups = await get_users_groups_ids(repeat_count, send_msg_users_group_count, user_signal_delay)
-        t2 = datetime.strptime(str(market_info.get_time()).split(".")[0], '%Y-%m-%d %H:%M:%S')
+        t2 = now_time()
         print("created_users_delay", t2-t1)
         for i in range(0, repeat_count):
             await send_photo_text_message_to_users(users_groups[i], signal.photo_path, msg, args=["signal_min_text"])
@@ -447,7 +440,7 @@ def handle_signal_msg_controller(signal, msg, pd: PriceData, open_position_price
         # print(users_groups)
         print([len(users_groups[i]) for i in range(repeat_count)])
         try:
-            t2 = datetime.strptime(str(market_info.get_time()).split(".")[0], '%Y-%m-%d %H:%M:%S')
+            t2 = now_time()
             delay = t2 - t1
             print("after_send_delay", delay)
             await send_message_to_users(managers_id, "delay: " + str(delay) + "; analize_time: " + str(t1) + "; send_msg_time: " + str(t2))
@@ -478,54 +471,57 @@ async def check_trial_users():
             await send_message_to_user(user_id, languageFile[userLanguage]["for_vip_text"])
 
 
-def signals_message_sender_controller(prices_data, intervals, unit_pd, prices_data_all):
-    async def signals_message_sender_function(main_prices_data, intervals, unit_pd, prices_data_all):
-        price_parser.create_parce_currencies_with_intervals_callbacks(prices_data_all)
-        last_send_message_check = time.time()
-        for pd in prices_data_all:
+def signals_message_sender_controller(prices_data, prices_data_all):
+    async def signals_message_sender_function(signal_prices_data, all_prices_data):
+        last_send_message_check = datetime_to_secs(now_time())
+        price_parser.create_parce_currencies_with_intervals_callbacks(all_prices_data)
+        signal_maker.reset_signals_files(signal_prices_data)
+        for pd in all_prices_data:
             pd.reset_chart_data()
-        signal_maker.reset_signals_files(main_prices_data)
-
         need_to_reset_seis = False
 
         while True:
-            t1 = time.perf_counter()
+            t1 = datetime_to_secs(now_time())
             try:
                 await check_trial_users()
             except Exception as e:
                 print("check_trial_users_ERROR", e)
-            t2 = time.perf_counter()
+            t2 = datetime_to_secs(now_time())
             print("new delay", t2-t1)
-            need_to_reset_seis = last_send_message_check + reset_seis_wait_time < time.time()
+            need_to_reset_seis = last_send_message_check + reset_seis_wait_time < datetime_to_secs(now_time())
             if need_to_reset_seis:
-                price_parser.create_parce_currencies_with_intervals_callbacks(prices_data_all)
-                last_send_message_check = time.time()
-                signal_maker.reset_signals_files(main_prices_data)
+                price_parser.create_parce_currencies_with_intervals_callbacks(all_prices_data)
+                for pd in prices_data:
+                    pd.reset_chart_data()
+                signal_maker.reset_signals_files(signal_prices_data)
+                last_send_message_check = datetime_to_secs(now_time())
                 continue
 
-            await asyncio.sleep(3)
+            await asyncio.sleep(5)
             try:
                 with open("users/test.txt", "r") as file:
                     cont = file.read().split(".")[0]
                     if cont.isdigit():
                         cont = float(cont)
-                        if cont > time.time():
-                            print("wait for signal", cont, time.time())
+                        if cont > datetime_to_secs(now_time()):
+                            last_send_message_check = datetime_to_secs(now_time())
+                            print("wait for signal", cont, datetime_to_secs(now_time()))
                             continue
             except Exception as e:
                 print("Error", e)
             print("search signals to send...")
             if not market_info.is_market_working():
+                last_send_message_check = datetime_to_secs(now_time())
                 continue
 
             created_prices_data = []
-            for pd in main_prices_data:
+            for pd in signal_prices_data:
                 if signal_maker.is_signal_analized(pd):
                     created_prices_data.append(pd)
             if len(created_prices_data) == 0:
                 continue
 
-            last_send_message_check = time.time()
+            last_send_message_check = datetime_to_secs(now_time())
 
             dfs_with_signals = []
             for pd in created_prices_data:
@@ -543,8 +539,7 @@ def signals_message_sender_controller(prices_data, intervals, unit_pd, prices_da
             df = random.choice(dfs_with_signals)
             signal = get_signal_by_type(df.signal_type[0])
 
-            time_zone = pytz.timezone("Europe/Bucharest")
-            time_now = datetime.now(time_zone)
+            time_now = now_time()
             pd = PriceData(df.symbol[0], df.exchange[0], interval_convertor.str_to_interval(df.interval[0]))
             path = f"sended_signals/time{time_now.hour}_{time_now.minute}_{pd.symbol}_{interval_convertor.interval_to_string(pd.interval).replace('.', '')}"
             df.to_csv(path)
@@ -555,9 +550,9 @@ def signals_message_sender_controller(prices_data, intervals, unit_pd, prices_da
 
             await asyncio.sleep(signal_search_delay)
 
-            signal_maker.reset_signals_files(main_prices_data)
+            signal_maker.reset_signals_files(signal_prices_data)
 
-    asyncio.run(signals_message_sender_function(prices_data, intervals, unit_pd, prices_data_all))
+    asyncio.run(signals_message_sender_function(prices_data, prices_data_all))
 
 
 if __name__ == '__main__':
@@ -566,44 +561,39 @@ if __name__ == '__main__':
     multiprocessing.freeze_support()
     currencies = price_parser.get_currencies()
 
-    intervals = [Interval.in_1_minute, Interval.in_3_minute, Interval.in_5_minute, Interval.in_15_minute, Interval.in_30_minute]
-    main_intervals = [Interval.in_1_minute, Interval.in_3_minute, Interval.in_5_minute]
-    parent_intervals = [
-        [Interval.in_3_minute, Interval.in_5_minute],
-        [Interval.in_5_minute, Interval.in_15_minute],
-        [Interval.in_15_minute, Interval.in_30_minute]
-    ]
-    prices_data = []
+    intervals = [Interval.in_1_minute, Interval.in_3_minute, Interval.in_5_minute, Interval.in_15_minute, Interval.in_45_minute]
+    main_intervals = [Interval.in_5_minute]
+    parent_intervals = [[Interval.in_15_minute, Interval.in_45_minute]]
+    vob_intervals = [[Interval.in_1_minute, Interval.in_3_minute]]
 
+    # prices data creation
+    prices_data = [PriceData(currency[0], currency[1], interval) for currency in currencies for interval in intervals]
+    ind = -1
     main_pds = []
     parent_pds = []
 
     for currency in currencies:
-        for interval in intervals:
-            prices_data.append(PriceData(currency[0], currency[1], interval))
-
-    ind = -1
-    for currency_index in range(len(currencies)):
         for main_interval_index in range(len(main_intervals)):
-            main_pd = PriceData(currencies[currency_index][0], currencies[currency_index][1], main_intervals[main_interval_index])
-            main_pds.append(main_pd)
+            main_pds.append(PriceData(currency[0], currency[1], main_intervals[main_interval_index]))
             parent_pds.append([])
             ind += 1
             for p_i in parent_intervals[main_interval_index]:
-                parent_pds[ind].append(PriceData(currencies[currency_index][0], currencies[currency_index][1], p_i))
+                parent_pds[ind].append(PriceData(currency[0], currency[1], p_i))
 
+    analize_pairs = [[main_pds[i], *parent_pds[i]] for i in range(len(main_pds))]
+    vob_pds = []
+    for currency in currencies:
+        pds = []
+        for intervals in vob_intervals:
+            for interval in intervals:
+                pds.append(PriceData(currency[0], currency[1], interval))
+            vob_pds.append(pds)
+
+    # reset chart and signal files
     for pd in prices_data:
         pd.remove_chart_data()
 
-    unit_pd = main_pds[0]
-    multiprocessing.Process(target=signals_message_sender_controller, args=(main_pds, main_intervals, unit_pd, prices_data)).start()
-
-    analize_pairs = []
-    for i in range(len(main_pds)):
-        i_main_pd = main_pds[i]
-        i_parent_pds = parent_pds[i]
-        analize_pair = (i_main_pd, i_parent_pds, unit_pd)
-        analize_pairs.append(analize_pair)
-    multiprocessing.Process(target=signal_maker.analize_currency_data_controller, args=(analize_pairs, )).start()
+    multiprocessing.Process(target=signals_message_sender_controller, args=(main_pds, prices_data)).start()
+    multiprocessing.Process(target=signal_maker.analize_currency_data_controller, args=(analize_pairs, vob_pds, )).start()
 
     executor.start_polling(dp, skip_updates=True)

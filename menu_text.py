@@ -20,7 +20,7 @@ def get_trial_button(language):
     return types.KeyboardButton(languageFile[language]["get_trial_button_text"])
 
 
-def get_select_language_markap():
+def get_select_language_markup():
     select_language_markup = types.ReplyKeyboardMarkup(resize_keyboard=True, keyboard=[
         [types.KeyboardButton(select_language_eng), types.KeyboardButton(select_language_ru),
          types.KeyboardButton(select_language_hin)]

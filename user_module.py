@@ -1,6 +1,6 @@
 import asyncio
 import random
-
+from my_time import secs_to_date
 import file_manager
 import manager_module
 import market_info
@@ -135,7 +135,7 @@ def get_users_strings():
         elif status == trial_status:
             end_date = user['trial_end_date']
             users_data.append((telegram_id, telegram_name, account_number))
-            users_strings_list.append(f"{user_number}. @{tag} | {telegram_name} | {account_number} | {status} | {market_info.secs_to_date(end_date)}")
+            users_strings_list.append(f"{user_number}. @{tag} | {telegram_name} | {account_number} | {status} | {secs_to_date(end_date)}")
             user_number += 1
 
     return users_strings_list, users_data
