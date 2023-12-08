@@ -971,6 +971,8 @@ class OBVolumeIndicator(Indicator):
         )
         fig.show()
 
+def clamp(value, min_value, max_value):
+    return max(min(value, max_value), min_value)
 
 if __name__ == "__main__":
     tv = TvDatafeed()

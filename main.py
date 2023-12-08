@@ -287,10 +287,10 @@ async def handle_media(message: types.Message):
         await set_user_tag(message.from_user.id, message.from_user.username)
 
     # LANGUAGE
-    if message.text not in [select_language_eng, select_language_ru, select_language_hin] and user_language == "none":
+    if message.text not in [select_language_eng, select_language_ru, select_language_hin] and user_language == startLanguage:
         await open_language_command(message)
         return
-    if message.text in [select_language_eng, select_language_ru, select_language_hin] and user_language == "none":
+    if message.text in [select_language_eng, select_language_ru, select_language_hin] and user_language == startLanguage:
         set_user_language(user_id, message.text)
         user_language = get_user_language(user_id)
         markup = get_markup_with_status(user_id, get_user_status(user_id))
@@ -551,6 +551,7 @@ def signals_message_sender_controller(prices_data, prices_data_all):
             await asyncio.sleep(signal_search_delay)
 
             signal_maker.reset_signals_files(signal_prices_data)
+            last_send_message_check = datetime_to_secs(now_time())
 
     asyncio.run(signals_message_sender_function(prices_data, prices_data_all))
 

@@ -134,7 +134,6 @@ class NewMultitimeframeAnalizer(Analizer):
         deal_time = get_deal_time(pds)
 
         debug_text = f"""\n\nПроверка сигнала:
-                        \tВалютная пара: {df.symbol[0]}" таймфрейм: {pd.interval} время свечи: {df.datetime[0]}
                         \tЕсть ли сигнал: {has_signal}
                         \tПоказания индикаторов: long_sob_count{sob_long_count} short_sob_count{sob_short_count} long_vob_count{vob_long_count} short_vob_count{vob_short_count}
                         \t\t * SOB -> long {sob_long_intervals} short {sob_short_intervals}

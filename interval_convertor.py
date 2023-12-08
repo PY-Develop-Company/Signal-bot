@@ -1,5 +1,6 @@
 from pandas import Timedelta
 from tvDatafeed import Interval
+
 import math
 from datetime import timedelta
 
@@ -104,5 +105,41 @@ def interval_to_int(interval: Interval):
         return 60
     elif interval == Interval.in_2_hour:
         return 120
+    elif interval == Interval.in_3_hour:
+        return 180
+    elif interval == Interval.in_4_hour:
+        return 240
+    elif interval == Interval.in_daily:
+        return 1440
+    elif interval == Interval.in_weekly:
+        return 1440 * 7
+    elif interval == Interval.in_monthly:
+        return 1440 * 30
+    else:
+        return None
+
+def int_to_interval(interval: int):
+    if interval == 1:
+        return Interval.in_1_minute
+    elif interval == 3:
+        return Interval.in_3_minute
+    elif interval == 5:
+        return Interval.in_5_minute
+    elif interval == 15:
+        return Interval.in_15_minute
+    elif interval == 30:
+        return Interval.in_30_minute
+    elif interval == 45:
+        return Interval.in_45_minute
+    elif interval == 60:
+        return Interval.in_1_hour
+    elif interval == 120:
+        return Interval.in_2_hour
+    elif interval == 1440:
+        return Interval.in_daily
+    elif interval == 1440 * 7:
+        return Interval.in_weekly
+    elif interval == 1440 * 30:
+        return Interval.in_monthly
     else:
         return None

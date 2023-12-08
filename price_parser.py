@@ -134,8 +134,16 @@ class PriceData:
         minutes = interval_convertor.interval_to_int(self.interval)
         main_minutes = interval_convertor.interval_to_int(main_signal_interval)
 
+        tmp = chart_bar + timedelta(minutes=main_minutes)
+        # print("needed bar check", main_signal_interval, minutes, chart_bar, main_minutes, "\n",
+        #       tmp, timedelta(minutes=(tmp.hour*60 + tmp.minute) % minutes), timedelta(minutes=minutes), "\n",
+        #       tmp - timedelta(minutes=(tmp.hour*60 + tmp.minute) % minutes) - timedelta(minutes=minutes))
+
         chart_bar = chart_bar + timedelta(minutes=main_minutes)
-        return chart_bar - timedelta(minutes=chart_bar.minute % minutes) - timedelta(minutes=minutes)
+        res = chart_bar - timedelta(minutes=(chart_bar.hour * 60 + chart_bar.minute) % minutes) - timedelta(
+            minutes=minutes)
+
+        return res
 
 
 def get_currencies():

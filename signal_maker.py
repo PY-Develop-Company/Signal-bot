@@ -91,23 +91,31 @@ def reset_signals_files(prices_data: [PriceData]):
 
 def is_all_charts_collected(main_pd: PriceData, parent_pds: [PriceData]):
     expected_bars = []
+    real_bars = []
+
     main_df = main_pd.get_chart_data_if_exists()
     if main_df is None:
         return False
     main_df_last_bar_checked = main_df["datetime"][0]
+
     expected_bars.append(main_df_last_bar_checked)
+    real_bars.append(main_df_last_bar_checked)
+    res = True
     for parent_pd in parent_pds:
         parent_df = parent_pd.get_chart_data_if_exists()
         if parent_df is None:
-            return False
+            res = False
+            break
         parent_df_last_bar_checked = parent_df["datetime"][0]
         needed_bar = parent_pd.get_needed_chart_bar_to_analize(main_df_last_bar_checked, main_pd.interval)
 
+        real_bars.append(parent_df_last_bar_checked)
         expected_bars.append(needed_bar)
         if not (parent_df_last_bar_checked == needed_bar):
-            return False
-
-    return True
+            res = False
+            break
+    print(real_bars, expected_bars)
+    return res
 
 
 def analize_currency_data_controller(analize_pds, additional_pds):
