@@ -513,12 +513,14 @@ def signals_message_sender_controller(prices_data, prices_data_all):
                     if cont.isdigit():
                         cont = float(cont)
                         if cont > datetime_to_secs(now_time()):
+                            last_send_message_check = datetime_to_secs(now_time())
                             print("wait for signal", cont, datetime_to_secs(now_time()))
                             continue
             except Exception as e:
                 print("Error", e)
             print("search signals to send...")
             if not is_market_working():
+                last_send_message_check = datetime_to_secs(now_time())
                 continue
 
             created_prices_data = []
@@ -558,6 +560,8 @@ def signals_message_sender_controller(prices_data, prices_data_all):
             await asyncio.sleep(signal_search_delay)
 
             signal_maker.reset_signals_files(main_prices_data)
+
+            last_send_message_check = datetime_to_secs(now_time())
 
     asyncio.run(signals_message_sender_function(prices_data, prices_data_all))
 
