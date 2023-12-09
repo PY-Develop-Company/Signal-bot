@@ -752,7 +752,11 @@ class OBVolumeIndicator(Indicator):
         def get_time_ratio(self):
             highest_volume = max(self.boxes_volumes)
             candles_count = (self.right_time - self.left_time) / interval_convertor.interval_to_datetime(self.interval)
-            time_ratio = candles_count / highest_volume
+            try:
+                time_ratio = candles_count / highest_volume
+            except ZeroDivisionError:
+                time_ratio = 0
+
             return time_ratio
 
         def generate_boxes(self, current_time):
