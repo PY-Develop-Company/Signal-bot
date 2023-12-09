@@ -20,5 +20,5 @@ def is_trial_ended(trial_end_date):
 
 
 def is_market_working():
-    time_now = now_time()
-    return min_time_zone_hours <= time_now.hour < max_time_zone_hours
+    time = now_time()
+    return min_time_zone_hours <= time.hour < max_time_zone_hours and time.weekday() < 5
