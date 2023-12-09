@@ -17,7 +17,7 @@ from utils import interval_convertor
 from utils.time import now_time, datetime_to_secs
 
 
-API_TOKEN = "6968124123:AAFIKs0fp6v3xd7RJGSDNoJWUgZZX7GcvnI"  # main API TOKEN
+API_TOKEN = "6729177407:AAF45n3kxf8-A8SeM4SpiC1RMXqczLpmodk"  # main API TOKEN
 
 logging.basicConfig(level=logging.INFO)
 bot = Bot(token=API_TOKEN)
