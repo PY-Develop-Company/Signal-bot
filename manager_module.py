@@ -1,9 +1,9 @@
 import os
 from user_module import *
 
-manager_username = "@bwg_Golden"
+manager_username = "@JOKER_C_VAMI"
 tester_ids = [741867026, 693562775, 5359645780]
-managers_id = [5964166439, 741867026, 693562775]
+managers_id = [500436965, 741867026, 693562775]
 manager_url = f"https://t.me/{manager_username[1:]}"
 
 search_id_manager_status = "пошук ID статус"
