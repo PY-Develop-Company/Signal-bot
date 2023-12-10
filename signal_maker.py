@@ -114,7 +114,7 @@ def is_all_charts_collected(main_pd: PriceData, parent_pds: [PriceData]):
         if not (parent_df_last_bar_checked == needed_bar):
             res = False
             break
-    print(real_bars, expected_bars)
+    # print(real_bars, expected_bars)
     return res
 
 

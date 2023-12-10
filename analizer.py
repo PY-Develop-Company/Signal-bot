@@ -23,6 +23,15 @@ def get_deal_time(pds):
     return deal_time
 
 
+def get_deal_time_intervals(intervals):
+    deal_time = 0
+    for interval in intervals:
+        deal_time += interval_to_int(interval)
+    deal_time /= (len(intervals) + 1)
+    deal_time = int(round(deal_time, 0))
+    return deal_time
+
+
 class Analizer:
     def analize_func(self, df, pd) -> (bool, Signal, str):
         return False, NeutralSignal(), "error"
@@ -124,14 +133,21 @@ class NewMultitimeframeAnalizer(Analizer):
 
         sob_is_long, sob_is_short = has_multitimeframe_signal(self.sob_count, sob_long_count, sob_short_count)
         vob_is_long, vob_is_short = has_multitimeframe_signal(self.vob_count, vob_long_count, vob_short_count)
-        if (sob_is_long and vob_is_long) or (sob_is_short and vob_is_short):
+        intervals_for_dealtime = []
+        if sob_is_long and vob_is_long:
             has_signal = True
-            signal = LongSignal() if sob_long_count > sob_short_count else ShortSignal()
+            signal = LongSignal()
+            intervals_for_dealtime = [*sob_long_intervals, *vob_long_intervals]
+        elif sob_is_short and vob_is_short:
+            has_signal = True
+            signal = ShortSignal()
+            intervals_for_dealtime = [*sob_short_intervals, *vob_short_intervals]
+
         # if vob_is_long or vob_is_short:
         #     has_signal = True
         #     signal = LongSignal() if vob_long_count > vob_short_count else ShortSignal()
 
-        deal_time = get_deal_time(pds)
+        deal_time = get_deal_time_intervals(intervals_for_dealtime)
 
         debug_text = f"""\n\nПроверка сигнала:
                         \tЕсть ли сигнал: {has_signal}

@@ -11,6 +11,8 @@ import interval_convertor
 from signals import get_signal_by_type
 from my_time import *
 
+
+# API_TOKEN = "6588822945:AAFX8eDWngrrbLeDLhzNw0nLkxI07D9wG8Y"  # my API TOKEN
 API_TOKEN = "6340912636:AAHACm2V2hDJUDXng0y0uhBRVRFJgqrok48"  # main API TOKEN
 
 logging.basicConfig(level=logging.INFO)
@@ -562,10 +564,12 @@ if __name__ == '__main__':
     multiprocessing.freeze_support()
     currencies = price_parser.get_currencies()
 
-    intervals = [Interval.in_1_minute, Interval.in_3_minute, Interval.in_5_minute, Interval.in_15_minute, Interval.in_45_minute]
-    main_intervals = [Interval.in_5_minute]
-    parent_intervals = [[Interval.in_15_minute, Interval.in_45_minute]]
-    vob_intervals = [[Interval.in_1_minute, Interval.in_3_minute]]
+    intervals = [Interval.in_1_minute, Interval.in_3_minute, Interval.in_5_minute, Interval.in_15_minute, Interval.in_30_minute, Interval.in_45_minute, Interval.in_1_hour]
+    main_intervals = [Interval.in_5_minute, Interval.in_15_minute]
+    parent_intervals = [[Interval.in_15_minute, Interval.in_45_minute],
+                        [Interval.in_30_minute, Interval.in_1_hour]]
+    vob_intervals = [[Interval.in_1_minute, Interval.in_3_minute, Interval.in_5_minute],
+                     [Interval.in_1_minute, Interval.in_3_minute, Interval.in_5_minute]]
 
     # prices data creation
     prices_data = [PriceData(currency[0], currency[1], interval) for currency in currencies for interval in intervals]
