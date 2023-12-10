@@ -20,7 +20,7 @@ async def add_manager(message):
     if f"{message.from_user.id}.txt" in os.listdir("users/"):
         ...
     else:
-        data = {"id": message.from_user.id, "status": "none", "do": "none", "language": "none"}
+        data = {"id": message.from_user.id, "status": none_manager_status, "do": "none", "language": startLanguage}
         file_manager.write_file(url, data)
 
 
