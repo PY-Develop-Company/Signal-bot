@@ -28,12 +28,14 @@ async def close_position(position_open_price_original, signal: Signal, pd: Price
 
     price_data = pd.get_price_data(bars_count=2)
     if (price_data is None) or (position_open_price is None):
-        msg, is_profit_position = signal.get_close_position_signal_message(pd, position_open_price_original,
-                                                                           position_open_price_original, bars_count)
+        open_price = position_open_price_original
+        close_price = position_open_price_original
     else:
-        msg, is_profit_position = signal.get_close_position_signal_message(pd, position_open_price.close[0],
-                                                                           price_data.close[0], bars_count)
-    return msg, is_profit_position
+        open_price = position_open_price.close[0]
+        close_price = price_data.close[0]
+
+    msg, is_profit_position = signal.get_close_position_signal_message(pd, open_price, close_price, bars_count)
+    return msg, is_profit_position, open_price, close_price
 
 
 def save_signal_file(df, pd: PriceData):

@@ -1,4 +1,4 @@
-from aiogram import Bot, Dispatcher, types
+from aiogram import Bot, Dispatcher
 import logging
 import price_parser
 from price_parser import PriceData
@@ -9,11 +9,15 @@ from manager_module import *
 from menu_text import *
 import interval_convertor
 from signals import get_signal_by_type
+from pandas import DataFrame, read_csv, concat
 from my_time import *
 
 
 # API_TOKEN = "6588822945:AAFX8eDWngrrbLeDLhzNw0nLkxI07D9wG8Y"  # my API TOKEN
 API_TOKEN = "6340912636:AAHACm2V2hDJUDXng0y0uhBRVRFJgqrok48"  # main API TOKEN
+
+manager = None
+shared_list = None
 
 logging.basicConfig(level=logging.INFO)
 bot = Bot(token=API_TOKEN)
@@ -32,7 +36,10 @@ send_msg_users_group_count = 20
 last_user_list_message = dict()
 last_user_manage_message = dict()
 
+signals_stats_path = "signals/signals.csv"
 start_img_path = "img/logo.jpg"
+
+last_check_time = now_time()
 
 
 def update_last_user_list_message(message):
@@ -126,7 +133,6 @@ async def send_photo_text_message_to_users(users_ids: [], img_path, text=" ", ar
     send_signal_message_tasks = []
     for user_id in users_ids:
         t = asyncio.create_task(send_photo_text_message_to_user(user_id, img_path, text, args=args))
-
         send_signal_message_tasks.append(t)
 
     await asyncio.gather(*send_signal_message_tasks)
@@ -427,38 +433,103 @@ async def manage_user_callback(call: types.CallbackQuery):
     await call.answer(call.data)
 
 
-def handle_signal_msg_controller(signal, msg, pd: PriceData, open_position_price, deal_time, start_analize_time):
-    async def handle_signal_msg(signal, msg, pd: PriceData, open_position_price, deal_time, start_analize_time):
+def handle_signal_msg_controller(signal, msg, pd: PriceData, open_position_price, deal_time, start_analize_time, shared_list):
+    async def handle_signal_msg(signal, msg, pd: PriceData, open_position_price, deal_time, start_analize_time, shared_list):
         t1 = datetime.strptime(str(start_analize_time).split(".")[0], '%Y-%m-%d %H:%M:%S')
         t2 = now_time()
-        print("before_send_delay", t2-t1)
+        print("before_send_delay", t2 - t1)
         user_signal_delay = (deal_time + 3) * 60
+
         users_groups = await get_users_groups_ids(repeat_count, send_msg_users_group_count, user_signal_delay)
         t2 = now_time()
-        print("created_users_delay", t2-t1)
+        print("created_users_delay", t2 - t1)
+
         for i in range(0, repeat_count):
             await send_photo_text_message_to_users(users_groups[i], signal.photo_path, msg, args=["signal_min_text"])
             await asyncio.sleep(send_msg_delay)
         # print(users_groups)
         print([len(users_groups[i]) for i in range(repeat_count)])
+
+        t2 = now_time()
+        delay = t2 - t1
+        print("after_send_delay", delay)
+
         try:
-            t2 = now_time()
-            delay = t2 - t1
-            print("after_send_delay", delay)
-            await send_message_to_users(managers_id, "delay: " + str(delay) + "; analize_time: " + str(t1) + "; send_msg_time: " + str(t2))
+            debug_msg = "delay: " + str(delay) + "; analize_time: " + str(t1) + "; send_msg_time: " + str(t2)
+            await send_message_to_users(managers_id, debug_msg)
         except Exception as e:
             print(e)
 
-        close_signal_message, is_profit = await signal_maker.close_position(open_position_price, signal, pd, deal_time)
+        close_signal_message, is_profit, open_price, close_price = await signal_maker.close_position(open_position_price, signal, pd, bars_count=deal_time)
+        shared_list[is_profit] += 1
         img_path = "./img/profit.jpg" if is_profit else "./img/loss.jpg"
 
         for i in range(0, repeat_count):
             await send_photo_text_message_to_users(users_groups[i], img_path, close_signal_message, args=["signal_deal_text", "signal_min_text"])
             await asyncio.sleep(send_msg_delay)
+
         for group in users_groups:
             for user in group:
-                set_next_signal_status(user,False)
-    asyncio.run(handle_signal_msg(signal, msg, pd, open_position_price, deal_time, start_analize_time))
+                set_next_signal_status(user, False)
+
+        while True:
+            send_close_message_time = now_time()
+            columns = ["currency", "interval", "open_time", "close_time", "signal_type", "open_price", "close_price", "is_profit"]
+            data = [[pd.symbol, pd.interval, t2, send_close_message_time, signal.type, open_price, close_price, is_profit]]
+            try:
+                if not os.path.exists(signals_stats_path):
+                    df = DataFrame(data=[], columns=columns)
+                    df.to_csv(signals_stats_path)
+                df = read_csv(signals_stats_path, index_col=[0])
+                df_new = DataFrame(data=data, columns=columns)
+                df = concat([df, df_new], axis=0, ignore_index=True)
+                df.to_csv(signals_stats_path)
+                break
+            except Exception as e:
+                await asyncio.sleep(10)
+                print(f"ERROR Can`t write signal result to {signals_stats_path}", e)
+
+    asyncio.run(handle_signal_msg(signal, msg, pd, open_position_price, deal_time, start_analize_time, shared_list))
+
+
+# async def print_stats(df, stats_name):
+#     profit_count = len(df[df["is_profit"]])
+#     lose_count = len(df[not df["is_profit"]])
+#     text = f"Total {stats_name} statistics:\n\tprofits: {profit_count};\n\tloses: {lose_count};\n"
+#     await send_message_to_users(managers_id, text)
+
+
+# async def try_send_stats():
+#     global last_check_time
+#     try:
+#         time_now = now_time()
+#         df = read_csv(signals_stats_path)
+#         df["close_time"] = to_datetime(df["close_time"])
+#         df["close_time_year"] = df["close_time"].apply(lambda row: row.year)
+#         df["close_time_week"] = df["close_time"].apply(lambda row: row.isocalendar()[1])
+#         df["close_time_date"] = df["close_time"].apply(lambda row: row.date())
+#         df["close_time_hour"] = df["close_time"].apply(lambda row: row.hour)
+#
+#         if time_now.hour != last_check_time.hour:
+#             print("send hour stats")
+#             hour_df = df[(df["close_time_date"] == last_check_time.date()) & (df["close_time_hour"] == last_check_time.hour)]
+#             if len(hour_df) > 0:
+#                 await print_stats(hour_df, f"day ({last_check_time.date()}) hour ({last_check_time.hour})")
+#         if time_now.day != last_check_time.day:
+#             print("send day stats")
+#             day_df = df[df["close_time_date"] == last_check_time.date()]
+#             if len(day_df) > 0:
+#                 await print_stats(day_df, f"day ({last_check_time.date()})")
+#         if time_now.isocalendar()[1] != last_check_time.isocalendar()[1]:
+#             print("send week stats", last_check_time.isocalendar()[1])
+#             week_df = df[(df["close_time_week"] == last_check_time.isocalendar()[1]) & (df["close_time_year"] == last_check_time.year)]
+#             if len(week_df) > 0:
+#                 start_week_day = last_check_time.date() - timedelta(days=6)
+#                 await print_stats(week_df, f"week ({start_week_day} to {last_check_time.date()})")
+#
+#         last_check_time = time_now
+#     except Exception as e:
+#         print("Error while sending stats", e)
 
 
 async def check_trial_users():
@@ -473,13 +544,19 @@ async def check_trial_users():
             await send_message_to_user(user_id, languageFile[userLanguage]["for_vip_text"])
 
 
-def signals_message_sender_controller(prices_data, prices_data_all):
-    async def signals_message_sender_function(signal_prices_data, all_prices_data):
-        last_send_message_check = datetime_to_secs(now_time())
-        price_parser.create_parce_currencies_with_intervals_callbacks(all_prices_data)
-        signal_maker.reset_signals_files(signal_prices_data)
-        for pd in all_prices_data:
-            pd.reset_chart_data()
+def signals_message_sender_controller(prices_data, prices_data_all, shared_list):
+    async def signals_message_sender_function(signal_prices_data, all_prices_data, shared_list):
+        def reset_seis(signal_prices_data, all_prices_data):
+            price_parser.create_parce_currencies_with_intervals_callbacks(all_prices_data)
+            last_send_message_check = datetime_to_secs(now_time())
+            for pd in all_prices_data:
+                pd.reset_chart_data()
+            signal_maker.reset_signals_files(signal_prices_data)
+
+            return last_send_message_check
+
+        last_send_message_check = reset_seis(signal_prices_data, all_prices_data)
+
         need_to_reset_seis = False
 
         while True:
@@ -492,14 +569,10 @@ def signals_message_sender_controller(prices_data, prices_data_all):
             print("new delay", t2-t1)
             need_to_reset_seis = last_send_message_check + reset_seis_wait_time < datetime_to_secs(now_time())
             if need_to_reset_seis:
-                price_parser.create_parce_currencies_with_intervals_callbacks(all_prices_data)
-                for pd in prices_data:
-                    pd.reset_chart_data()
-                signal_maker.reset_signals_files(signal_prices_data)
-                last_send_message_check = datetime_to_secs(now_time())
+                last_send_message_check = reset_seis(signal_prices_data, all_prices_data)
                 continue
 
-            await asyncio.sleep(5)
+            await asyncio.sleep(3)
             try:
                 with open("users/test.txt", "r") as file:
                     cont = file.read().split(".")[0]
@@ -513,7 +586,6 @@ def signals_message_sender_controller(prices_data, prices_data_all):
                 print("Error", e)
             print("search signals to send...")
             if not market_info.is_market_working():
-                last_send_message_check = datetime_to_secs(now_time())
                 continue
 
             created_prices_data = []
@@ -548,23 +620,30 @@ def signals_message_sender_controller(prices_data, prices_data_all):
 
             multiprocessing.Process(target=handle_signal_msg_controller,
                                     args=(signal, df.msg[0], pd, df.open_price[0], int(df.deal_time[0]),
-                                          df.start_analize_time[0]), daemon=True).start()
+                                          df.start_analize_time[0], shared_list), daemon=True).start()
 
             await asyncio.sleep(signal_search_delay)
 
             signal_maker.reset_signals_files(signal_prices_data)
             last_send_message_check = datetime_to_secs(now_time())
 
-    asyncio.run(signals_message_sender_function(prices_data, prices_data_all))
+    asyncio.run(signals_message_sender_function(prices_data, prices_data_all, shared_list))
 
 
 if __name__ == '__main__':
     from aiogram import executor
 
     multiprocessing.freeze_support()
+
+    manager = multiprocessing.Manager()
+    shared_list = manager.list()
+    shared_list.append(0)
+    shared_list.append(0)
+
     currencies = price_parser.get_currencies()
 
-    intervals = [Interval.in_1_minute, Interval.in_3_minute, Interval.in_5_minute, Interval.in_15_minute, Interval.in_30_minute, Interval.in_45_minute, Interval.in_1_hour]
+    intervals = [Interval.in_1_minute, Interval.in_3_minute, Interval.in_5_minute, Interval.in_15_minute,
+                 Interval.in_30_minute, Interval.in_45_minute, Interval.in_1_hour]
     main_intervals = [Interval.in_5_minute, Interval.in_15_minute]
     parent_intervals = [[Interval.in_15_minute, Interval.in_45_minute],
                         [Interval.in_30_minute, Interval.in_1_hour]]
@@ -598,7 +677,7 @@ if __name__ == '__main__':
     for pd in prices_data:
         pd.remove_chart_data()
 
-    multiprocessing.Process(target=signals_message_sender_controller, args=(main_pds, prices_data)).start()
-    multiprocessing.Process(target=signal_maker.analize_currency_data_controller, args=(analize_pairs, vob_pds, )).start()
+    multiprocessing.Process(target=signals_message_sender_controller, args=(main_pds, prices_data, shared_list)).start()
+    multiprocessing.Process(target=signal_maker.analize_currency_data_controller, args=(analize_pairs, vob_pds,)).start()
 
     executor.start_polling(dp, skip_updates=True)
