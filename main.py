@@ -175,29 +175,39 @@ async def show_users_list_to_user(user_id, is_next=True):
 
 @dp.message_handler(commands="start")
 async def start_command(message):
-    if message.from_user.id in managers_id:
+    user_id = message.from_user.id
+    if user_id in managers_id:
         await add_manager(message)
     else:
-        add_user(message.from_user.id, message.from_user.first_name, message.from_user.last_name, message.from_user.username)
+        add_user(user_id, message.from_user.first_name, message.from_user.last_name, message.from_user.username)
 
-    if get_user_language(message.from_user.id) == startLanguage:
+    if get_user_language(user_id) == startLanguage:
         await open_menu(message, get_select_language_markup(), "Select language:")
         return
 
-    if get_user_status(message.from_user.id) == wait_id_input_status:
-        await update_status_user(message.from_user.id, none_status)
+    if get_user_status(user_id) == wait_id_input_status:
+        await update_status_user(user_id, none_status)
 
-    if message.from_user.id in managers_id:
-        markup = get_manager_markup(get_user_language(message.from_user.id))
+    if user_id in managers_id:
+        markup = get_manager_markup(get_user_language(user_id))
     else:
-        markup = get_markup_with_status(message.from_user.id, get_user_status(message.from_user.id))
+        markup = get_markup_with_status(user_id, get_user_status(user_id))
 
-    if has_user_status(message.from_user.id, deposit_status):
-        msg_text = languageFile[get_user_language(message.from_user.id)]["start_vip_text"]
+    if has_user_status(user_id, deposit_status):
+        msg_text = languageFile[get_user_language(user_id)]["start_vip_text"]
     else:
-        msg_text = languageFile[get_user_language(message.from_user.id)]["start_text"]
+        msg_text = languageFile[get_user_language(user_id)]["start_text"]
 
-    await send_photo_text_message_to_user(message.from_user.id, start_img_path, msg_text, markup)
+    await send_photo_text_message_to_user(user_id, start_img_path, msg_text, markup)
+    userLanguage = get_user_language(user_id)
+    if get_user_status(user_id) == id_status:
+        await send_message_to_user(user_id, languageFile[userLanguage]["accept_id_message_text"])
+    elif get_user_status(user_id) == deposit_status:
+        await send_message_to_user(user_id, languageFile[userLanguage]["start_vip_text"])
+    elif get_user_status(user_id) == wait_deposit_status:
+        await send_message_to_user(user_id, languageFile[userLanguage]["wait_deposit_status"])
+    elif get_user_status(user_id) == wait_id_status:
+        await send_message_to_user(user_id, languageFile[userLanguage]["wait_id_status"])
 
 
 @dp.message_handler(commands="language")
@@ -541,8 +551,16 @@ async def check_trial_users():
 
             markup = get_markup_with_status(user_id, get_user_status(user_id))
             await send_message_to_user(user_id, languageFile[userLanguage]["ended_trial_text"], markup)
-            await send_message_to_user(user_id, languageFile[userLanguage]["for_vip_text"])
-
+            if get_user_status(user_id)==none_status:
+                await send_message_to_user(user_id, languageFile[userLanguage]["for_vip_text"])
+            elif get_user_status(user_id)==id_status:
+                await send_message_to_user(user_id, languageFile[userLanguage]["accept_id_message_text"])
+            elif get_user_status(user_id)==deposit_status:
+                await send_message_to_user(user_id, languageFile[userLanguage]["start_vip_text"])
+            elif get_user_status(user_id)==wait_deposit_status:
+                await send_message_to_user(user_id, languageFile[userLanguage]["wait_deposit_status"])
+            elif get_user_status(user_id)==wait_id_status:
+                await send_message_to_user(user_id, languageFile[userLanguage]["wait_id_status"])
 
 def signals_message_sender_controller(prices_data, prices_data_all, shared_list):
     async def signals_message_sender_function(signal_prices_data, all_prices_data, shared_list):
