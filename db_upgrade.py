@@ -1,8 +1,9 @@
 from file_manager import *
 from user_module import *
+from my_time import datetime_to_str
 
 
-def printDb():
+def print_db():
     DB = read_file("users/db.txt")
     for id, user in enumerate(DB):
         print(f"ID {id}: {user}")
@@ -10,9 +11,9 @@ def printDb():
 
 def upgrade():
     oldDB = read_file("users/old_db.txt")
-    newDB=[]
-    count=0
-    nowTime = timeConvertToStr(getNowTime()-timedelta(seconds=7200))
+    newDB = []
+    count = 0
+    nowTime = datetime_to_str(now_time() - timedelta(seconds=7200))
     for user in oldDB:
         bufer_user = {
                     "id": user["id"],

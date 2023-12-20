@@ -1,10 +1,10 @@
 import asyncio
-import random
 from my_time import secs_to_date
 import file_manager
 import manager_module
 import market_info
 from datetime import datetime, timedelta
+from my_time import datetime_to_str, now_time, str_to_datetime
 
 user_db_path = "users/db.txt"
 startLanguage = "none"
@@ -24,29 +24,21 @@ wait_id_input_status = 'status wait input ID'
 wait_deposit_status = 'status wait check Deposit'
 
 
-def getNowTime():
-    return datetime.now()
+def get_user_time(id):
+    data = file_manager.read_file(user_db_path)
+    users_with_id = [user for user in data if user['id'] == id]
 
-def timeConvertToStr(buferTime):
-    return datetime.strftime(buferTime, "%Y-%m-%d %H:%M:%S")
+    if len(users_with_id) == 1:
+        user = users_with_id[0]
+        return str_to_datetime(user['time'])
+    return None
 
 
-def timeStrConvertToTime(buferTime):
-    return datetime.strptime(buferTime, "%Y-%m-%d %H:%M:%S")
-
-
-def getUserTime(id):
+def set_user_time(id, new_time):
     data = file_manager.read_file(user_db_path)
     for user in data:
         if user['id'] == id:
-            return timeStrConvertToTime(user['time'])
-
-
-def setUserTime(id,newtime):
-    data = file_manager.read_file(user_db_path)
-    for user in data:
-        if user['id'] == id:
-            user['time'] = newtime
+            user['time'] = new_time
             file_manager.write_file(user_db_path, data)
             return
 
@@ -54,6 +46,7 @@ def setUserTime(id,newtime):
 async def get_users_groups_ids(groups_count, users_in_group_count, delay_second):
     while True:
         try:
+            # users_with_status = [user["id"] for user in data if user["status"] == status]
             deposit_users = get_users_with_status(deposit_status)
             trial_users = get_users_with_status(trial_status)
             tester_users = manager_module.tester_ids
@@ -62,8 +55,6 @@ async def get_users_groups_ids(groups_count, users_in_group_count, delay_second)
             print("Error", e)
             await asyncio.sleep(0.5)
 
-    send_signal_time = getNowTime()
-    send_signal_time += timedelta(seconds=delay_second)
     while True:
         try:
             DB = file_manager.read_file(user_db_path)
@@ -91,9 +82,9 @@ async def get_users_groups_ids(groups_count, users_in_group_count, delay_second)
         if len(result_users_groups) >= groups_count:
             break
 
-        if user['time'] < getNowTime():
+        if user['time'] < now_time():
             group.append(user["id"])
-            setUserTime(user['id'], timeConvertToStr(send_signal_time))
+            set_user_time(user['id'], datetime_to_str(now_time() + timedelta(seconds=delay_second)))
 
     if len(group) > 0:
         result_users_groups.append(group)
@@ -304,7 +295,7 @@ def add_user(id, first_name, last_name, tag):
             "had_trial_status": False,
             "trial_end_date": None,
             "before_trial_status": "none",
-            "time": timeConvertToStr(getNowTime()),
+            "time": datetime_to_str(now_time()),
             "get_next_signal": False
         }
         data.append(bufer_user)

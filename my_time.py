@@ -7,7 +7,15 @@ origin_date = datetime(1900, 1, 1)
 
 
 def now_time():
-    return datetime.strptime(str(datetime.now(time_zone)).split(".")[0], '%Y-%m-%d %H:%M:%S')
+    return str_to_datetime(str(datetime.now(time_zone)).split(".")[0])
+
+
+def str_to_datetime(time):
+    return datetime.strptime(time, "%Y-%m-%d %H:%M:%S")
+
+
+def datetime_to_str(time):
+    return datetime.strftime(time, "%Y-%m-%d %H:%M:%S")
 
 
 def datetime_to_secs(dt):

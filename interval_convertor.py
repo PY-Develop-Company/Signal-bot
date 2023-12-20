@@ -118,6 +118,7 @@ def interval_to_int(interval: Interval):
     else:
         return None
 
+
 def int_to_interval(interval: int):
     if interval == 1:
         return Interval.in_1_minute
