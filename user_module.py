@@ -46,28 +46,19 @@ def set_user_time(id, new_time):
 async def get_users_groups_ids(groups_count, users_in_group_count, delay_second):
     while True:
         try:
-            # users_with_status = [user["id"] for user in data if user["status"] == status]
-            deposit_users = get_users_with_status(deposit_status)
-            trial_users = get_users_with_status(trial_status)
-            tester_users = manager_module.tester_ids
-            break
-        except Exception as e:
-            print("Error", e)
-            await asyncio.sleep(0.5)
-
-    while True:
-        try:
             DB = file_manager.read_file(user_db_path)
             break
         except Exception as e:
             print("Error", e)
             await asyncio.sleep(0.5)
 
+    statuses = [deposit_status, trial_status]
     signal_users = []
     for user in DB:
-        if user['id'] in [*deposit_users, *trial_users, *tester_users] and user['get_next_signal']:
-            user['time'] = datetime.strptime(user['time'], "%Y-%m-%d %H:%M:%S")
+        if (user["status"] in statuses or user["id"] in manager_module.tester_ids) and user['get_next_signal']:
+            user['time'] = str_to_datetime(user['time'])
             signal_users.append(user)
+
     sorted_users = sorted(signal_users, key=lambda x: x['time'])
     all_users_count = groups_count * users_in_group_count
     if len(sorted_users) > all_users_count:
@@ -98,12 +89,11 @@ async def get_users_groups_ids(groups_count, users_in_group_count, delay_second)
 def remove_user_with_id(id):
     users_data = file_manager.read_file(user_db_path)
     for i, user_data in enumerate(users_data):
-        if int(user_data['id']) == id:
-            if users_data[i]['status'] == deposit_status:
-                users_data[i]['status'] = none_status
-                data = users_data[i]['name'] + " | " + str(users_data[i]['acount_number']) + " | " + users_data[i]['status']
-                file_manager.write_file(user_db_path, users_data)
-                return True, data
+        if int(user_data['id']) == id and users_data[i]['status'] == deposit_status:
+            users_data[i]['status'] = none_status
+            data = users_data[i]['name'] + " | " + str(users_data[i]['acount_number']) + " | " + users_data[i]['status']
+            file_manager.write_file(user_db_path, users_data)
+            return True, data
     return False, ""
 
 
@@ -191,9 +181,10 @@ def get_current_users_data(manager_id):
 
 def has_user_status(id, status):
     data = file_manager.read_file(user_db_path)
-    for user in data:
-        if user['id'] == id and user['status'] == status:
-            return True
+    users = [user for user in data if user['id'] == id and user['status'] == status]
+
+    if len(users) > 0:
+        return True
     return False
 
 
@@ -202,9 +193,11 @@ def get_user_language(id):
         return manager_module.get_manager_language(id)
     else:
         data = file_manager.read_file(user_db_path)
-        for user in data:
-            if user['id'] == id:
-                return user['language']
+        users = [user['language'] for user in data if user['id'] == id]
+        if len(users) > 0:
+            return users[0]
+
+    return None
 
 
 def set_user_language(id, new_language):
@@ -228,9 +221,9 @@ def set_next_signal_status(id, flag):
 
 def get_next_signal_status(id):
     data = file_manager.read_file(user_db_path)
-    for user in data:
-        if user['id'] == id:
-            return user['get_next_signal']
+    users = [user['get_next_signal'] for user in data if user['id'] == id]
+    if len(users) > 0:
+        return users[0]
     return None
 
 
@@ -242,9 +235,11 @@ def get_users_with_status(status):
 
 def had_trial_status(id):
     data = file_manager.read_file(user_db_path)
-    for user in data:
-        if user['id'] == id:
-            return user['had_trial_status']
+    users = [user['had_trial_status'] for user in data if user['id'] == id]
+
+    if len(users) > 0:
+        return users[0]
+    return None
 
 
 def set_trial_to_user(id):
@@ -273,9 +268,11 @@ def remove_trial_from_user(id):
 
 def get_user_trial_end_date(id):
     data = file_manager.read_file(user_db_path)
-    for user in data:
-        if user["id"] == id:
-            return user["trial_end_date"]
+    users = [user['trial_end_date'] for user in data if user['id'] == id]
+
+    if len(users) > 0:
+        return users[0]
+    return None
 
 
 def add_user(id, first_name, last_name, tag):
@@ -324,42 +321,48 @@ async def set_user_tag(id, tag):
 
 async def get_user_with_status(status):
     data = file_manager.read_file(user_db_path)
-    for user in data:
-        if user['status'] == status:
-            return True, user['id']
+    users = [user for user in data if user['status'] == status]
+
+    if len(users) > 0:
+        return True, users[0]['id']
     return False, None
 
 
 def get_user_status(id):
     data = file_manager.read_file(user_db_path)
-    for user in data:
-        if user['id'] == id:
-            return user["status"]
+    users = [user['status'] for user in data if user['id'] == id]
+
+    if len(users) > 0:
+        return users[0]
     return None
 
 
 def get_user_tag(id):
     data = file_manager.read_file(user_db_path)
-    for user in data:
-        if user['id'] == id:
-            return user["tag"]
+    users = [user['tag'] for user in data if user['id'] == id]
+
+    if len(users) > 0:
+        return users[0]
     return None
 
 
 def get_user_account_number(id):
     data = file_manager.read_file(user_db_path)
-    for user in data:
-        if user['id'] == id:
-            return user["acount_number"]
+    users = [user['acount_number'] for user in data if user['id'] == id]
+
+    if len(users) > 0:
+        return users[0]
     return None
 
 
 def find_user_with_id(id):
     data = file_manager.read_file(user_db_path)
-    for user in data:
-        if user['id'] == id:
-            return True
+    users = [user for user in data if user['id'] == id]
+
+    if len(users) > 0:
+        return True
     return False
+
 
 async def main():
     await get_users_groups_ids(50, 20, 60*5)
