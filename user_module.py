@@ -24,12 +24,20 @@ wait_id_input_status = 'status wait input ID'
 wait_deposit_status = 'status wait check Deposit'
 
 
-def get_user_time(id):
+def find_user_with_id(id):
     data = file_manager.read_file(user_db_path)
     users_with_id = [user for user in data if user['id'] == id]
 
-    if len(users_with_id) == 1:
+    if len(users_with_id) > 0:
         user = users_with_id[0]
+        return user
+    return None
+
+
+def get_user_time(id):
+    user = find_user_with_id(id)
+
+    if not(user is None):
         return str_to_datetime(user['time'])
     return None
 
@@ -180,10 +188,9 @@ def get_current_users_data(manager_id):
 
 
 def has_user_status(id, status):
-    data = file_manager.read_file(user_db_path)
-    users = [user for user in data if user['id'] == id and user['status'] == status]
+    user = find_user_with_id(id)
 
-    if len(users) > 0:
+    if not(user is None) and user['status'] == status:
         return True
     return False
 
@@ -192,11 +199,9 @@ def get_user_language(id):
     if id in manager_module.managers_id:
         return manager_module.get_manager_language(id)
     else:
-        data = file_manager.read_file(user_db_path)
-        users = [user['language'] for user in data if user['id'] == id]
-        if len(users) > 0:
-            return users[0]
-
+        user = find_user_with_id(id)
+        if not (user is None):
+            return user['language']
     return None
 
 
@@ -220,10 +225,9 @@ def set_next_signal_status(id, flag):
 
 
 def get_next_signal_status(id):
-    data = file_manager.read_file(user_db_path)
-    users = [user['get_next_signal'] for user in data if user['id'] == id]
-    if len(users) > 0:
-        return users[0]
+    user = find_user_with_id(id)
+    if not (user is None):
+        return user['get_next_signal']
     return None
 
 
@@ -234,11 +238,9 @@ def get_users_with_status(status):
 
 
 def had_trial_status(id):
-    data = file_manager.read_file(user_db_path)
-    users = [user['had_trial_status'] for user in data if user['id'] == id]
-
-    if len(users) > 0:
-        return users[0]
+    user = find_user_with_id(id)
+    if not (user is None):
+        return user['had_trial_status']
     return None
 
 
@@ -329,39 +331,29 @@ async def get_user_with_status(status):
 
 
 def get_user_status(id):
-    data = file_manager.read_file(user_db_path)
-    users = [user['status'] for user in data if user['id'] == id]
-
-    if len(users) > 0:
-        return users[0]
+    user = find_user_with_id(id)
+    if not (user is None):
+        return user['status']
     return None
 
 
 def get_user_tag(id):
-    data = file_manager.read_file(user_db_path)
-    users = [user['tag'] for user in data if user['id'] == id]
-
-    if len(users) > 0:
-        return users[0]
+    user = find_user_with_id(id)
+    if not (user is None):
+        return user['tag']
     return None
 
 
 def get_user_account_number(id):
-    data = file_manager.read_file(user_db_path)
-    users = [user['acount_number'] for user in data if user['id'] == id]
-
-    if len(users) > 0:
-        return users[0]
+    user = find_user_with_id(id)
+    if not (user is None):
+        return user['acount_number']
     return None
 
 
-def find_user_with_id(id):
-    data = file_manager.read_file(user_db_path)
-    users = [user for user in data if user['id'] == id]
-
-    if len(users) > 0:
-        return True
-    return False
+def have_user_with_id(id):
+    user = find_user_with_id(id)
+    return not (user is None)
 
 
 async def main():
