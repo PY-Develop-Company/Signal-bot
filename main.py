@@ -240,7 +240,7 @@ async def remove_user_command(call: types.CallbackQuery):
     await remove_last_user_list_message(call.message.chat.id)
 
     user_id = int(call.data.split("_")[-1])
-    have_user_with_id = find_user_with_id(user_id)
+    have_user_with_id = have_user_with_id(user_id)
 
     if have_user_with_id:
         status = get_user_status(user_id)
