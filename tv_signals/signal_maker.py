@@ -1,4 +1,5 @@
 from pandas import DataFrame, Timedelta, read_csv
+
 from tvDatafeed import Interval
 import asyncio
 
@@ -8,7 +9,6 @@ from tv_signals.analizer import NewMultitimeframeAnalizer, VOBAnalizer, Multitim
 from tv_signals.signal_types import *
 
 from utils import file_manager, interval_convertor
-
 
 username = 't4331662@gmail.com'
 password = 'Pxp626AmH7_'
@@ -118,8 +118,8 @@ def is_all_charts_collected(main_pd: PriceData, parent_pds: [PriceData]):
     return res
 
 
-def analize_currency_data_controller(analize_pairs):
-    async def analize_currency_data_function(check_pds: [PriceData]):
+def analize_currency_data_controller(analize_pds, additional_pds):
+    async def analize_currency_data_function(check_pds: [PriceData], additional_pds):
         main_pd = check_pds[0]
         start_analize_time = check_pds[0].get_chart_download_time()
 
@@ -137,9 +137,8 @@ def analize_currency_data_controller(analize_pairs):
                 continue
             prices_dfs.append(ch_data)
 
-        analizer = MultitimeframeAnalizer(2, 2)
+        analizer = NewMultitimeframeAnalizer(1, 1)
         has_signal, signal, debug, deal_time = analizer.analize(prices_dfs, check_pds)
-
         open_position_price = main_price_df.close[0]
         msg = signal.get_open_msg_text(main_pd, deal_time)
 
@@ -152,16 +151,15 @@ def analize_currency_data_controller(analize_pairs):
 
         print("Created signal file:", msg, main_price_df.datetime[0])
 
-    async def analize_currency_data_loop(analize_pairs):
+    async def analize_currency_data_loop(analize_pds, additional_pds):
         while True:
             print("analize_loop")
             tasks = []
-            for analize_pair in analize_pairs:
-                task = asyncio.create_task(
-                    analize_currency_data_function([analize_pair[0], *analize_pair[1]]))
+            for i in range(len(analize_pds)):
+                task = asyncio.create_task(analize_currency_data_function(analize_pds[i], additional_pds[i]))
                 tasks.append(task)
             await asyncio.gather(*tasks)
             await asyncio.sleep(3)
 
-    asyncio.run(analize_currency_data_loop(analize_pairs))
+    asyncio.run(analize_currency_data_loop(analize_pds, additional_pds))
 

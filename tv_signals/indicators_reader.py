@@ -2,6 +2,8 @@ import numpy as np
 import pandas
 from pandas import Series
 from tvDatafeed import Interval, TvDatafeed
+
+
 import plotly.graph_objects as go
 
 import math
@@ -18,8 +20,10 @@ blocks_delta = {
         Interval.in_3_minute: 70,
         Interval.in_5_minute: 100,
         Interval.in_15_minute: 140,
-        Interval.in_30_minute: 210,
-        Interval.in_45_minute: 200
+        Interval.in_30_minute: 200,
+        Interval.in_45_minute: 200,
+        Interval.in_1_hour: 200,
+        Interval.in_2_hour: 200
     },
     "AUDUSD": {
         Interval.in_1_minute: 35,
@@ -27,7 +31,9 @@ blocks_delta = {
         Interval.in_5_minute: 110,
         Interval.in_15_minute: 140,
         Interval.in_30_minute: 220,
-        Interval.in_45_minute: 200
+        Interval.in_45_minute: 220,
+        Interval.in_1_hour: 220,
+        Interval.in_2_hour: 220
     },
     "AUDCAD": {
         Interval.in_1_minute: 40,
@@ -35,7 +41,9 @@ blocks_delta = {
         Interval.in_5_minute: 130,
         Interval.in_15_minute: 140,
         Interval.in_30_minute: 200,
-        Interval.in_45_minute: 190
+        Interval.in_45_minute: 200,
+        Interval.in_1_hour: 200,
+        Interval.in_2_hour: 200
     },
     "EURJPY": {
         Interval.in_1_minute: 40,
@@ -43,7 +51,9 @@ blocks_delta = {
         Interval.in_5_minute: 110,
         Interval.in_15_minute: 140,
         Interval.in_30_minute: 199,
-        Interval.in_45_minute: 190
+        Interval.in_45_minute: 199,
+        Interval.in_1_hour: 199,
+        Interval.in_2_hour: 199
     },
     "EURCAD": {
         Interval.in_1_minute: 85,
@@ -51,7 +61,9 @@ blocks_delta = {
         Interval.in_5_minute: 160,
         Interval.in_15_minute: 220,
         Interval.in_30_minute: 260,
-        Interval.in_45_minute: 260
+        Interval.in_45_minute: 260,
+        Interval.in_1_hour: 260,
+        Interval.in_2_hour: 260
     },
     "AUDCHF": {
         Interval.in_1_minute: 30,
@@ -59,7 +71,9 @@ blocks_delta = {
         Interval.in_5_minute: 110,
         Interval.in_15_minute: 160,
         Interval.in_30_minute: 190,
-        Interval.in_45_minute: 190
+        Interval.in_45_minute: 190,
+        Interval.in_1_hour: 190,
+        Interval.in_2_hour: 190
     },
     "GBPUSD": {
         Interval.in_1_minute: 85,
@@ -67,7 +81,9 @@ blocks_delta = {
         Interval.in_5_minute: 110,
         Interval.in_15_minute: 170,
         Interval.in_30_minute: 200,
-        Interval.in_45_minute: 200
+        Interval.in_45_minute: 200,
+        Interval.in_1_hour: 200,
+        Interval.in_2_hour: 200
     },
     "AUDJPY": {
         Interval.in_1_minute: 50,
@@ -75,7 +91,9 @@ blocks_delta = {
         Interval.in_5_minute: 150,
         Interval.in_15_minute: 200,
         Interval.in_30_minute: 220,
-        Interval.in_45_minute: 220
+        Interval.in_45_minute: 220,
+        Interval.in_1_hour: 220,
+        Interval.in_2_hour: 220
     },
     "GBPAUD": {
         Interval.in_1_minute: 77,
@@ -83,7 +101,9 @@ blocks_delta = {
         Interval.in_5_minute: 200,
         Interval.in_15_minute: 300,
         Interval.in_30_minute: 350,
-        Interval.in_45_minute: 350
+        Interval.in_45_minute: 350,
+        Interval.in_1_hour: 350,
+        Interval.in_2_hour: 350
     },
     "BTCUSD": {
         Interval.in_1_minute: 0,
@@ -91,7 +111,9 @@ blocks_delta = {
         Interval.in_5_minute: 0,
         Interval.in_15_minute: 0,
         Interval.in_30_minute: 0,
-        Interval.in_45_minute: 0
+        Interval.in_45_minute: 0,
+        Interval.in_1_hour: 0,
+        Interval.in_2_hour: 0
     }
 }
 
@@ -101,7 +123,9 @@ min_sob_size = {
     Interval.in_5_minute: 20,
     Interval.in_15_minute: 34,
     Interval.in_30_minute: 50,
-    Interval.in_45_minute: 55
+    Interval.in_45_minute: 55,
+    Interval.in_1_hour: 55,
+    Interval.in_2_hour: 55
 }
 
 
@@ -398,11 +422,8 @@ class ScalpProIndicator(Indicator):
         c3 = -a * a
         c1 = 1 - c2 - c3
 
-        res = np.array([c1 * (p[i] + p[i + 1]) * 0.5 + c2 *
-                        res[i + 1] if (i + 1 < len(p)) else 0 +
-                                                            c3 *
-                                                            res[i + 2] if (i + 2 < len(p)) else 0
-                        for i in range(len(p) - 2, -1, -1)])
+        res = np.array([c1 * (p[i] + p[i + 1]) * 0.5 + c2 * res[i + 1] if (i + 1 < len(p)) else 0 + c3 *
+                        res[i + 2] if (i + 2 < len(p)) else 0 for i in range(len(p) - 2, -1, -1)])
         # for i in range(len(p) - 2, -1, -1):
         #     ssm1 = 0
         #     ssm2 = 0
@@ -674,12 +695,30 @@ class OBVolumeIndicator(Indicator):
 
     @staticmethod
     def get_alt_interval(interval):
-        raw_timeframe = interval_convertor.interval_to_int(interval)
-        tmp = round(raw_timeframe / 15)
-        fixed_timeframe = 1 if tmp < 1 else tmp
-        alt_interval = interval_convertor.int_to_interval(fixed_timeframe)
-
-        return alt_interval
+        if interval == str(Interval.in_1_minute):
+            return Interval.in_1_minute
+        elif interval == str(Interval.in_3_minute):
+            return Interval.in_1_minute
+        elif interval == str(Interval.in_5_minute):
+            return Interval.in_1_minute
+        elif interval == str(Interval.in_15_minute):
+            return Interval.in_1_minute
+        elif interval == str(Interval.in_30_minute):
+            return Interval.in_3_minute
+        elif interval == str(Interval.in_45_minute):
+            return Interval.in_3_minute
+        elif interval == str(Interval.in_1_hour):
+            return Interval.in_5_minute
+        elif interval == str(Interval.in_2_hour):
+            return Interval.in_15_minute
+        else:
+            return Interval.in_1_minute
+        # raw_timeframe = interval_convertor.interval_to_int(interval)
+        # tmp = round(raw_timeframe / 15)
+        # fixed_timeframe = 1 if tmp < 1 else tmp
+        # alt_interval = interval_convertor.int_to_interval(fixed_timeframe)
+        #
+        # return alt_interval
 
     def get_timeframe_data(self):
         i = 0
@@ -755,7 +794,11 @@ class OBVolumeIndicator(Indicator):
         def get_time_ratio(self):
             highest_volume = max(self.boxes_volumes)
             candles_count = (self.right_time - self.left_time) / interval_convertor.interval_to_datetime(self.interval)
-            time_ratio = candles_count / highest_volume
+            try:
+                time_ratio = candles_count / highest_volume
+            except ZeroDivisionError:
+                time_ratio = 0
+
             return time_ratio
 
         def generate_boxes(self, current_time):
@@ -973,6 +1016,10 @@ class OBVolumeIndicator(Indicator):
             xaxis=dict(type="category")
         )
         fig.show()
+
+
+def clamp(value, min_value, max_value):
+    return max(min(value, max_value), min_value)
 
 
 if __name__ == "__main__":

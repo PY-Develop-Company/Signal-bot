@@ -23,6 +23,15 @@ def get_deal_time(pds):
     return deal_time
 
 
+def get_deal_time_intervals(intervals):
+    deal_time = 0
+    for interval in intervals:
+        deal_time += interval_to_int(interval)
+    deal_time /= (len(intervals) + 1)
+    deal_time = int(round(deal_time, 0))
+    return deal_time
+
+
 class Analizer:
     def analize_func(self, df, pd) -> (bool, Signal, str):
         return False, NeutralSignal(), "error"
@@ -88,12 +97,14 @@ class MultitimeframeAnalizer(Analizer):
 
 
 class NewMultitimeframeAnalizer(Analizer):
-    def __init__(self, vob_count, sob_count):
+    def __init__(self, vob_count, sob_count, nw_count):
         self.vob_count = vob_count
         self.sob_count = sob_count
+        self.nw_count = nw_count
 
         self.sob = SOBAnalizer()
         self.vob = VOBAnalizer()
+        self.nw = NWAnalizer()
 
     def analize_multitimeframe(self, pds_dfs, analizer: Analizer):
         long_intervals = []
@@ -119,27 +130,32 @@ class NewMultitimeframeAnalizer(Analizer):
         pds_dfs = dict(zip(pds, parent_dfs))
         sob_long_count, sob_short_count, sob_long_intervals, sob_short_intervals, sob_debugs = self.analize_multitimeframe(pds_dfs, self.sob)
         vob_long_count, vob_short_count, vob_long_intervals, vob_short_intervals, vob_debugs = self.analize_multitimeframe(pds_dfs, self.vob)
+        nw_long_count, nw_short_count, nw_long_intervals, nw_short_intervals, nw_debugs = self.analize_multitimeframe(pds_dfs, self.nw)
         has_signal = False
         signal = NeutralSignal()
 
         sob_is_long, sob_is_short = has_multitimeframe_signal(self.sob_count, sob_long_count, sob_short_count)
         vob_is_long, vob_is_short = has_multitimeframe_signal(self.vob_count, vob_long_count, vob_short_count)
-        if (sob_is_long and vob_is_long) or (sob_is_short and vob_is_short):
+        nw_is_long, nw_is_short = has_multitimeframe_signal(self.nw_count, nw_long_count, nw_short_count)
+        intervals_for_dealtime = []
+        if sob_is_long and vob_is_long and nw_is_long:
             has_signal = True
-            signal = LongSignal() if sob_long_count > sob_short_count else ShortSignal()
-        # if vob_is_long or vob_is_short:
-        #     has_signal = True
-        #     signal = LongSignal() if vob_long_count > vob_short_count else ShortSignal()
+            signal = LongSignal()
+            intervals_for_dealtime = [*sob_long_intervals, *vob_long_intervals, *nw_long_intervals]
+        elif sob_is_short and vob_is_short and nw_is_short:
+            has_signal = True
+            signal = ShortSignal()
+            intervals_for_dealtime = [*sob_short_intervals, *vob_short_intervals, *nw_short_intervals]
 
-        deal_time = get_deal_time(pds)
+        deal_time = get_deal_time_intervals(intervals_for_dealtime)
 
         debug_text = f"""\n\nПроверка сигнала:
-                            \tВалютная пара: {pds[0].symbol}" таймфрейми: {[pd.interval for pd in pds]} время свеч: {[df.datetime[0] for df in parent_dfs]}
-                            \tЕсть ли сигнал: {has_signal}
-                            \tПоказания индикаторов: long_sob_count{sob_long_count} short_sob_count{sob_short_count} long_vob_count{vob_long_count} short_vob_count{vob_short_count}
-                            \t\t * SOB -> long {sob_long_intervals} short {sob_short_intervals}
-                            \t\t * VOB -> long {vob_long_intervals} short {vob_short_intervals}
-                            \n vob debugs{vob_debugs}"""
+                        \tЕсть ли сигнал: {has_signal}
+                        \tПоказания индикаторов: long_sob_count short_sob_count long_vob_count short_vob_count{vob_short_count}
+                        \t\t * SOB -> long {sob_long_count}:{sob_long_intervals} short {sob_short_count}:{sob_short_intervals}
+                        \t\t * VOB -> long {vob_long_count}:{vob_long_intervals} short {vob_short_count}:{vob_short_intervals}
+                        \t\t * NW -> long {nw_long_count}:{nw_long_intervals} short {nw_short_count}:{nw_short_intervals}
+                        \n vob debugs{vob_debugs}"""
 
         return has_signal, signal, debug_text, deal_time
 

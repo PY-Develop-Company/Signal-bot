@@ -1,17 +1,21 @@
 from aiogram import Bot, Dispatcher
-import random
+from tvDatafeed import Interval
+from pandas import DataFrame, read_csv, concat
+
 import logging
+import random
+import multiprocessing
+
 from tv_signals.signal_types import get_signal_by_type
 from tv_signals.price_parser import PriceData
 from tv_signals import signal_maker, price_parser
-from tvDatafeed import Interval
-import multiprocessing
+
+from utils import interval_convertor
+
 from manager_module import *
 from menu_text import *
-from utils import interval_convertor
 from utils.time import now_time, datetime_to_secs
-from pandas import DataFrame, read_csv, concat
-from market_info import is_market_working, is_trial_ended
+
 
 API_TOKEN = "6729177407:AAF45n3kxf8-A8SeM4SpiC1RMXqczLpmodk"  # main API TOKEN
 
@@ -23,8 +27,8 @@ bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot)
 signal_search_delay = 60
 
-callbacks_wait_time = 180
-reset_seis_wait_time = 180
+callbacks_wait_time = 600
+reset_seis_wait_time = 600
 
 users_for_print_count = 15
 
@@ -174,38 +178,45 @@ async def show_users_list_to_user(user_id, is_next=True):
 
 @dp.message_handler(commands="start")
 async def start_command(message):
-    if message.from_user.id in managers_id:
+    user_id = message.from_user.id
+    if user_id in managers_id:
         await add_manager(message)
     else:
-        add_user(message.from_user.id, message.from_user.first_name, message.from_user.last_name, message.from_user.username)
+        add_user(user_id, message.from_user.first_name, message.from_user.last_name, message.from_user.username)
 
-    # if get_user_language(message.from_user.id) == startLanguage:
+    # if get_user_language(user_id) == startLanguage:
     #     await open_menu(message, get_select_language_markup(), "Select language:")
     #     return
 
-    if get_user_status(message.from_user.id) == wait_id_input_status:
-        await update_status_user(message.from_user.id, none_status)
+    if get_user_status(user_id) == wait_id_input_status:
+        await update_status_user(user_id, none_status)
 
-    if message.from_user.id in managers_id:
-        markup = get_manager_markup(get_user_language(message.from_user.id))
+    if user_id in managers_id:
+        markup = get_manager_markup(get_user_language(user_id))
     else:
-        markup = get_markup_with_status(message.from_user.id, get_user_status(message.from_user.id))
+        markup = get_markup_with_status(user_id, get_user_status(user_id))
 
-    if has_user_status(message.from_user.id, deposit_status):
-        msg_text = languageFile[get_user_language(message.from_user.id)]["start_vip_text"]
+    if has_user_status(user_id, deposit_status):
+        msg_text = languageFile[get_user_language(user_id)]["start_vip_text"]
     else:
-        msg_text = languageFile[get_user_language(message.from_user.id)]["start_text"]
+        msg_text = languageFile[get_user_language(user_id)]["start_text"]
 
-    await send_photo_text_message_to_user(message.from_user.id, start_img_path, msg_text, markup)
+    await send_photo_text_message_to_user(user_id, start_img_path, msg_text, markup)
+    userLanguage = get_user_language(user_id)
+    if get_user_status(user_id) == id_status:
+        await send_message_to_user(user_id, languageFile[userLanguage]["accept_id_message_text"])
+    elif get_user_status(user_id) == wait_deposit_status:
+        await send_message_to_user(user_id, languageFile[userLanguage]["wait_deposit_status"])
+    elif get_user_status(user_id) == wait_id_status:
+        await send_message_to_user(user_id, languageFile[userLanguage]["wait_id_status"])
 
 
-@dp.message_handler(commands="language")
-async def open_language_command(message):
-    ...
-    # if get_user_status(message.from_user.id) == wait_id_input_status:
-    #     await update_status_user(message.from_user.id, none_status)
-    # set_user_language(message.from_user.id, startLanguage)
-    # await open_menu(message, get_select_language_markup(), "Select language:")
+# @dp.message_handler(commands="language")
+# async def open_language_command(message):
+#     if get_user_status(message.from_user.id) == wait_id_input_status:
+#         await update_status_user(message.from_user.id, none_status)
+#     set_user_language(message.from_user.id, startLanguage)
+#     await open_menu(message, get_select_language_markup(), "Select language:")
 
 
 @dp.message_handler(commands="start_test")
@@ -240,9 +251,9 @@ async def remove_user_command(call: types.CallbackQuery):
     await remove_last_user_list_message(call.message.chat.id)
 
     user_id = int(call.data.split("_")[-1])
-    have_user_with_id = have_user_with_id(user_id)
+    have_user = have_user_with_id(user_id)
 
-    if have_user_with_id:
+    if have_user:
         status = get_user_status(user_id)
         if status == trial_status:
             await bot.send_message(call.message.chat.id, languageFile[get_user_language(call.message.chat.id)]["cant_remove_trial_user_text"])
@@ -437,7 +448,7 @@ async def manage_user_callback(call: types.CallbackQuery):
 
 def handle_signal_msg_controller(signal, msg, pd: PriceData, open_position_price, deal_time, start_analize_time, shared_list):
     async def handle_signal_msg(signal, msg, pd: PriceData, open_position_price, deal_time, start_analize_time, shared_list):
-        t1 = datetime.strptime(str(start_analize_time).split(".")[0], '%Y-%m-%d %H:%M:%S')
+        t1 = str_to_datetime(str(start_analize_time).split(".")[0])
         t2 = now_time()
         print("before_send_delay", t2 - t1)
         user_signal_delay = (deal_time + 3) * 60
@@ -538,13 +549,21 @@ async def check_trial_users():
     users_ids = get_users_with_status(trial_status)
     for user_id in users_ids:
         userLanguage = get_user_language(user_id)
-        if is_trial_ended(get_user_trial_end_date(user_id)):
+        if market_info.is_trial_ended(get_user_trial_end_date(user_id)):
             remove_trial_from_user(user_id)
 
             markup = get_markup_with_status(user_id, get_user_status(user_id))
             await send_message_to_user(user_id, languageFile[userLanguage]["ended_trial_text"], markup)
-            await send_message_to_user(user_id, languageFile[userLanguage]["for_vip_text"])
-
+            if get_user_status(user_id)==none_status:
+                await send_message_to_user(user_id, languageFile[userLanguage]["for_vip_text"])
+            elif get_user_status(user_id)==id_status:
+                await send_message_to_user(user_id, languageFile[userLanguage]["accept_id_message_text"])
+            elif get_user_status(user_id)==deposit_status:
+                await send_message_to_user(user_id, languageFile[userLanguage]["start_vip_text"])
+            elif get_user_status(user_id)==wait_deposit_status:
+                await send_message_to_user(user_id, languageFile[userLanguage]["wait_deposit_status"])
+            elif get_user_status(user_id)==wait_id_status:
+                await send_message_to_user(user_id, languageFile[userLanguage]["wait_id_status"])
 
 def signals_message_sender_controller(prices_data, prices_data_all, shared_list):
     async def signals_message_sender_function(signal_prices_data, all_prices_data, shared_list):
@@ -587,7 +606,7 @@ def signals_message_sender_controller(prices_data, prices_data_all, shared_list)
             except Exception as e:
                 print("Error", e)
             print("search signals to send...")
-            if not is_market_working():
+            if not market_info.is_market_working():
                 continue
 
             created_prices_data = []
@@ -645,13 +664,12 @@ if __name__ == '__main__':
     currencies = price_parser.get_currencies()
 
     intervals = [Interval.in_1_minute, Interval.in_3_minute, Interval.in_5_minute, Interval.in_15_minute,
-                 Interval.in_30_minute]
-    main_intervals = [Interval.in_1_minute, Interval.in_3_minute, Interval.in_5_minute]
-    parent_intervals = [
-        [Interval.in_3_minute, Interval.in_5_minute],
-        [Interval.in_5_minute, Interval.in_15_minute],
-        [Interval.in_15_minute, Interval.in_30_minute]
-    ]
+                 Interval.in_30_minute, Interval.in_45_minute, Interval.in_1_hour]
+    main_intervals = [Interval.in_5_minute, Interval.in_15_minute]
+    parent_intervals = [[Interval.in_15_minute, Interval.in_45_minute],
+                        [Interval.in_30_minute, Interval.in_1_hour]]
+    vob_intervals = [[Interval.in_1_minute, Interval.in_3_minute, Interval.in_5_minute],
+                     [Interval.in_1_minute, Interval.in_3_minute, Interval.in_5_minute]]
 
     # prices data creation
     prices_data = [PriceData(currency[0], currency[1], interval) for currency in currencies for interval in intervals]
@@ -667,13 +685,21 @@ if __name__ == '__main__':
             for p_i in parent_intervals[main_interval_index]:
                 parent_pds[ind].append(PriceData(currency[0], currency[1], p_i))
 
-    analize_pairs = [(main_pds[i], parent_pds[i]) for i in range(len(main_pds))]
+    analize_pairs = [[main_pds[i], *parent_pds[i]] for i in range(len(main_pds))]
+    vob_pds = []
+    for currency in currencies:
+        pds = []
+        for intervals in vob_intervals:
+            for interval in intervals:
+                pds.append(PriceData(currency[0], currency[1], interval))
+            vob_pds.append(pds)
 
     # reset chart and signal files
     for pd in prices_data:
         pd.remove_chart_data()
 
     multiprocessing.Process(target=signals_message_sender_controller, args=(main_pds, prices_data, shared_list)).start()
-    multiprocessing.Process(target=signal_maker.analize_currency_data_controller, args=(analize_pairs, )).start()
+    multiprocessing.Process(target=signal_maker.analize_currency_data_controller, args=(analize_pairs, vob_pds,)).start()
 
     executor.start_polling(dp, skip_updates=True)
+
