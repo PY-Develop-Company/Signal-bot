@@ -187,3 +187,5 @@ fabric.properties
 signals/
 sended_signals/
 currencies_data/
+
+config.ini

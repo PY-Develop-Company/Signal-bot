@@ -1,6 +1,7 @@
 from aiogram import Bot, Dispatcher
 from tvDatafeed import Interval
 from pandas import DataFrame, read_csv, concat
+import configparser
 
 import logging
 import random
@@ -16,8 +17,10 @@ from manager_module import *
 from menu_text import *
 from utils.time import now_time, datetime_to_secs
 
+config = configparser.ConfigParser()
+config.read("config.ini")
 
-API_TOKEN = "6729177407:AAF45n3kxf8-A8SeM4SpiC1RMXqczLpmodk"  # main API TOKEN
+API_TOKEN = config["BOT"]["Token"]
 
 manager = None
 shared_list = None
@@ -25,16 +28,15 @@ shared_list = None
 logging.basicConfig(level=logging.INFO)
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot)
-signal_search_delay = 60
 
-callbacks_wait_time = 600
-reset_seis_wait_time = 600
+signal_search_delay = config["MESSAGES"].getint("SignalSearchDelay", fallback=60)
+reset_seis_wait_time = config["MESSAGES"].getint("ResetSeisWaitTime", fallback=600)
 
-users_for_print_count = 15
+users_for_print_count = config["GENERAL"].getint("UsersForPrintCount", fallback=15)
 
-send_msg_delay = 0.1
-repeat_count = 50
-send_msg_users_group_count = 20
+send_msg_delay = config["GENERAL"].getfloat("SendMsgDelay", fallback=0.1)
+send_msg_repeat_count = config["GENERAL"].getint("SendMsgRepeatCount", fallback=50)
+send_msg_group_count = config["GENERAL"].getint("SendMsgGroupCount", fallback=20)
 
 last_user_list_message = dict()
 last_user_manage_message = dict()
@@ -453,15 +455,15 @@ def handle_signal_msg_controller(signal, msg, pd: PriceData, open_position_price
         print("before_send_delay", t2 - t1)
         user_signal_delay = (deal_time + 3) * 60
 
-        users_groups = await get_users_groups_ids(repeat_count, send_msg_users_group_count, user_signal_delay)
+        users_groups = await get_users_groups_ids(send_msg_repeat_count, send_msg_group_count, user_signal_delay)
         t2 = now_time()
         print("created_users_delay", t2 - t1)
 
-        for i in range(0, repeat_count):
+        for i in range(0, send_msg_repeat_count):
             await send_photo_text_message_to_users(users_groups[i], signal.photo_path, msg, args=["signal_min_text"])
             await asyncio.sleep(send_msg_delay)
         # print(users_groups)
-        print([len(users_groups[i]) for i in range(repeat_count)])
+        print([len(users_groups[i]) for i in range(send_msg_repeat_count)])
 
         t2 = now_time()
         delay = t2 - t1
@@ -477,7 +479,7 @@ def handle_signal_msg_controller(signal, msg, pd: PriceData, open_position_price
         shared_list[is_profit] += 1
         img_path = "./img/profit.jpg" if is_profit else "./img/loss.jpg"
 
-        for i in range(0, repeat_count):
+        for i in range(0, send_msg_repeat_count):
             await send_photo_text_message_to_users(users_groups[i], img_path, close_signal_message, args=["signal_deal_text", "signal_min_text"])
             await asyncio.sleep(send_msg_delay)
 
