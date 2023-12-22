@@ -4,8 +4,7 @@ from signals import *
 from signals import Signal
 from interval_convertor import interval_to_int
 from price_parser import PriceData
-import pytz
-from datetime import datetime
+from my_time import now_time
 
 
 def has_multitimeframe_signal(needed_count, long_count, short_count):
