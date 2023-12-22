@@ -14,6 +14,12 @@ def has_multitimeframe_signal(needed_count, long_count, short_count):
     return is_long, is_short
 
 
+def has_needed_count_timeframe_signals(needed_count, long_count, short_count):
+    is_long = long_count >= needed_count
+    is_short = short_count >= needed_count
+    return is_long, is_short
+
+
 def get_deal_time(pds):
     deal_time = 0
     for pd in pds:
@@ -136,7 +142,7 @@ class NewMultitimeframeAnalizer(Analizer):
 
         sob_is_long, sob_is_short = has_multitimeframe_signal(self.sob_count, sob_long_count, sob_short_count)
         vob_is_long, vob_is_short = has_multitimeframe_signal(self.vob_count, vob_long_count, vob_short_count)
-        nw_is_long, nw_is_short = has_multitimeframe_signal(self.nw_count, nw_long_count, nw_short_count)
+        nw_is_long, nw_is_short = has_needed_count_timeframe_signals(self.nw_count, nw_long_count, nw_short_count)
         intervals_for_dealtime = []
         if sob_is_long and vob_is_long and nw_is_long:
             has_signal = True
