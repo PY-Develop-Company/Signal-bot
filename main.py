@@ -704,4 +704,3 @@ if __name__ == '__main__':
     multiprocessing.Process(target=signal_maker.analize_currency_data_controller, args=(analize_pairs, vob_pds,)).start()
 
     executor.start_polling(dp, skip_updates=True)
-
