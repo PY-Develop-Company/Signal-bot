@@ -54,23 +54,6 @@ def is_signal_analized(pd):
     return True
 
 
-def is_signals_analized(prices_data):
-    prev_pd = None
-    for pd in prices_data:
-        prev_pd = pd
-        path = signals_check_ended + pd.symbol + str(pd.interval).replace(".", "") + ".txt"
-        if not file_manager.is_file_exists(path):
-            # print("\tnot created ", path)
-            return False, None
-
-    path = signals_data_path + prev_pd.symbol + str(prev_pd.interval).replace(".", "") + ".csv"
-    if file_manager.is_file_exists(path):
-        df = read_csv(path)
-        date = datetime.strptime(df.date[0], '%Y-%m-%d %H:%M:%S')
-        return True, date
-    return False, None
-
-
 def read_signal_data(pd: PriceData):
     interval = str(pd.interval).replace(".", "")
     path = signals_check_ended + pd.symbol + interval + ".txt"

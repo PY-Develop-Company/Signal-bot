@@ -5,8 +5,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c8e52443-fb39-41fa-9e09-4877251a22f1" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/config.ini" beforeDir="false" afterPath="$PROJECT_DIR$/config.ini" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/market_info.py" beforeDir="false" afterPath="$PROJECT_DIR$/market_info.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/language.json" beforeDir="false" afterPath="$PROJECT_DIR$/language.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu_text.py" beforeDir="false" afterPath="$PROJECT_DIR$/menu_text.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/signal_maker.py" beforeDir="false" afterPath="$PROJECT_DIR$/signal_maker.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/signals/signals.csv" beforeDir="false" afterPath="$PROJECT_DIR$/signals/signals.csv" afterDir="false" />
     </list>
     <list id="cbe571c8-b52a-4250-a9e3-ad1313cd5330" name="Changes by Alex" comment="" />
     <list id="48029012-d7c5-49d8-850d-060bbfa1276c" name="Changes by Roma lox" comment="" />
