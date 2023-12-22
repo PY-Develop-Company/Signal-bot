@@ -1,4 +1,5 @@
 import os
+import user_module
 from user_module import *
 
 manager_username = "@NoMeFU"
@@ -21,7 +22,7 @@ async def add_manager(message):
     if f"{message.from_user.id}.txt" in os.listdir("users/"):
         ...
     else:
-        data = {"id": message.from_user.id, "status": "none", "do": "none", "language": "none"}
+        data = {"id": message.from_user.id, "status": none_manager_status, "do": "none", "language": startLanguage}
         file_manager.write_file(url, data)
 
 
@@ -61,7 +62,7 @@ def get_manager_do(manager_id):
 def get_manager_user_acount(manager_id):
     url = get_url(manager_id)
     manager = file_manager.read_file(url)
-    return get_user_account_number(int(manager["do"]))
+    return user_module.get_user_account_number(int(manager["do"]))
 
 
 def is_manager_status(manager_id, status):

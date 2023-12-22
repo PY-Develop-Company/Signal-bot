@@ -1,21 +1,23 @@
-import random
-import time
-from aiogram import Bot, Dispatcher, types
+from aiogram import Bot, Dispatcher
 import logging
 import price_parser
 from price_parser import PriceData
 import signal_maker
 from tvDatafeed import Interval
-import market_info
-import asyncio
 import multiprocessing
 from manager_module import *
 from menu_text import *
 import interval_convertor
 from signals import get_signal_by_type
-from pandas import DataFrame, read_csv, to_datetime, concat
+from pandas import DataFrame, read_csv, concat, to_datetime
+from my_time import *
+import configparser
+import random
 
-API_TOKEN = "6538527964:AAGQzoisiQ7HNNpwfxuhEP771tLEV9msRJA"  # main API TOKEN
+config = configparser.ConfigParser()
+config.read("config.ini")
+
+API_TOKEN = config["BOT"]["Token"]
 
 manager = None
 shared_list = None
@@ -23,16 +25,15 @@ shared_list = None
 logging.basicConfig(level=logging.INFO)
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot)
-signal_search_delay = 60
-signal_for_user_delay = 300
 
-callbacks_wait_time = 600
+signal_search_delay = config["MESSAGES"].getint("SignalSearchDelay", fallback=60)
+reset_seis_wait_time = config["MESSAGES"].getint("ResetSeisWaitTime", fallback=600)
 
-users_for_print_count = 15
+users_for_print_count = config["GENERAL"].getint("UsersForPrintCount", fallback=15)
 
-send_msg_delay = 0.1
-repeat_count = 50
-send_msg_users_group_count = 20
+send_msg_delay = config["GENERAL"].getfloat("SendMsgDelay", fallback=0.1)
+send_msg_repeat_count = config["GENERAL"].getint("SendMsgRepeatCount", fallback=50)
+send_msg_group_count = config["GENERAL"].getint("SendMsgGroupCount", fallback=20)
 
 last_user_list_message = dict()
 last_user_manage_message = dict()
@@ -40,7 +41,18 @@ last_user_manage_message = dict()
 signals_stats_path = "signals/signals.csv"
 start_img_path = "img/logo.jpg"
 
-last_check_time = market_info.get_time()
+last_check_time = now_time()
+
+
+def get_stats_for_days(days_count):
+    df = read_csv(signals_stats_path, index_col=[0])
+    df["close_time"] = to_datetime(df["close_time"])
+
+    limit_time = now_time() - timedelta(days=days_count)
+    df = df[df["close_time"] >= limit_time]
+    profit_array = df["is_profit"].value_counts()
+
+    return profit_array[True], profit_array[False]
 
 
 def update_last_user_list_message(message):
@@ -176,31 +188,47 @@ async def show_users_list_to_user(user_id, is_next=True):
 
 @dp.message_handler(commands="start")
 async def start_command(message):
-    if message.from_user.id in managers_id:
+    user_id = message.from_user.id
+    if user_id in managers_id:
         await add_manager(message)
     else:
-        add_user(message.from_user.id, message.from_user.first_name, message.from_user.last_name, message.from_user.username)
+        add_user(user_id, message.from_user.first_name, message.from_user.last_name, message.from_user.username)
 
-    if get_user_language(message.from_user.id) == startLanguage:
-        await open_menu(message, get_select_language_markap(), "Select language:")
+    if get_user_language(user_id) == startLanguage:
+        await open_menu(message, get_select_language_markup(), "Select language:")
         return
 
-    if message.from_user.id in managers_id:
-        markup = get_manager_markup(get_user_language(message.from_user.id))
-    else:
-        markup = get_markup_with_status(message.from_user.id, get_user_status(message.from_user.id))
+    if get_user_status(user_id) == wait_id_input_status:
+        await update_status_user(user_id, none_status)
 
-    if has_user_status(message.from_user.id, deposit_status):
-        msg_text = languageFile[get_user_language(message.from_user.id)]["start_vip_text"]
+    if user_id in managers_id:
+        markup = get_manager_markup(get_user_language(user_id))
     else:
-        msg_text = languageFile[get_user_language(message.from_user.id)]["start_text"]
-    await send_photo_text_message_to_user(message.from_user.id, start_img_path, msg_text, markup)
+        markup = get_markup_with_status(user_id, get_user_status(user_id))
+
+    if has_user_status(user_id, deposit_status):
+        msg_text = languageFile[get_user_language(user_id)]["start_vip_text"]
+    else:
+        msg_text = languageFile[get_user_language(user_id)]["start_text"]
+
+    await send_photo_text_message_to_user(user_id, start_img_path, msg_text, markup)
+    userLanguage = get_user_language(user_id)
+    if get_user_status(user_id) == id_status:
+        await send_message_to_user(user_id, languageFile[userLanguage]["accept_id_message_text"])
+    elif get_user_status(user_id) == deposit_status:
+        await send_message_to_user(user_id, languageFile[userLanguage]["start_vip_text"])
+    elif get_user_status(user_id) == wait_deposit_status:
+        await send_message_to_user(user_id, languageFile[userLanguage]["wait_deposit_status"])
+    elif get_user_status(user_id) == wait_id_status:
+        await send_message_to_user(user_id, languageFile[userLanguage]["wait_id_status"])
 
 
 @dp.message_handler(commands="language")
 async def open_language_command(message):
+    if get_user_status(message.from_user.id) == wait_id_input_status:
+        await update_status_user(message.from_user.id, none_status)
     set_user_language(message.from_user.id, startLanguage)
-    await open_menu(message, get_select_language_markap(), "Select language:")
+    await open_menu(message, get_select_language_markup(), "Select language:")
 
 
 @dp.message_handler(commands="start_test")
@@ -210,7 +238,7 @@ async def start_test_command(message):
             msg = message.text.split(" ")[-1]
             if msg.isdigit():
                 with open("users/test.txt", "w") as file:
-                    file.write(str(float(msg) + time.time()))
+                    file.write(str(float(msg) + datetime_to_secs(now_time())))
 
 
 @dp.message_handler(commands="stop_test")
@@ -235,9 +263,9 @@ async def remove_user_command(call: types.CallbackQuery):
     await remove_last_user_list_message(call.message.chat.id)
 
     user_id = int(call.data.split("_")[-1])
-    have_user_with_id = find_user_with_id(user_id)
+    user_with_id = have_user_with_id(user_id)
 
-    if have_user_with_id:
+    if user_with_id:
         status = get_user_status(user_id)
         if status == trial_status:
             await bot.send_message(call.message.chat.id, languageFile[get_user_language(call.message.chat.id)]["cant_remove_trial_user_text"])
@@ -290,10 +318,10 @@ async def handle_media(message: types.Message):
         await set_user_tag(message.from_user.id, message.from_user.username)
 
     # LANGUAGE
-    if message.text not in [select_language_eng, select_language_ru, select_language_hin] and user_language == "none":
+    if message.text not in [select_language_eng, select_language_ru, select_language_hin] and user_language == startLanguage:
         await open_language_command(message)
         return
-    if message.text in [select_language_eng, select_language_ru, select_language_hin] and user_language == "none":
+    if message.text in [select_language_eng, select_language_ru, select_language_hin] and user_language == startLanguage:
         set_user_language(user_id, message.text)
         user_language = get_user_language(user_id)
         markup = get_markup_with_status(user_id, get_user_status(user_id))
@@ -327,6 +355,8 @@ async def handle_media(message: types.Message):
                 await open_menu(message, get_accept_reject_markup(user_language), get_manager_user_acount(user_id))
             else:
                 await message.answer(languageFile[user_language]["no_deposit_requests_text"])
+        elif message.text == languageFile[user_language]["stats_button"]:
+            await open_menu(message, get_statistics_period_markup(user_language), languageFile[user_language]["selects_stats_period_text"])
         else:
             is_accept_button = message.text == languageFile[user_language]["accept_button"]
             is_reject_button = message.text == languageFile[user_language]["reject_button"]
@@ -422,28 +452,40 @@ async def manage_user_callback(call: types.CallbackQuery):
     await call.answer(call.data)
 
 
+@dp.callback_query_handler(text_contains="show_stats_")
+async def manage_user_callback(call: types.CallbackQuery):
+    days_count = int(call.data.split("_")[-1])
+    profit_count, loss_count = get_stats_for_days(days_count)
+    persent = round(profit_count / (profit_count + loss_count)*100)
+
+    await bot.send_message(call.message.chat.id,
+                           text=languageFile[get_user_language(call.message.chat.id)]["statistics_text"].format(days_count, f"{persent}:{100-persent}", profit_count, loss_count))
+    await call.answer(call.data)
+
+
 def handle_signal_msg_controller(signal, msg, pd: PriceData, open_position_price, deal_time, start_analize_time, shared_list):
     async def handle_signal_msg(signal, msg, pd: PriceData, open_position_price, deal_time, start_analize_time, shared_list):
-        t1 = datetime.strptime(start_analize_time, '%Y-%m-%d %H:%M:%S')
-        t2 = market_info.get_time()
+        t1 = datetime.strptime(str(start_analize_time).split(".")[0], '%Y-%m-%d %H:%M:%S')
+        t2 = now_time()
         print("before_send_delay", t2 - t1)
+        user_signal_delay = (deal_time + 3) * 60
 
-        users_groups = await get_users_group_ids(repeat_count, send_msg_users_group_count, signal_for_user_delay)
-        t2 = market_info.get_time()
+        users_groups = await get_users_groups_ids(send_msg_repeat_count, send_msg_group_count, user_signal_delay)
+        t2 = now_time()
         print("created_users_delay", t2 - t1)
 
-        for i in range(0, repeat_count):
+        for i in range(0, send_msg_repeat_count):
             await send_photo_text_message_to_users(users_groups[i], signal.photo_path, msg, args=["signal_min_text"])
             await asyncio.sleep(send_msg_delay)
+        # print(users_groups)
+        print([len(users_groups[i]) for i in range(send_msg_repeat_count)])
 
-        print([len(users_groups[i]) for i in range(repeat_count)])
-        send_open_message_time = market_info.get_time()
-        delay = send_open_message_time - t1
-
+        t2 = now_time()
+        delay = t2 - t1
         print("after_send_delay", delay)
-        debug_msg = "delay: " + str(delay) + "; analize_time: " + str(t1) + "; send_msg_time: " + str(send_open_message_time)
 
         try:
+            debug_msg = "delay: " + str(delay) + "; analize_time: " + str(t1) + "; send_msg_time: " + str(t2)
             await send_message_to_users(managers_id, debug_msg)
         except Exception as e:
             print(e)
@@ -452,14 +494,14 @@ def handle_signal_msg_controller(signal, msg, pd: PriceData, open_position_price
         shared_list[is_profit] += 1
         img_path = "./img/profit.jpg" if is_profit else "./img/loss.jpg"
 
-        for i in range(0, repeat_count):
+        for i in range(0, send_msg_repeat_count):
             await send_photo_text_message_to_users(users_groups[i], img_path, close_signal_message, args=["signal_deal_text", "signal_min_text"])
             await asyncio.sleep(send_msg_delay)
 
         while True:
-            send_close_message_time = market_info.get_time()
+            send_close_message_time = now_time()
             columns = ["currency", "interval", "open_time", "close_time", "signal_type", "open_price", "close_price", "is_profit"]
-            data = [[pd.symbol, pd.interval, send_open_message_time, send_close_message_time, signal.type, open_price, close_price, is_profit]]
+            data = [[pd.symbol, pd.interval, t2, send_close_message_time, signal.type, open_price, close_price, is_profit]]
             try:
                 if not os.path.exists(signals_stats_path):
                     df = DataFrame(data=[], columns=columns)
@@ -476,44 +518,44 @@ def handle_signal_msg_controller(signal, msg, pd: PriceData, open_position_price
     asyncio.run(handle_signal_msg(signal, msg, pd, open_position_price, deal_time, start_analize_time, shared_list))
 
 
-async def print_stats(df, stats_name):
-    profit_count = len(df[df["is_profit"] == True])
-    lose_count = len(df[df["is_profit"] == False])
-    text = f"Total {stats_name} statistics:\n\tprofits: {profit_count};\n\tloses: {lose_count};\n"
-    await send_message_to_users(managers_id, text)
+# async def print_stats(df, stats_name):
+#     profit_count = len(df[df["is_profit"]])
+#     lose_count = len(df[not df["is_profit"]])
+#     text = f"Total {stats_name} statistics:\n\tprofits: {profit_count};\n\tloses: {lose_count};\n"
+#     await send_message_to_users(managers_id, text)
 
 
-async def try_send_stats():
-    global last_check_time
-    try:
-        time_now = market_info.get_time()
-        df = read_csv(signals_stats_path)
-        df["close_time"] = to_datetime(df["close_time"])
-        df["close_time_year"] = df["close_time"].apply(lambda row: row.year)
-        df["close_time_week"] = df["close_time"].apply(lambda row: row.isocalendar()[1])
-        df["close_time_date"] = df["close_time"].apply(lambda row: row.date())
-        df["close_time_hour"] = df["close_time"].apply(lambda row: row.hour)
-
-        if time_now.day != last_check_time.day and time_now.hour != last_check_time.hour:
-            print("send hour stats")
-            hour_df = df[(df["close_time_date"] == last_check_time.date()) & (df["close_time_hour"] == last_check_time.hour)]
-            if len(hour_df) > 0:
-                await print_stats(hour_df, f"day ({last_check_time.date()}) hour ({last_check_time.hour})")
-        if time_now.day != last_check_time.day:
-            print("send day stats")
-            day_df = df[df["close_time_date"] == last_check_time.date()]
-            if len(day_df) > 0:
-                await print_stats(day_df, f"day ({last_check_time.date()})")
-        if time_now.isocalendar()[1] != last_check_time.isocalendar()[1]:
-            print("send week stats", last_check_time.isocalendar()[1])
-            week_df = df[(df["close_time_week"] == last_check_time.isocalendar()[1]) & (df["close_time_year"] == last_check_time.year)]
-            if len(week_df) > 0:
-                start_week_day = last_check_time.date() - timedelta(days=6)
-                await print_stats(week_df, f"week ({start_week_day} to {last_check_time.date()})")
-
-        last_check_time = time_now
-    except Exception as e:
-        print("Error while sending stats", e)
+# async def try_send_stats():
+#     global last_check_time
+#     try:
+#         time_now = now_time()
+#         df = read_csv(signals_stats_path)
+#         df["close_time"] = to_datetime(df["close_time"])
+#         df["close_time_year"] = df["close_time"].apply(lambda row: row.year)
+#         df["close_time_week"] = df["close_time"].apply(lambda row: row.isocalendar()[1])
+#         df["close_time_date"] = df["close_time"].apply(lambda row: row.date())
+#         df["close_time_hour"] = df["close_time"].apply(lambda row: row.hour)
+#
+#         if time_now.hour != last_check_time.hour:
+#             print("send hour stats")
+#             hour_df = df[(df["close_time_date"] == last_check_time.date()) & (df["close_time_hour"] == last_check_time.hour)]
+#             if len(hour_df) > 0:
+#                 await print_stats(hour_df, f"day ({last_check_time.date()}) hour ({last_check_time.hour})")
+#         if time_now.day != last_check_time.day:
+#             print("send day stats")
+#             day_df = df[df["close_time_date"] == last_check_time.date()]
+#             if len(day_df) > 0:
+#                 await print_stats(day_df, f"day ({last_check_time.date()})")
+#         if time_now.isocalendar()[1] != last_check_time.isocalendar()[1]:
+#             print("send week stats", last_check_time.isocalendar()[1])
+#             week_df = df[(df["close_time_week"] == last_check_time.isocalendar()[1]) & (df["close_time_year"] == last_check_time.year)]
+#             if len(week_df) > 0:
+#                 start_week_day = last_check_time.date() - timedelta(days=6)
+#                 await print_stats(week_df, f"week ({start_week_day} to {last_check_time.date()})")
+#
+#         last_check_time = time_now
+#     except Exception as e:
+#         print("Error while sending stats", e)
 
 
 async def check_trial_users():
@@ -525,34 +567,45 @@ async def check_trial_users():
 
             markup = get_markup_with_status(user_id, get_user_status(user_id))
             await send_message_to_user(user_id, languageFile[userLanguage]["ended_trial_text"], markup)
-            await send_message_to_user(user_id, languageFile[userLanguage]["for_vip_text"])
+            if get_user_status(user_id)==none_status:
+                await send_message_to_user(user_id, languageFile[userLanguage]["for_vip_text"])
+            elif get_user_status(user_id)==id_status:
+                await send_message_to_user(user_id, languageFile[userLanguage]["accept_id_message_text"])
+            elif get_user_status(user_id)==deposit_status:
+                await send_message_to_user(user_id, languageFile[userLanguage]["start_vip_text"])
+            elif get_user_status(user_id)==wait_deposit_status:
+                await send_message_to_user(user_id, languageFile[userLanguage]["wait_deposit_status"])
+            elif get_user_status(user_id)==wait_id_status:
+                await send_message_to_user(user_id, languageFile[userLanguage]["wait_id_status"])
 
 
-def signals_message_sender_controller(prices_data, intervals, unit_pd, prices_data_all, shared_list):
-    async def signals_message_sender_function(main_prices_data, intervals, unit_pd, prices_data_all, shared_list):
-        price_parser.create_parce_currencies_with_intervals_callbacks(prices_data_all)
-        last_send_message_check = time.time()
-        for pd in prices_data_all:
-            pd.reset_chart_data()
-        signal_maker.reset_signals_files(main_prices_data)
+def signals_message_sender_controller(prices_data, prices_data_all, shared_list):
+    async def signals_message_sender_function(signal_prices_data, all_prices_data, shared_list):
+        def reset_seis(signal_prices_data, all_prices_data):
+            price_parser.create_parce_currencies_with_intervals_callbacks(all_prices_data)
+            last_send_message_check = datetime_to_secs(now_time())
+            for pd in all_prices_data:
+                pd.reset_chart_data()
+            signal_maker.reset_signals_files(signal_prices_data)
+
+            return last_send_message_check
+
+        last_send_message_check = reset_seis(signal_prices_data, all_prices_data)
 
         need_to_reset_seis = False
-        reset_seis_wait_time = 600
 
         while True:
-            t1 = time.perf_counter()
+            t1 = datetime_to_secs(now_time())
             try:
                 await check_trial_users()
             except Exception as e:
                 print("check_trial_users_ERROR", e)
-            t2 = time.perf_counter()
+            t2 = datetime_to_secs(now_time())
             print("new delay", t2-t1)
-            await try_send_stats()
-            need_to_reset_seis = last_send_message_check + reset_seis_wait_time < time.time()
+            # await try_send_stats()
+            need_to_reset_seis = last_send_message_check + reset_seis_wait_time < datetime_to_secs(now_time())
             if need_to_reset_seis:
-                price_parser.create_parce_currencies_with_intervals_callbacks(prices_data_all)
-                last_send_message_check = time.time()
-                signal_maker.reset_signals_files(main_prices_data)
+                last_send_message_check = reset_seis(signal_prices_data, all_prices_data)
                 continue
 
             await asyncio.sleep(3)
@@ -561,23 +614,24 @@ def signals_message_sender_controller(prices_data, intervals, unit_pd, prices_da
                     cont = file.read().split(".")[0]
                     if cont.isdigit():
                         cont = float(cont)
-                        if cont > time.time():
-                            print("wait for signal", cont, time.time())
+                        if cont > datetime_to_secs(now_time()):
+                            last_send_message_check = datetime_to_secs(now_time())
+                            print("wait for signal", cont, datetime_to_secs(now_time()))
                             continue
             except Exception as e:
-                print("4Error", e)
+                print("Error", e)
             print("search signals to send...")
             if not market_info.is_market_working():
                 continue
 
             created_prices_data = []
-            for pd in main_prices_data:
+            for pd in signal_prices_data:
                 if signal_maker.is_signal_analized(pd):
                     created_prices_data.append(pd)
             if len(created_prices_data) == 0:
                 continue
 
-            last_send_message_check = time.time()
+            last_send_message_check = datetime_to_secs(now_time())
 
             dfs_with_signals = []
             for pd in created_prices_data:
@@ -595,7 +649,7 @@ def signals_message_sender_controller(prices_data, intervals, unit_pd, prices_da
             df = random.choice(dfs_with_signals)
             signal = get_signal_by_type(df.signal_type[0])
 
-            time_now = market_info.get_time()
+            time_now = now_time()
             pd = PriceData(df.symbol[0], df.exchange[0], interval_convertor.str_to_interval(df.interval[0]))
             path = f"sended_signals/time{time_now.hour}_{time_now.minute}_{pd.symbol}_{interval_convertor.interval_to_string(pd.interval).replace('.', '')}"
             df.to_csv(path)
@@ -606,9 +660,10 @@ def signals_message_sender_controller(prices_data, intervals, unit_pd, prices_da
 
             await asyncio.sleep(signal_search_delay)
 
-            signal_maker.reset_signals_files(main_prices_data)
+            signal_maker.reset_signals_files(signal_prices_data)
+            last_send_message_check = datetime_to_secs(now_time())
 
-    asyncio.run(signals_message_sender_function(prices_data, intervals, unit_pd, prices_data_all, shared_list))
+    asyncio.run(signals_message_sender_function(prices_data, prices_data_all, shared_list))
 
 
 if __name__ == '__main__':
@@ -623,44 +678,43 @@ if __name__ == '__main__':
 
     currencies = price_parser.get_currencies()
 
-    intervals = [Interval.in_1_minute, Interval.in_3_minute, Interval.in_5_minute, Interval.in_15_minute, Interval.in_30_minute]
-    main_intervals = [Interval.in_1_minute, Interval.in_3_minute, Interval.in_5_minute]
-    parent_intervals = [
-        [Interval.in_3_minute, Interval.in_5_minute],
-        [Interval.in_5_minute, Interval.in_15_minute],
-        [Interval.in_15_minute, Interval.in_30_minute]
-    ]
-    prices_data = []
+    intervals = [Interval.in_1_minute, Interval.in_3_minute, Interval.in_5_minute, Interval.in_15_minute,
+                 Interval.in_30_minute, Interval.in_45_minute, Interval.in_1_hour]
+    main_intervals = [Interval.in_5_minute, Interval.in_15_minute]
+    parent_intervals = [[Interval.in_15_minute, Interval.in_45_minute],
+                        [Interval.in_30_minute, Interval.in_1_hour]]
+    vob_intervals = [[Interval.in_1_minute, Interval.in_3_minute, Interval.in_5_minute],
+                     [Interval.in_1_minute, Interval.in_3_minute, Interval.in_5_minute]]
 
+    # prices data creation
+    prices_data = [PriceData(currency[0], currency[1], interval) for currency in currencies for interval in intervals]
+    ind = -1
     main_pds = []
     parent_pds = []
 
     for currency in currencies:
-        for interval in intervals:
-            prices_data.append(PriceData(currency[0], currency[1], interval))
-
-    ind = -1
-    for currency_index in range(len(currencies)):
         for main_interval_index in range(len(main_intervals)):
-            main_pd = PriceData(currencies[currency_index][0], currencies[currency_index][1], main_intervals[main_interval_index])
-            main_pds.append(main_pd)
+            main_pds.append(PriceData(currency[0], currency[1], main_intervals[main_interval_index]))
             parent_pds.append([])
             ind += 1
             for p_i in parent_intervals[main_interval_index]:
-                parent_pds[ind].append(PriceData(currencies[currency_index][0], currencies[currency_index][1], p_i))
+                parent_pds[ind].append(PriceData(currency[0], currency[1], p_i))
 
+    analize_pairs = [[main_pds[i], *parent_pds[i]] for i in range(len(main_pds))]
+    vob_pds = []
+    for currency in currencies:
+        pds = []
+        for intervals in vob_intervals:
+            for interval in intervals:
+                pds.append(PriceData(currency[0], currency[1], interval))
+            vob_pds.append(pds)
+
+    # reset chart and signal files
     for pd in prices_data:
         pd.remove_chart_data()
 
-    unit_pd = main_pds[0]
-    multiprocessing.Process(target=signals_message_sender_controller, args=(main_pds, main_intervals, unit_pd, prices_data, shared_list, )).start()
-
-    analize_pairs = []
-    for i in range(len(main_pds)):
-        i_main_pd = main_pds[i]
-        i_parent_pds = parent_pds[i]
-        analize_pair = (i_main_pd, i_parent_pds, unit_pd)
-        analize_pairs.append(analize_pair)
-    multiprocessing.Process(target=signal_maker.analize_currency_data_controller, args=(analize_pairs, )).start()
+    multiprocessing.Process(target=signals_message_sender_controller, args=(main_pds, prices_data, shared_list)).start()
+    multiprocessing.Process(target=signal_maker.analize_currency_data_controller, args=(analize_pairs, vob_pds,)).start()
 
     executor.start_polling(dp, skip_updates=True)
+

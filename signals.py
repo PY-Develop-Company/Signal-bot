@@ -97,4 +97,3 @@ def get_oposite_by_type(signal_type):
         return ShortSignal()
     elif signal_type == ShortSignal.type:
         return LongSignal()
-

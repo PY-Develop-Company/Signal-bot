@@ -20,12 +20,21 @@ def get_trial_button(language):
     return types.KeyboardButton(languageFile[language]["get_trial_button_text"])
 
 
-def get_select_language_markap():
+def get_select_language_markup():
     select_language_markup = types.ReplyKeyboardMarkup(resize_keyboard=True, keyboard=[
         [types.KeyboardButton(select_language_eng), types.KeyboardButton(select_language_ru),
          types.KeyboardButton(select_language_hin)]
     ])
     return select_language_markup
+
+
+def get_statistics_period_markup(languageCode):
+    stats_markup = types.InlineKeyboardMarkup(row_width=4).add(
+        types.InlineKeyboardButton(languageFile[languageCode]["period_1_day"], callback_data=f"show_stats_{1}"),
+        types.InlineKeyboardButton(languageFile[languageCode]["period_7_days"], callback_data=f"show_stats_{7}"),
+        types.InlineKeyboardButton(languageFile[languageCode]["period_1_month"], callback_data=f"show_stats_{30}"),
+        types.InlineKeyboardButton(languageFile[languageCode]["period_1_year"], callback_data=f"show_stats_{365}"))
+    return stats_markup
 
 
 def get_empty_markup():
@@ -36,7 +45,8 @@ def get_empty_markup():
 def get_manager_markup(languageCode):
     manager_markup = types.ReplyKeyboardMarkup(resize_keyboard=True, keyboard=[
         [types.KeyboardButton(languageFile[languageCode]["search_id_request"]), types.KeyboardButton(languageFile[languageCode]["search_deposit_request"])],
-        [types.KeyboardButton(languageFile[languageCode]["user_management_button"])]
+        [types.KeyboardButton(languageFile[languageCode]["user_management_button"])],
+        [types.KeyboardButton(languageFile[languageCode]["stats_button"])]
     ])
     return manager_markup
 
