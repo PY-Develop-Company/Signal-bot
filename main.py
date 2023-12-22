@@ -47,6 +47,17 @@ start_img_path = "img/logo.jpg"
 last_check_time = now_time()
 
 
+def get_stats_for_days(days_count):
+    df = read_csv(signals_stats_path, index_col=[0])
+    df["close_time"] = to_datetime(df["close_time"])
+
+    limit_time = now_time() - timedelta(days=days_count)
+    df = df[df["close_time"] >= limit_time]
+    profit_array = df["is_profit"].value_counts()
+
+    return profit_array[True], profit_array[False]
+
+
 def update_last_user_list_message(message):
     global last_user_list_message
     last_user_list_message.update({message.chat.id: message})
@@ -253,9 +264,9 @@ async def remove_user_command(call: types.CallbackQuery):
     await remove_last_user_list_message(call.message.chat.id)
 
     user_id = int(call.data.split("_")[-1])
-    have_user = have_user_with_id(user_id)
+    user_with_id = have_user_with_id(user_id)
 
-    if have_user:
+    if user_with_id:
         status = get_user_status(user_id)
         if status == trial_status:
             await bot.send_message(call.message.chat.id, languageFile[get_user_language(call.message.chat.id)]["cant_remove_trial_user_text"])
@@ -347,6 +358,8 @@ async def handle_media(message: types.Message):
                 await open_menu(message, get_accept_reject_markup(user_language), get_manager_user_acount(user_id))
             else:
                 await message.answer(languageFile[user_language]["no_deposit_requests_text"])
+        elif message.text == languageFile[user_language]["stats_button"]:
+            await open_menu(message, get_statistics_period_markup(user_language), languageFile[user_language]["selects_stats_period_text"])
         else:
             is_accept_button = message.text == languageFile[user_language]["accept_button"]
             is_reject_button = message.text == languageFile[user_language]["reject_button"]
@@ -445,6 +458,17 @@ async def manage_user_callback(call: types.CallbackQuery):
     sent_msg = await bot.send_message(call.message.chat.id, text=languageFile[get_user_language(call.message.chat.id)]["select_user_id_to_ban_text"], reply_markup=keyboard)
 
     update_last_user_manage_message(sent_msg)
+    await call.answer(call.data)
+
+
+@dp.callback_query_handler(text_contains="show_stats_")
+async def manage_user_callback(call: types.CallbackQuery):
+    days_count = int(call.data.split("_")[-1])
+    profit_count, loss_count = get_stats_for_days(days_count)
+    persent = round(profit_count / (profit_count + loss_count)*100)
+
+    await bot.send_message(call.message.chat.id,
+                           text=languageFile[get_user_language(call.message.chat.id)]["statistics_text"].format(days_count, f"{persent}:{100-persent}", profit_count, loss_count))
     await call.answer(call.data)
 
 
@@ -566,6 +590,7 @@ async def check_trial_users():
                 await send_message_to_user(user_id, languageFile[userLanguage]["wait_deposit_status"])
             elif get_user_status(user_id)==wait_id_status:
                 await send_message_to_user(user_id, languageFile[userLanguage]["wait_id_status"])
+
 
 def signals_message_sender_controller(prices_data, prices_data_all, shared_list):
     async def signals_message_sender_function(signal_prices_data, all_prices_data, shared_list):
