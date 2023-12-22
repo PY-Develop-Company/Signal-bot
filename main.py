@@ -15,7 +15,7 @@ import interval_convertor
 from signals import get_signal_by_type
 from pandas import DataFrame, read_csv, to_datetime, concat
 
-API_TOKEN = "6538527964:AAF2sblcgdx9dyVo1jcyGLCFhoIRa9-3N_A"  # main API TOKEN
+API_TOKEN = "6538527964:AAGQzoisiQ7HNNpwfxuhEP771tLEV9msRJA"  # main API TOKEN
 
 manager = None
 shared_list = None
