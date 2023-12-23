@@ -1,6 +1,6 @@
 from aiogram import Bot, Dispatcher
 from tvDatafeed import Interval
-from pandas import DataFrame, read_csv, concat
+from pandas import DataFrame, read_csv, concat, to_datetime
 import configparser
 
 import logging
