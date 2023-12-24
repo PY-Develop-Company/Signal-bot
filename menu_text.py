@@ -32,10 +32,11 @@ def get_select_language_markup():
 
 def get_statistics_period_markup(languageCode):
     stats_markup = types.InlineKeyboardMarkup(row_width=4).add(
-        types.InlineKeyboardButton(languageFile[languageCode]["period_1_day"], callback_data=f"show_stats_{1}"),
-        types.InlineKeyboardButton(languageFile[languageCode]["period_7_days"], callback_data=f"show_stats_{7}"),
-        types.InlineKeyboardButton(languageFile[languageCode]["period_1_month"], callback_data=f"show_stats_{30}"),
-        types.InlineKeyboardButton(languageFile[languageCode]["period_1_year"], callback_data=f"show_stats_{365}"))
+        types.InlineKeyboardButton(languageFile[languageCode]["period_today"], callback_data=f"show_stats_today_{1}"),
+        types.InlineKeyboardButton(languageFile[languageCode]["period_yesterday"], callback_data=f"show_stats_yesterday_{1}"),
+        types.InlineKeyboardButton(languageFile[languageCode]["period_7_days"], callback_data=f"show_stats_n_{7}"),
+        types.InlineKeyboardButton(languageFile[languageCode]["period_1_month"], callback_data=f"show_stats_n_{30}"),
+        types.InlineKeyboardButton(languageFile[languageCode]["period_1_year"], callback_data=f"show_stats_n_{365}"))
     return stats_markup
 
 
