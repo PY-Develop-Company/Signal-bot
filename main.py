@@ -44,15 +44,21 @@ start_img_path = "img/logo.jpg"
 last_check_time = now_time()
 
 
-def get_stats_for_days(days_count):
+def get_stats_for_days(start_time, days_count):
     df = read_csv(signals_stats_path, index_col=[0])
     df["close_time"] = to_datetime(df["close_time"])
 
-    limit_time = now_time() - timedelta(days=days_count)
-    df = df[df["close_time"] >= limit_time]
+    limit_time = start_time - timedelta(days=days_count)
+    df = df[(start_time > df["close_time"]) & (df["close_time"] >= limit_time)]
     profit_array = df["is_profit"].value_counts()
 
-    return profit_array[True], profit_array[False]
+    profit_count = 0
+    loss_count = 0
+    if True in profit_array:
+        profit_count = profit_array[True]
+    if False in profit_array:
+        loss_count = profit_array[False]
+    return profit_count, loss_count
 
 
 def update_last_user_list_message(message):
@@ -454,12 +460,30 @@ async def manage_user_callback(call: types.CallbackQuery):
 
 @dp.callback_query_handler(text_contains="show_stats_")
 async def manage_user_callback(call: types.CallbackQuery):
+    stats_type = call.data.split("_")[-2]
     days_count = int(call.data.split("_")[-1])
-    profit_count, loss_count = get_stats_for_days(days_count)
-    persent = round(profit_count / (profit_count + loss_count)*100)
+    start_time = now_time()
+    period_str = stats_type
+
+    if stats_type == "n":
+        period_str = f"{days_count} days"
+    elif stats_type == "yesterday":
+        start_time -= timedelta(hours=start_time.hour, minutes=start_time.minute, seconds=start_time.second)
+    elif stats_type == "today":
+        days_count = timedelta(hours=start_time.hour, minutes=start_time.minute, seconds=start_time.second).total_seconds() / 60 / 60 / 24
+
+    profit_count, loss_count = get_stats_for_days(start_time, days_count)
+    signals_count = profit_count + loss_count
+
+    if signals_count == 0:
+        persent = 50
+        alter_persent = 50
+    else:
+        persent = round(profit_count / (profit_count + loss_count)*100)
+        alter_persent = 100-persent
 
     await bot.send_message(call.message.chat.id,
-                           text=languageFile[get_user_language(call.message.chat.id)]["statistics_text"].format(days_count, f"{persent}:{100-persent}", profit_count, loss_count))
+                           text=languageFile[get_user_language(call.message.chat.id)]["statistics_text"].format(period_str, f"{persent}:{alter_persent}", profit_count, loss_count))
     await call.answer(call.data)
 
 
