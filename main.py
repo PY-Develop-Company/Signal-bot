@@ -221,8 +221,6 @@ async def start_command(message):
     userLanguage = get_user_language(user_id)
     if get_user_status(user_id) == id_status:
         await send_message_to_user(user_id, languageFile[userLanguage]["accept_id_message_text"])
-    elif get_user_status(user_id) == deposit_status:
-        await send_message_to_user(user_id, languageFile[userLanguage]["start_vip_text"])
     elif get_user_status(user_id) == wait_deposit_status:
         await send_message_to_user(user_id, languageFile[userLanguage]["wait_deposit_status"])
     elif get_user_status(user_id) == wait_id_status:
