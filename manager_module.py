@@ -1,5 +1,6 @@
-import os
 from user_module import *
+from DBModul import *
+
 
 manager_username = "@JOKER_C_VAMI"
 tester_ids = [741867026, 693562775, 5359645780]
@@ -11,59 +12,75 @@ search_deposit_manager_status = "пошук депозиту статус"
 none_manager_status = "none"
 
 
-def get_url(manager_id):
-    return f"users/{manager_id}.txt"
-
-
-async def add_manager(message):
-    url = f"users/{message.from_user.id}.txt"
-    if f"{message.from_user.id}.txt" in os.listdir("users/"):
-        ...
-    else:
-        data = {"id": message.from_user.id, "status": none_manager_status, "do": "none", "language": startLanguage}
-        file_manager.write_file(url, data)
+async def add_manager(id):
+    cursor = db_connection.cursor()
+    cursor.execute(f"SELECT id FROM {manager_table} WHERE id = ?", (id,))
+    existing_user = cursor.fetchone()
+    if not existing_user:
+        cursor.execute(f'''INSERT INTO {manager_table} (id, status, do, language) VALUES (?, ?, ?, ?)''', (id, none_manager_status, "none", startLanguage))
+        db_connection.commit()
 
 
 def get_manager_language(id):
-    url = get_url(id)
-    manager = file_manager.read_file(url)
-    return manager["language"]
+    cursor = db_connection.cursor()
+    try:
+        cursor.execute(f"SELECT language FROM {manager_table} WHERE id = ?", (id,))
+        language = cursor.fetchone()[0]
+        return language
+    except sqlite3.Error as error:
+        print(f"Error fetching manager's language: {error}")
+        return None
 
 
 def set_manager_language(id, language):
-    url = get_url(id)
-    manager = file_manager.read_file(url)
-    manager["language"] = language
-    file_manager.write_file(url, manager)
+    cursor = db_connection.cursor()
+    try:
+        cursor.execute(f"UPDATE {manager_table} SET language = ? WHERE id = ?", (language, id))
+        db_connection.commit()
+    except sqlite3.Error as error:
+        print(f"Error set language manager {id}: {error}")
 
 
 def update_manager_do(manager_id, do):
-    url = get_url(manager_id)
-    manager = file_manager.read_file(url)
-    manager["do"] = do
-    file_manager.write_file(url, manager)
+    cursor = db_connection.cursor()
+    try:
+        cursor.execute(f"UPDATE {manager_table} SET do = ? WHERE id = ?", (do, manager_id))
+        db_connection.commit()
+    except sqlite3.Error as error:
+        print(f"Error updating manager's 'do': {error}, {(do, manager_id)}")
 
 
 async def update_manager_status(manager_id, status):
-    url = get_url(manager_id)
-    manager = file_manager.read_file(url)
-    manager["status"] = status
-    file_manager.write_file(url, manager)
+    cursor = db_connection.cursor()
+    try:
+        cursor.execute(f"UPDATE {manager_table} SET status = ? WHERE id = ?", (status, manager_id))
+        db_connection.commit()
+    except sqlite3.Error as error:
+        print(f"Error updating manager's 'status': {error}")
 
 
 def get_manager_do(manager_id):
-    url = get_url(manager_id)
-    manager = file_manager.read_file(url)
-    return manager["do"]
+    try:
+        cursor = db_connection.cursor()
+        cursor.execute(f"SELECT do FROM {manager_table} WHERE id = {manager_id}")
+        do = cursor.fetchone()[0]
+        return do
+    except sqlite3.Error as error:
+        print(f"Error get manager 'do': {error}, {manager_id}")
+        return None
 
 
-def get_manager_user_acount(manager_id):
-    url = get_url(manager_id)
-    manager = file_manager.read_file(url)
-    return get_user_account_number(int(manager["do"]))
+def get_manager_user_account(manager_id):
+    return get_user_account_number(get_manager_do(manager_id))
 
 
 def is_manager_status(manager_id, status):
-    url = get_url(manager_id)
-    manager = file_manager.read_file(url)
-    return manager["status"] == status
+    connection = db_connection
+    cursor = connection.cursor()
+    try:
+        cursor.execute(f"SELECT status FROM {manager_table} WHERE id = ?", (manager_id,))
+        status = cursor.fetchone()
+        return status and status[0] == status
+    except sqlite3.Error as error:
+        print(f"Error fetching manager's status: {error}")
+        return False

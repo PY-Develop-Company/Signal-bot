@@ -13,6 +13,8 @@ currencies_path = "./users/currencies.txt"
 currencies_data_path = "./currencies_data/"
 currency_check_ended = "currencies_data/check_ended/"
 
+timeout_secs = 180
+
 currencies_last_analize_date = {}
 tv = TvDatafeed()
 tvl = TvDatafeedLive()
@@ -188,9 +190,9 @@ def create_parce_currencies_with_intervals_callbacks(pds: [PriceData]):
     tv = TvDatafeed()
     try:
         for pd in pds:
-            seis = tvl.new_seis(pd.symbol, pd.exchange, pd.interval)
+            seis = tvl.new_seis(pd.symbol, pd.exchange, pd.interval, timeout=timeout_secs)
             print("seis", seis)
-            consumer = tvl.new_consumer(seis, update_currency_file_consumer)
+            consumer = tvl.new_consumer(seis, update_currency_file_consumer, timeout=timeout_secs)
     except ValueError as e:
         print("Error1", e)
     except Exception as e:

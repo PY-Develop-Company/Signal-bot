@@ -5,8 +5,20 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c8e52443-fb39-41fa-9e09-4877251a22f1" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/DBModul.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/analized_signals_table.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/signals_table.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/language.json" beforeDir="false" afterPath="$PROJECT_DIR$/language.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/manager_module.py" beforeDir="false" afterPath="$PROJECT_DIR$/manager_module.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu_text.py" beforeDir="false" afterPath="$PROJECT_DIR$/menu_text.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/db_upgrade.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/ta_test.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tv_signals/price_parser.py" beforeDir="false" afterPath="$PROJECT_DIR$/tv_signals/price_parser.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tv_signals/signal_maker.py" beforeDir="false" afterPath="$PROJECT_DIR$/tv_signals/signal_maker.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user_module.py" beforeDir="false" afterPath="$PROJECT_DIR$/user_module.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/file_manager.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils/file_manager.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/interval_convertor.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils/interval_convertor.py" afterDir="false" />
     </list>
     <list id="cbe571c8-b52a-4250-a9e3-ad1313cd5330" name="Changes by Alex" comment="" />
     <list id="45a04bb1-6fd8-4553-b69b-26e161c06906" name="Changes by Roma lox" comment="" />
@@ -56,6 +68,7 @@
     "codeWithMe.voiceChat.enabledByDefault": "false",
     "git-widget-placeholder": "jocker",
     "last_opened_file_path": "C:/Users/Alex/Projects/Programming/Vilors/Signal-bot",
+    "node.js.selected.package.tslint": "(autodetect)",
     "settings.editor.selected.configurable": "project.propVCSSupport.Mappings"
   }
 }]]></component>
@@ -64,16 +77,17 @@
       <recent name="C:\Users\Alex\Projects\Programming\Vilors\Signal-bot\img" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\Alex\Projects\Programming\Vilors\Signal-bot" />
       <recent name="C:\Users\Alex\Projects\Programming\Vilors\Signal-bot\debug\smth" />
       <recent name="C:\Users\Alex\Projects\Programming\Vilors\Signal-bot\debug\new_clasic" />
       <recent name="C:\Users\Alex\Projects\Programming\Vilors\Signal-bot\debug\new_extra" />
       <recent name="C:\Users\Alex\Projects\Programming\Vilors\Signal-bot\debug\clasic" />
-      <recent name="C:\Users\Alex\Projects\Programming\Vilors\Signal-bot\currencies_data" />
     </key>
   </component>
   <component name="RunManager" selected="Python.main">
     <configuration name="indicators_reader" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="Signal-bot" />
+      <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
@@ -84,6 +98,7 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
       <option name="SCRIPT_NAME" value="C:\Users\Alex\Projects\Programming\Vilors\Signal-bot\indicators_reader.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
@@ -95,6 +110,7 @@
     </configuration>
     <configuration name="interval_convertor" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="Signal-bot" />
+      <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
@@ -105,6 +121,7 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/interval_convertor.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
@@ -116,6 +133,7 @@
     </configuration>
     <configuration name="main" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
       <module name="Signal-bot" />
+      <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
@@ -126,6 +144,7 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/main.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
@@ -137,6 +156,7 @@
     </configuration>
     <configuration name="signal_maker" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="Signal-bot" />
+      <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
@@ -147,6 +167,7 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/signal_maker.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
@@ -158,6 +179,7 @@
     </configuration>
     <configuration name="signals" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="Signal-bot" />
+      <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
@@ -168,6 +190,7 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/signals.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
@@ -179,6 +202,7 @@
     </configuration>
     <configuration name="ta_test" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="Signal-bot" />
+      <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
@@ -189,6 +213,7 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/ta_test.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
@@ -229,5 +254,8 @@
         </entry>
       </map>
     </option>
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/Signal_bot$main.coverage" NAME="main Coverage Results" MODIFIED="1703777464125" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>

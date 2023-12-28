@@ -1,20 +1,19 @@
-from pandas import DataFrame, Timedelta, read_csv
+from pandas import Timedelta
 
 from tvDatafeed import Interval
+
 import asyncio
 
 from datetime import datetime
 
-from tv_signals.analizer import NewMultitimeframeAnalizer, VOBAnalizer, MultitimeframeAnalizer
+from tv_signals.analizer import NewMultitimeframeAnalizer
 from tv_signals.signal_types import *
 
-from utils import file_manager, interval_convertor
+from utils import interval_convertor
 
 username = 't4331662@gmail.com'
 password = 'Pxp626AmH7_'
 
-signals_data_path = "./signals/"
-signals_check_ended = "./signals/check_ended/"
 signals_analysis_last_date = {}
 signal_last_update = datetime.now()
 
@@ -38,56 +37,6 @@ async def close_position(position_open_price_original, signal: Signal, pd: Price
 
     msg, is_profit_position = signal.get_close_position_signal_message(pd, open_price, close_price, bars_count)
     return msg, is_profit_position, open_price, close_price
-
-
-def save_signal_file(df, pd: PriceData):
-    interval = str(pd.interval).replace(".", "")
-    path = signals_data_path + pd.symbol + interval + ".csv"
-    df.to_csv(path)
-    with open(f"{signals_check_ended}{pd.symbol}{str(pd.interval).replace('.', '')}.txt", "w") as file:
-        pass
-
-
-def is_signal_analized(pd):
-    path = signals_check_ended + pd.symbol + str(pd.interval).replace(".", "") + ".txt"
-    return file_manager.is_file_exists(path)
-
-
-def is_signals_analized(prices_data):
-    prev_pd = None
-    for pd in prices_data:
-        prev_pd = pd
-        path = signals_check_ended + pd.symbol + str(pd.interval).replace(".", "") + ".txt"
-        if not file_manager.is_file_exists(path):
-            # print("\tnot created ", path)
-            return False, None
-
-    path = signals_data_path + prev_pd.symbol + str(prev_pd.interval).replace(".", "") + ".csv"
-    if file_manager.is_file_exists(path):
-        df = read_csv(path)
-        date = datetime.strptime(df.date[0], '%Y-%m-%d %H:%M:%S')
-        return True, date
-    return False, None
-
-
-def read_signal_data(pd: PriceData):
-    interval = str(pd.interval).replace(".", "")
-    path = signals_check_ended + pd.symbol + interval + ".txt"
-    if not file_manager.is_file_exists(path):
-        return None
-    path = signals_data_path + pd.symbol + interval + ".csv"
-    if not file_manager.is_file_exists(path):
-        return None
-
-    df = read_csv(path)
-    return df
-
-
-def reset_signals_files(prices_data: [PriceData]):
-    for pd in prices_data:
-        interval = str(pd.interval).replace(".", "")
-        path = signals_check_ended + pd.symbol + interval + ".txt"
-        file_manager.delete_file_if_exists(path)
 
 
 def is_all_charts_collected(main_pd: PriceData, parent_pds: [PriceData]):
@@ -115,6 +64,7 @@ def is_all_charts_collected(main_pd: PriceData, parent_pds: [PriceData]):
         if not (parent_df_last_bar_checked == needed_bar):
             res = False
             break
+    # print(real_bars, expected_bars)
     return res
 
 
@@ -142,12 +92,8 @@ def analize_currency_data_controller(analize_pds, additional_pds):
         open_position_price = main_price_df.close[0]
         msg = signal.get_open_msg_text(main_pd, deal_time)
 
-        data = [[has_signal, signal.type, msg, main_price_df.datetime[0], open_position_price, main_pd.interval,
-                 main_pd.symbol, main_pd.exchange, deal_time, debug, start_analize_time]]
-        columns = ["has_signal", "signal_type", "msg", "date", "open_price", "interval", "symbol", "exchange",
-                   "deal_time", "debug", "start_analize_time"]
-        df = DataFrame(data, columns=columns)
-        save_signal_file(df, main_pd)
+        AnalizedSignalsTable.add_analized_signal(main_pd, main_price_df.datetime[0], has_signal, signal.type,
+                                                 deal_time, open_position_price, msg, start_analize_time)
 
         print("Created signal file:", msg, main_price_df.datetime[0])
 
@@ -162,4 +108,3 @@ def analize_currency_data_controller(analize_pds, additional_pds):
             await asyncio.sleep(3)
 
     asyncio.run(analize_currency_data_loop(analize_pds, additional_pds))
-

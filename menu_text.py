@@ -95,14 +95,15 @@ def get_users_markup(languageCode):
 
 
 def get_markup_with_status(user_id, status):
+    user_language = get_user_language(user_id)
     if user_id in manager_module.managers_id:
-        return get_manager_markup(get_user_language(user_id))
+        return get_manager_markup(user_language)
     else:
         if status in [none_status]:
-            return get_no_vip_markup(get_user_language(user_id))
+            return get_no_vip_markup(user_language)
         elif status in [deposit_status, trial_status]:
-            return get_vip_markup(get_user_language(user_id))
+            return get_vip_markup(user_language)
         elif status in [wait_id_status, wait_deposit_status, id_status]:
-            return get_half_vip_markup(get_user_language(user_id))
+            return get_half_vip_markup(user_language)
         elif status in [wait_id_input_status]:
             return get_empty_markup()
