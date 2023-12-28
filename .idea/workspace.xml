@@ -5,11 +5,151 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c8e52443-fb39-41fa-9e09-4877251a22f1" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/Signal-bot.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Signal-bot.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config.ini" beforeDir="false" afterPath="$PROJECT_DIR$/config.ini" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/currencies_data/AUDCADIntervalin_15_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/AUDCADIntervalin_15_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/currencies_data/AUDCADIntervalin_1_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/AUDCADIntervalin_1_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/currencies_data/AUDCADIntervalin_30_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/AUDCADIntervalin_30_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/currencies_data/AUDCADIntervalin_3_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/AUDCADIntervalin_3_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/currencies_data/AUDCADIntervalin_5_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/AUDCADIntervalin_5_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/currencies_data/AUDCHFIntervalin_1_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/AUDCHFIntervalin_1_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/currencies_data/AUDCHFIntervalin_3_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/AUDCHFIntervalin_3_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/currencies_data/AUDJPYIntervalin_1_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/AUDJPYIntervalin_1_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/currencies_data/AUDJPYIntervalin_3_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/AUDJPYIntervalin_3_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/currencies_data/AUDUSDIntervalin_15_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/AUDUSDIntervalin_15_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/currencies_data/AUDUSDIntervalin_1_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/AUDUSDIntervalin_1_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/currencies_data/AUDUSDIntervalin_30_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/AUDUSDIntervalin_30_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/currencies_data/AUDUSDIntervalin_3_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/AUDUSDIntervalin_3_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/currencies_data/AUDUSDIntervalin_5_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/AUDUSDIntervalin_5_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/currencies_data/EURCADIntervalin_1_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/EURCADIntervalin_1_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/currencies_data/EURCADIntervalin_3_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/EURCADIntervalin_3_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/currencies_data/EURCADIntervalin_5_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/EURCADIntervalin_5_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/currencies_data/EURJPYIntervalin_15_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/EURJPYIntervalin_15_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/currencies_data/EURJPYIntervalin_1_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/EURJPYIntervalin_1_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/currencies_data/EURJPYIntervalin_30_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/EURJPYIntervalin_30_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/currencies_data/EURJPYIntervalin_3_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/EURJPYIntervalin_3_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/currencies_data/EURJPYIntervalin_5_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/EURJPYIntervalin_5_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/currencies_data/EURUSDIntervalin_15_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/EURUSDIntervalin_15_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/currencies_data/EURUSDIntervalin_1_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/EURUSDIntervalin_1_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/currencies_data/EURUSDIntervalin_30_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/EURUSDIntervalin_30_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/currencies_data/EURUSDIntervalin_3_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/EURUSDIntervalin_3_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/currencies_data/EURUSDIntervalin_5_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/EURUSDIntervalin_5_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/currencies_data/GBPAUDIntervalin_1_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/GBPAUDIntervalin_1_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/currencies_data/GBPAUDIntervalin_3_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/GBPAUDIntervalin_3_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/currencies_data/GBPUSDIntervalin_1_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/GBPUSDIntervalin_1_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/currencies_data/GBPUSDIntervalin_3_minute.csv" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/GBPUSDIntervalin_3_minute.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/currencies_data/check_ended/AUDCADIntervalin_15_minute.txt" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/check_ended/AUDCADIntervalin_15_minute.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/currencies_data/check_ended/AUDCADIntervalin_1_minute.txt" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/check_ended/AUDCADIntervalin_1_minute.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/currencies_data/check_ended/AUDCADIntervalin_30_minute.txt" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/check_ended/AUDCADIntervalin_30_minute.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/currencies_data/check_ended/AUDCADIntervalin_3_minute.txt" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/check_ended/AUDCADIntervalin_3_minute.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/currencies_data/check_ended/AUDCADIntervalin_5_minute.txt" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/check_ended/AUDCADIntervalin_5_minute.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/currencies_data/check_ended/AUDCHFIntervalin_1_minute.txt" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/check_ended/AUDCHFIntervalin_1_minute.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/currencies_data/check_ended/AUDCHFIntervalin_3_minute.txt" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/check_ended/AUDCHFIntervalin_3_minute.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/currencies_data/check_ended/AUDJPYIntervalin_1_minute.txt" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/check_ended/AUDJPYIntervalin_1_minute.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/currencies_data/check_ended/AUDJPYIntervalin_3_minute.txt" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/check_ended/AUDJPYIntervalin_3_minute.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/currencies_data/check_ended/AUDUSDIntervalin_15_minute.txt" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/check_ended/AUDUSDIntervalin_15_minute.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/currencies_data/check_ended/AUDUSDIntervalin_1_minute.txt" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/check_ended/AUDUSDIntervalin_1_minute.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/currencies_data/check_ended/AUDUSDIntervalin_30_minute.txt" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/check_ended/AUDUSDIntervalin_30_minute.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/currencies_data/check_ended/AUDUSDIntervalin_3_minute.txt" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/check_ended/AUDUSDIntervalin_3_minute.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/currencies_data/check_ended/AUDUSDIntervalin_5_minute.txt" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/check_ended/AUDUSDIntervalin_5_minute.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/currencies_data/check_ended/EURCADIntervalin_1_minute.txt" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/check_ended/EURCADIntervalin_1_minute.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/currencies_data/check_ended/EURCADIntervalin_3_minute.txt" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/check_ended/EURCADIntervalin_3_minute.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/currencies_data/check_ended/EURCADIntervalin_5_minute.txt" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/check_ended/EURCADIntervalin_5_minute.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/currencies_data/check_ended/EURJPYIntervalin_15_minute.txt" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/check_ended/EURJPYIntervalin_15_minute.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/currencies_data/check_ended/EURJPYIntervalin_1_minute.txt" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/check_ended/EURJPYIntervalin_1_minute.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/currencies_data/check_ended/EURJPYIntervalin_30_minute.txt" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/check_ended/EURJPYIntervalin_30_minute.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/currencies_data/check_ended/EURJPYIntervalin_3_minute.txt" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/check_ended/EURJPYIntervalin_3_minute.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/currencies_data/check_ended/EURJPYIntervalin_5_minute.txt" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/check_ended/EURJPYIntervalin_5_minute.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/currencies_data/check_ended/EURUSDIntervalin_15_minute.txt" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/check_ended/EURUSDIntervalin_15_minute.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/currencies_data/check_ended/EURUSDIntervalin_1_minute.txt" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/check_ended/EURUSDIntervalin_1_minute.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/currencies_data/check_ended/EURUSDIntervalin_30_minute.txt" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/check_ended/EURUSDIntervalin_30_minute.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/currencies_data/check_ended/EURUSDIntervalin_3_minute.txt" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/check_ended/EURUSDIntervalin_3_minute.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/currencies_data/check_ended/EURUSDIntervalin_5_minute.txt" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/check_ended/EURUSDIntervalin_5_minute.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/currencies_data/check_ended/GBPAUDIntervalin_1_minute.txt" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/check_ended/GBPAUDIntervalin_1_minute.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/currencies_data/check_ended/GBPAUDIntervalin_3_minute.txt" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/check_ended/GBPAUDIntervalin_3_minute.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/currencies_data/check_ended/GBPUSDIntervalin_1_minute.txt" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/check_ended/GBPUSDIntervalin_1_minute.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/currencies_data/check_ended/GBPUSDIntervalin_3_minute.txt" beforeDir="false" afterPath="$PROJECT_DIR$/currencies_data/check_ended/GBPUSDIntervalin_3_minute.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/db_upgrade.py" beforeDir="false" afterPath="$PROJECT_DIR$/db_upgrade.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/manager_module.py" beforeDir="false" afterPath="$PROJECT_DIR$/manager_module.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sended_signals/time11_25_GBPUSD_Intervalin_1_minute" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/sended_signals/time11_27_GBPUSD_Intervalin_1_minute" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/sended_signals/time12_39_GBPAUD_Intervalin_5_minute" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/sended_signals/time12_42_AUDJPY_Intervalin_1_minute" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/sended_signals/time12_44_GBPAUD_Intervalin_5_minute" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/sended_signals/time12_46_EURCAD_Intervalin_1_minute" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/sended_signals/time12_47_AUDJPY_Intervalin_1_minute" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/sended_signals/time12_48_EURJPY_Intervalin_3_minute" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/sended_signals/time12_52_GBPAUD_Intervalin_3_minute" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/sended_signals/time12_54_EURUSD_Intervalin_3_minute" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/sended_signals/time12_56_GBPAUD_Intervalin_1_minute" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/sended_signals/time12_58_EURUSD_Intervalin_1_minute" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/sended_signals/time13_14_GBPAUD_Intervalin_5_minute" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/sended_signals/time13_16_GBPAUD_Intervalin_1_minute" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/sended_signals/time17_33_AUDUSD_Intervalin_1_minute" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/sended_signals/time18_28_GBPUSD_Intervalin_1_minute" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/sended_signals/time18_50_EURCAD_Intervalin_1_minute" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/sended_signals/time18_8_EURJPY_Intervalin_1_minute" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/sended_signals/time19_25_GBPAUD_Intervalin_5_minute" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/sended_signals/time19_3_AUDCAD_Intervalin_3_minute" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/sended_signals/time19_9_EURJPY_Intervalin_1_minute" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/sended_signals/time3_40_AUDUSD_Intervalin_5_minute" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/sended_signals/time3_50_AUDCHF_Intervalin_5_minute" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/sended_signals/time3_56_EURCAD_Intervalin_1_minute" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/sended_signals/time4_25_GBPUSD_Intervalin_5_minute" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/sended_signals/time4_2_AUDJPY_Intervalin_1_minute" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/sended_signals/time4_32_AUDUSD_Intervalin_1_minute" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/sended_signals/time4_39_AUDUSD_Intervalin_3_minute" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/sended_signals/time4_8_GBPAUD_Intervalin_1_minute" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/signals/AUDCADIntervalin_5_minute.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/signals/AUDCHFIntervalin_5_minute.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/signals/AUDJPYIntervalin_5_minute.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/signals/AUDUSDIntervalin_5_minute.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/signals/EURCADIntervalin_5_minute.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/signals/EURJPYIntervalin_5_minute.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/signals/EURUSDIntervalin_5_minute.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/signals/GBPAUDIntervalin_5_minute.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/signals/GBPUSDIntervalin_5_minute.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/signals/check_ended/AUDCADIntervalin_1_minute.txt" beforeDir="false" afterPath="$PROJECT_DIR$/DBModul.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/signals/check_ended/AUDCADIntervalin_3_minute.txt" beforeDir="false" afterPath="$PROJECT_DIR$/analized_signals_table.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/signals/check_ended/AUDCADIntervalin_5_minute.txt" beforeDir="false" afterPath="$PROJECT_DIR$/signals_table.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/signals/check_ended/AUDUSDIntervalin_1_minute.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/signals/check_ended/AUDUSDIntervalin_3_minute.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/signals/check_ended/EURUSDIntervalin_1_minute.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/signals/check_ended/EURUSDIntervalin_3_minute.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/signals/check_ended/EURUSDIntervalin_5_minute.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/user_module.py" beforeDir="false" afterPath="$PROJECT_DIR$/user_module.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/users/db.txt" beforeDir="false" afterPath="$PROJECT_DIR$/users/db.txt" afterDir="false" />
     </list>
-    <list id="cbe571c8-b52a-4250-a9e3-ad1313cd5330" name="Changes by Alex" comment="" />
-    <list id="48029012-d7c5-49d8-850d-060bbfa1276c" name="Changes by Roma lox" comment="" />
+    <list id="cbe571c8-b52a-4250-a9e3-ad1313cd5330" name="Changes by Alex" comment="">
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/price_parser.py" beforeDir="false" afterPath="$PROJECT_DIR$/price_parser.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/signal_maker.py" beforeDir="false" afterPath="$PROJECT_DIR$/signal_maker.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/signals/AUDCADIntervalin_1_minute.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/signals/AUDCADIntervalin_3_minute.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/signals/AUDCHFIntervalin_1_minute.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/signals/AUDCHFIntervalin_3_minute.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/signals/AUDJPYIntervalin_1_minute.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/signals/AUDJPYIntervalin_3_minute.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/signals/AUDUSDIntervalin_1_minute.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/signals/AUDUSDIntervalin_3_minute.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/signals/EURCADIntervalin_1_minute.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/signals/EURCADIntervalin_3_minute.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/signals/EURJPYIntervalin_1_minute.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/signals/EURJPYIntervalin_3_minute.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/signals/EURUSDIntervalin_1_minute.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/signals/EURUSDIntervalin_3_minute.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/signals/GBPAUDIntervalin_1_minute.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/signals/GBPAUDIntervalin_3_minute.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/signals/GBPUSDIntervalin_1_minute.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/signals/GBPUSDIntervalin_3_minute.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/user_module.py" beforeDir="false" afterPath="$PROJECT_DIR$/user_module.py" afterDir="false" />
+    </list>
+    <list id="73581503-abda-4dcc-8ad0-174eae78c264" name="Changes by Roma lox" comment="">
+      <change beforePath="$PROJECT_DIR$/config.ini" beforeDir="false" afterPath="$PROJECT_DIR$/config.ini" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+    </list>
     <list id="7fa9b9cd-5f0a-41aa-bb8c-dd6d412d680c" name="Changes by SIRIUS" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -28,6 +168,74 @@
   </component>
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$PROJECT_DIR$/users/db.txt" root0="SKIP_HIGHLIGHTING" />
+  </component>
+  <component name="LineStatusTrackerManager">
+    <file path="$PROJECT_DIR$/user_module.py">
+      <ranges>
+        <range start1="1" end1="1" start2="1" end2="3" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
+        <range start1="5" end1="6" start2="7" end2="8" changelist="cbe571c8-b52a-4250-a9e3-ad1313cd5330" />
+        <range start1="7" end1="7" start2="9" end2="12" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
+        <range start1="27" end1="29" start2="32" end2="37" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
+        <range start1="30" end1="34" start2="38" end2="58" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
+        <range start1="39" end1="41" start2="63" end2="65" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
+        <range start1="44" end1="51" start2="68" end2="76" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
+        <range start1="69" end1="70" start2="94" end2="102" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
+        <range start1="97" end1="103" start2="129" end2="146" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
+        <range start1="104" end1="105" start2="147" end2="152" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
+        <range start1="108" end1="109" start2="155" end2="158" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
+        <range start1="110" end1="112" start2="159" end2="159" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
+        <range start1="113" end1="127" start2="160" end2="180" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
+        <range start1="128" end1="130" start2="181" end2="185" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
+        <range start1="151" end1="152" start2="206" end2="208" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
+        <range start1="178" end1="179" start2="234" end2="236" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
+        <range start1="192" end1="193" start2="249" end2="250" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
+        <range start1="203" end1="204" start2="260" end2="261" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
+        <range start1="207" end1="216" start2="264" end2="275" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
+        <range start1="218" end1="224" start2="277" end2="285" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
+        <range start1="226" end1="230" start2="287" end2="291" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
+        <range start1="234" end1="237" start2="295" end2="304" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
+        <range start1="239" end1="243" start2="306" end2="310" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
+        <range start1="246" end1="257" start2="313" end2="326" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
+        <range start1="259" end1="268" start2="328" end2="340" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
+        <range start1="270" end1="273" start2="342" end2="348" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
+        <range start1="274" end1="277" start2="349" end2="355" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
+        <range start1="280" end1="301" start2="358" end2="382" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
+        <range start1="304" end1="311" start2="385" end2="389" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
+        <range start1="313" end1="321" start2="391" end2="399" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
+        <range start1="324" end1="330" start2="402" end2="406" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
+        <range start1="334" end1="336" start2="410" end2="412" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
+        <range start1="341" end1="343" start2="417" end2="419" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
+        <range start1="348" end1="350" start2="424" end2="426" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
+        <range start1="359" end1="360" start2="435" end2="436" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
+      </ranges>
+    </file>
+    <file path="$PROJECT_DIR$/main.py">
+      <ranges>
+        <range start1="11" end1="12" start2="11" end2="11" changelist="73581503-abda-4dcc-8ad0-174eae78c264" />
+        <range start1="15" end1="15" start2="14" end2="16" changelist="73581503-abda-4dcc-8ad0-174eae78c264" />
+        <range start1="40" end1="41" start2="41" end2="41" changelist="cbe571c8-b52a-4250-a9e3-ad1313cd5330" />
+        <range start1="47" end1="49" start2="47" end2="47" changelist="73581503-abda-4dcc-8ad0-174eae78c264" />
+        <range start1="50" end1="53" start2="48" end2="52" changelist="73581503-abda-4dcc-8ad0-174eae78c264" />
+        <range start1="54" end1="60" start2="53" end2="56" changelist="c8e52443-fb39-41fa-9e09-4877251a22f1" />
+        <range start1="535" end1="550" start2="531" end2="533" changelist="73581503-abda-4dcc-8ad0-174eae78c264" />
+        <range start1="552" end1="592" start2="535" end2="535" changelist="cbe571c8-b52a-4250-a9e3-ad1313cd5330" />
+        <range start1="595" end1="600" start2="538" end2="544" changelist="cbe571c8-b52a-4250-a9e3-ad1313cd5330" />
+        <range start1="601" end1="613" start2="545" end2="559" changelist="cbe571c8-b52a-4250-a9e3-ad1313cd5330" />
+        <range start1="617" end1="618" start2="563" end2="564" changelist="cbe571c8-b52a-4250-a9e3-ad1313cd5330" />
+        <range start1="619" end1="620" start2="565" end2="565" changelist="cbe571c8-b52a-4250-a9e3-ad1313cd5330" />
+        <range start1="622" end1="623" start2="567" end2="568" changelist="cbe571c8-b52a-4250-a9e3-ad1313cd5330" />
+        <range start1="624" end1="625" start2="569" end2="570" changelist="cbe571c8-b52a-4250-a9e3-ad1313cd5330" />
+        <range start1="626" end1="629" start2="571" end2="572" changelist="cbe571c8-b52a-4250-a9e3-ad1313cd5330" />
+        <range start1="632" end1="636" start2="575" end2="576" changelist="cbe571c8-b52a-4250-a9e3-ad1313cd5330" />
+        <range start1="637" end1="638" start2="577" end2="579" changelist="cbe571c8-b52a-4250-a9e3-ad1313cd5330" />
+        <range start1="640" end1="641" start2="581" end2="582" changelist="cbe571c8-b52a-4250-a9e3-ad1313cd5330" />
+        <range start1="659" end1="664" start2="600" end2="603" changelist="cbe571c8-b52a-4250-a9e3-ad1313cd5330" />
+        <range start1="666" end1="673" start2="605" end2="607" changelist="cbe571c8-b52a-4250-a9e3-ad1313cd5330" />
+        <range start1="674" end1="688" start2="608" end2="610" changelist="cbe571c8-b52a-4250-a9e3-ad1313cd5330" />
+        <range start1="690" end1="692" start2="612" end2="614" changelist="cbe571c8-b52a-4250-a9e3-ad1313cd5330" />
+        <range start1="695" end1="696" start2="617" end2="618" changelist="cbe571c8-b52a-4250-a9e3-ad1313cd5330" />
+      </ranges>
+    </file>
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -54,7 +262,7 @@
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;ShowUsagesActions.previewPropertyKey&quot;: &quot;true&quot;,
     &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;bwg-final&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;bwg&quot;,
     &quot;last_opened_file_path&quot;: &quot;C:/Users/Alex/Projects/Programming/Vilors/Signal-bot&quot;,
     &quot;settings.editor.selected.configurable&quot;: &quot;reference.settingsdialog.IDE.editor.colors&quot;
   }
@@ -72,6 +280,48 @@
     </key>
   </component>
   <component name="RunManager" selected="Python.main">
+    <configuration name="DBModul" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="Signal-bot" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/DBModul.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="analized_signals_table" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="Signal-bot" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/analized_signals_table.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="db_upgrade" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="Signal-bot" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -135,7 +385,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="signal_maker" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+    <configuration name="signals_table" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="Signal-bot" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -147,49 +397,7 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/signal_maker.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration name="ta_test" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
-      <module name="Signal-bot" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/ta_test.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration name="user_module" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
-      <module name="Signal-bot" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/user_module.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/signals_table.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -201,10 +409,10 @@
     <recent_temporary>
       <list>
         <item itemvalue="Python.db_upgrade" />
+        <item itemvalue="Python.signals_table" />
+        <item itemvalue="Python.analized_signals_table" />
+        <item itemvalue="Python.DBModul" />
         <item itemvalue="Python.market_info" />
-        <item itemvalue="Python.user_module" />
-        <item itemvalue="Python.signal_maker" />
-        <item itemvalue="Python.ta_test" />
       </list>
     </recent_temporary>
   </component>

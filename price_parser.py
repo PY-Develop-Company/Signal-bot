@@ -5,6 +5,7 @@ from pandas import DataFrame, read_csv
 import file_manager
 import interval_convertor
 import pytz
+from my_time import now_time
 
 trade_pause_wait_time = 600
 
@@ -47,15 +48,14 @@ class PriceData:
         interval = str(self.interval).replace(".", "")
         df.to_csv(currencies_data_path + self.symbol + interval + ".csv")
         with open(f"{currency_check_ended}{self.symbol}{str(self.interval).replace('.', '')}.txt", "w") as file:
-            time = datetime.now(pytz.timezone("Europe/Bucharest"))
-            file.write(str(time))
+            file.write(str(now_time()))
 
     def get_chart_download_time(self):
         try:
             with open(f"{currency_check_ended}{self.symbol}{str(self.interval).replace('.', '')}.txt", "r") as file:
-                res = datetime.strptime(file.read().split(".")[0], '%Y-%m-%d %H:%M:%S')
+                res = datetime.strptime(file.read(), '%Y-%m-%d %H:%M:%S')
         except Exception as e:
-            return datetime.strptime(str(datetime.now(pytz.timezone("Europe/Bucharest"))).split(".")[0], '%Y-%m-%d %H:%M:%S')
+            return now_time()
         return res
 
     def get_chart_data_if_exists(self):

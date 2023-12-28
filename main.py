@@ -9,10 +9,11 @@ from manager_module import *
 from menu_text import *
 import interval_convertor
 from signals import get_signal_by_type
-from pandas import DataFrame, read_csv, concat, to_datetime
 from my_time import *
 import configparser
 import random
+from signals_table import SignalsTable
+from analized_signals_table import AnalizedSignalsTable
 
 config = configparser.ConfigParser()
 config.read("config.ini")
@@ -38,26 +39,21 @@ send_msg_group_count = config["GENERAL"].getint("SendMsgGroupCount", fallback=20
 last_user_list_message = dict()
 last_user_manage_message = dict()
 
-signals_stats_path = "signals/signals.csv"
 start_img_path = "img/logo.jpg"
 
 last_check_time = now_time()
 
 
 def get_stats_for_days(start_time, days_count):
-    df = read_csv(signals_stats_path, index_col=[0])
-    df["close_time"] = to_datetime(df["close_time"])
 
-    limit_time = start_time - timedelta(days=days_count)
-    df = df[(start_time > df["close_time"]) & (df["close_time"] >= limit_time)]
-    profit_array = df["is_profit"].value_counts()
+    limit_time_secs = datetime_to_secs(start_time - timedelta(days=days_count))
+    start_time_secs = datetime_to_secs(start_time)
+    profits = SignalsTable.get_profit_data_in_period(start_time_secs, limit_time_secs)
+    profits = [prof[0] for prof in profits]
 
-    profit_count = 0
-    loss_count = 0
-    if True in profit_array:
-        profit_count = profit_array[True]
-    if False in profit_array:
-        loss_count = profit_array[False]
+    profit_count = profits.count(1)
+    loss_count = profits.count(0)
+
     return profit_count, loss_count
 
 
@@ -533,112 +529,57 @@ def handle_signal_msg_controller(signal, msg, pd: PriceData, open_position_price
                 set_next_signal_status(user, False)
 
         while True:
-            send_close_message_time = now_time()
-            columns = ["currency", "interval", "open_time", "close_time", "signal_type", "open_price", "close_price", "is_profit"]
-            data = [[pd.symbol, pd.interval, t2, send_close_message_time, signal.type, open_price, close_price, is_profit]]
-            try:
-                if not os.path.exists(signals_stats_path):
-                    df = DataFrame(data=[], columns=columns)
-                    df.to_csv(signals_stats_path)
-                df = read_csv(signals_stats_path, index_col=[0])
-                df_new = DataFrame(data=data, columns=columns)
-                df = concat([df, df_new], axis=0, ignore_index=True)
-                df.to_csv(signals_stats_path)
-                break
-            except Exception as e:
-                await asyncio.sleep(10)
-                print(f"ERROR Can`t write signal result to {signals_stats_path}", e)
+            send_close_msg_time = now_time()
+            SignalsTable.add_sended_signal(pd, deal_time, t2, send_close_msg_time, signal.type, open_price, close_price, is_profit)
 
     asyncio.run(handle_signal_msg(signal, msg, pd, open_position_price, deal_time, start_analize_time, shared_list))
 
 
-# async def print_stats(df, stats_name):
-#     profit_count = len(df[df["is_profit"]])
-#     lose_count = len(df[not df["is_profit"]])
-#     text = f"Total {stats_name} statistics:\n\tprofits: {profit_count};\n\tloses: {lose_count};\n"
-#     await send_message_to_users(managers_id, text)
-
-
-# async def try_send_stats():
-#     global last_check_time
-#     try:
-#         time_now = now_time()
-#         df = read_csv(signals_stats_path)
-#         df["close_time"] = to_datetime(df["close_time"])
-#         df["close_time_year"] = df["close_time"].apply(lambda row: row.year)
-#         df["close_time_week"] = df["close_time"].apply(lambda row: row.isocalendar()[1])
-#         df["close_time_date"] = df["close_time"].apply(lambda row: row.date())
-#         df["close_time_hour"] = df["close_time"].apply(lambda row: row.hour)
-#
-#         if time_now.hour != last_check_time.hour:
-#             print("send hour stats")
-#             hour_df = df[(df["close_time_date"] == last_check_time.date()) & (df["close_time_hour"] == last_check_time.hour)]
-#             if len(hour_df) > 0:
-#                 await print_stats(hour_df, f"day ({last_check_time.date()}) hour ({last_check_time.hour})")
-#         if time_now.day != last_check_time.day:
-#             print("send day stats")
-#             day_df = df[df["close_time_date"] == last_check_time.date()]
-#             if len(day_df) > 0:
-#                 await print_stats(day_df, f"day ({last_check_time.date()})")
-#         if time_now.isocalendar()[1] != last_check_time.isocalendar()[1]:
-#             print("send week stats", last_check_time.isocalendar()[1])
-#             week_df = df[(df["close_time_week"] == last_check_time.isocalendar()[1]) & (df["close_time_year"] == last_check_time.year)]
-#             if len(week_df) > 0:
-#                 start_week_day = last_check_time.date() - timedelta(days=6)
-#                 await print_stats(week_df, f"week ({start_week_day} to {last_check_time.date()})")
-#
-#         last_check_time = time_now
-#     except Exception as e:
-#         print("Error while sending stats", e)
-
-
 async def check_trial_users():
-    users_ids = get_users_with_status(trial_status)
-    for user_id in users_ids:
-        userLanguage = get_user_language(user_id)
-        if market_info.is_trial_ended(get_user_trial_end_date(user_id)):
-            remove_trial_from_user(user_id)
+    try:
+        users_ids = get_users_with_status(trial_status)
+        for user_id in users_ids:
+            userLanguage = get_user_language(user_id)
+            if market_info.is_trial_ended(get_user_trial_end_date(user_id)):
+                remove_trial_from_user(user_id)
 
-            markup = get_markup_with_status(user_id, get_user_status(user_id))
-            await send_message_to_user(user_id, languageFile[userLanguage]["ended_trial_text"], markup)
-            if get_user_status(user_id)==none_status:
-                await send_message_to_user(user_id, languageFile[userLanguage]["for_vip_text"])
-            elif get_user_status(user_id)==id_status:
-                await send_message_to_user(user_id, languageFile[userLanguage]["accept_id_message_text"])
-            elif get_user_status(user_id)==deposit_status:
-                await send_message_to_user(user_id, languageFile[userLanguage]["start_vip_text"])
-            elif get_user_status(user_id)==wait_deposit_status:
-                await send_message_to_user(user_id, languageFile[userLanguage]["wait_deposit_status"])
-            elif get_user_status(user_id)==wait_id_status:
-                await send_message_to_user(user_id, languageFile[userLanguage]["wait_id_status"])
+                markup = get_markup_with_status(user_id, get_user_status(user_id))
+                await send_message_to_user(user_id, languageFile[userLanguage]["ended_trial_text"], markup)
+                if get_user_status(user_id)==none_status:
+                    await send_message_to_user(user_id, languageFile[userLanguage]["for_vip_text"])
+                elif get_user_status(user_id)==id_status:
+                    await send_message_to_user(user_id, languageFile[userLanguage]["accept_id_message_text"])
+                elif get_user_status(user_id)==deposit_status:
+                    await send_message_to_user(user_id, languageFile[userLanguage]["start_vip_text"])
+                elif get_user_status(user_id)==wait_deposit_status:
+                    await send_message_to_user(user_id, languageFile[userLanguage]["wait_deposit_status"])
+                elif get_user_status(user_id)==wait_id_status:
+                    await send_message_to_user(user_id, languageFile[userLanguage]["wait_id_status"])
+    except Exception as e:
+        print("check_trial_users_ERROR", e)
 
 
 def signals_message_sender_controller(prices_data, prices_data_all, shared_list):
     async def signals_message_sender_function(signal_prices_data, all_prices_data, shared_list):
-        def reset_seis(signal_prices_data, all_prices_data):
+        def reset_seis(all_prices_data):
             price_parser.create_parce_currencies_with_intervals_callbacks(all_prices_data)
-            last_send_message_check = datetime_to_secs(now_time())
             for pd in all_prices_data:
                 pd.reset_chart_data()
-            signal_maker.reset_signals_files(signal_prices_data)
+            AnalizedSignalsTable.set_all_checked()
 
-            return last_send_message_check
+            return datetime_to_secs(now_time())
 
-        last_send_message_check = reset_seis(signal_prices_data, all_prices_data)
-
-        need_to_reset_seis = False
+        last_send_message_check = reset_seis(all_prices_data)
 
         while True:
             t1 = datetime_to_secs(now_time())
-            try:
-                await check_trial_users()
-            except Exception as e:
-                print("check_trial_users_ERROR", e)
+            await check_trial_users()
             t2 = datetime_to_secs(now_time())
-            print("new delay", t2-t1)
+            print("check_trial_users delay", t2-t1)
+
             need_to_reset_seis = last_send_message_check + reset_seis_wait_time < datetime_to_secs(now_time())
             if need_to_reset_seis:
-                last_send_message_check = reset_seis(signal_prices_data, all_prices_data)
+                last_send_message_check = reset_seis(all_prices_data)
                 continue
 
             await asyncio.sleep(3)
@@ -657,43 +598,24 @@ def signals_message_sender_controller(prices_data, prices_data_all, shared_list)
             if not market_info.is_market_working():
                 continue
 
-            created_prices_data = []
-            for pd in signal_prices_data:
-                if signal_maker.is_signal_analized(pd):
-                    created_prices_data.append(pd)
-            if len(created_prices_data) == 0:
+            unchecked_signals_df = AnalizedSignalsTable.get_unchecked_signals()
+            real_signals_df = unchecked_signals_df[unchecked_signals_df["has_signal"]]
+            if len(real_signals_df) == 0:
                 continue
 
-            last_send_message_check = datetime_to_secs(now_time())
+            signal_df_id = random.choice(real_signals_df.index)
+            df = real_signals_df[signal_df_id]
 
-            dfs_with_signals = []
-            for pd in created_prices_data:
-                df = signal_maker.read_signal_data(pd)
-                if df.has_signal[0]:
-                    dfs_with_signals.append(df)
-
-            if len(dfs_with_signals) == 0:
-                print("No signals detected. Deleting signal files:")
-                for pd in created_prices_data:
-                    pd.print()
-                signal_maker.reset_signals_files(created_prices_data)
-                continue
-
-            df = random.choice(dfs_with_signals)
-            signal = get_signal_by_type(df.signal_type[0])
-
-            time_now = now_time()
-            pd = PriceData(df.symbol[0], df.exchange[0], interval_convertor.str_to_interval(df.interval[0]))
-            path = f"sended_signals/time{time_now.hour}_{time_now.minute}_{pd.symbol}_{interval_convertor.interval_to_string(pd.interval).replace('.', '')}"
-            df.to_csv(path)
+            signal = get_signal_by_type(df.signal_type)
+            pd = PriceData(df.symbol, df.exchange, interval_convertor.str_to_interval(df.interval))
 
             multiprocessing.Process(target=handle_signal_msg_controller,
-                                    args=(signal, df.msg[0], pd, df.open_price[0], int(df.deal_time[0]),
-                                          df.start_analize_time[0], shared_list), daemon=True).start()
+                                    args=(signal, df.msg, pd, df.open_price, int(df.deal_time),
+                                          df.start_analize_time, shared_list), daemon=True).start()
 
             await asyncio.sleep(signal_search_delay)
 
-            signal_maker.reset_signals_files(signal_prices_data)
+            AnalizedSignalsTable.set_all_checked()
             last_send_message_check = datetime_to_secs(now_time())
 
     asyncio.run(signals_message_sender_function(prices_data, prices_data_all, shared_list))
