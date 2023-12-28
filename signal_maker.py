@@ -87,9 +87,7 @@ def analize_currency_data_controller(analize_pds, additional_pds):
         has_signal, signal, debug, deal_time = analizer.analize(prices_dfs, check_pds)
         open_position_price = main_price_df.close[0]
         msg = signal.get_open_msg_text(main_pd, deal_time)
-
-        has_signal = True
-        deal_time = 1
+        
         AnalizedSignalsTable.add_analized_signal(main_pd, main_price_df.datetime[0], has_signal, signal.type,
                                                  deal_time, open_position_price, msg, start_analize_time)
 
