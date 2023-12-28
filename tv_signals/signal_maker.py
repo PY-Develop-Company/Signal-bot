@@ -11,6 +11,8 @@ from tv_signals.signal_types import *
 
 from utils import interval_convertor
 
+from analized_signals_table import AnalizedSignalsTable
+
 username = 't4331662@gmail.com'
 password = 'Pxp626AmH7_'
 

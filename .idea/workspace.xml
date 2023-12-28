@@ -5,14 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c8e52443-fb39-41fa-9e09-4877251a22f1" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/img/Info.jpg" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tv_signals/signal_maker.py" beforeDir="false" afterPath="$PROJECT_DIR$/tv_signals/signal_maker.py" afterDir="false" />
     </list>
     <list id="cbe571c8-b52a-4250-a9e3-ad1313cd5330" name="Changes by Alex" comment="" />
     <list id="45a04bb1-6fd8-4553-b69b-26e161c06906" name="Changes by Roma lox" comment="" />
-    <list id="7fa9b9cd-5f0a-41aa-bb8c-dd6d412d680c" name="Changes by SIRIUS" comment="">
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-    </list>
+    <list id="7fa9b9cd-5f0a-41aa-bb8c-dd6d412d680c" name="Changes by SIRIUS" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
