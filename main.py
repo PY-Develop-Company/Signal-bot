@@ -158,17 +158,18 @@ async def open_menu(message, menu_markup, answer_text="none"):
 
 
 async def update_account_user(id, account_number):
-    data = file_manager.read_file(user_db_path)
-    for user in data:
-        found_user = user['id'] == id
-        if found_user:
-            user['account_number'] = account_number
-            if user['status'] == deposit_status:
-                await send_message_to_user(id, languageFile[get_user_language(id)]["get_vip_text"])
+    try:
+        cursor = DB_OPEN_WORK.cursor()
+        cursor.execute(f"UPDATE {user_table} SET account_number = ? WHERE id = ?", (account_number, id))
+        DB_OPEN_WORK.commit()
+        user_language = get_user_language(id)
+        if user_language:
+            if account_number == deposit_status:
+                await send_message_to_user(id, languageFile[user_language]["get_vip_text"])
             elif account_number == none_status:
-                await send_message_to_user(id, languageFile[get_user_language(id)]["reject_vip_text"])
-            break
-    file_manager.write_file(user_db_path, data)
+                await send_message_to_user(id, languageFile[user_language]["reject_vip_text"])
+    except sqlite3.Error as error:
+        print(f"Error update account {id}: {error}")
 
 
 async def show_users_list_to_user(user_id, is_next=True):

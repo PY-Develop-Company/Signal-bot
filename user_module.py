@@ -11,7 +11,6 @@ from pandas import read_sql_query, to_datetime
 
 db_connection = DBModul.DB_OPEN_WORK
 
-user_db_path = "users/db.txt"
 startLanguage = "none"
 
 current_users_pointer_max_dict = dict()
