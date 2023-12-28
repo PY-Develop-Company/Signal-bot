@@ -2,14 +2,14 @@ import asyncio
 
 import DBModul
 from my_time import secs_to_date
-import file_manager
 import manager_module
 import market_info
 from datetime import timedelta
 from my_time import datetime_to_str, now_time, str_to_datetime
 from DBModul import *
+from pandas import read_sql_query, to_datetime
 
-OpenedDB = DBModul.DB_OPEN_WORK
+db_connection = DBModul.DB_OPEN_WORK
 
 user_db_path = "users/db.txt"
 startLanguage = "none"
@@ -30,29 +30,28 @@ wait_deposit_status = 'status wait check Deposit'
 
 
 def find_user_with_id(id):
-    connection = OpenedDB
-    cursor = connection.cursor()
     try:
-        cursor.execute(f"SELECT * FROM {user_Table} WHERE id = ?", (id,))
-        user = cursor.fetchone()
+        sql_query = f"SELECT * FROM {user_table} WHERE id = {id}"
 
-        if user:
-            user_dict = {
-                "id": user[0],
-                "name": user[1],
-                "tag": user[2],
-                "language": user[3],
-                "status": user[4],
-                "account_number": user[5],
-                "had_trial_status": user[6],
-                "trial_end_date": user[7],
-                "before_trial_status": user[8],
-                "time": user[9],
-                "get_next_signal": user[10]
-            }
-            return user_dict
-        else:
+        df = read_sql_query(sql_query, db_connection)
+
+        if len(df) == 0:
             return None
+
+        user_dict = {
+            "id": df["id"][0],
+            "name": df["name"][0],
+            "tag": df["tag"][0],
+            "language": df["language"][0],
+            "status": df["status"][0],
+            "account_number": df["account_number"][0],
+            "had_trial_status": df["had_trial_status"][0],
+            "trial_end_date": df["trial_end_date"][0],
+            "before_trial_status": df["before_trial_status"][0],
+            "time": df["time"][0],
+            "get_next_signal": df["get_next_signal"][0],
+        }
+        return user_dict
     except sqlite3.Error as error:
         print(f"Error find user: {error}")
         return None
@@ -67,46 +66,30 @@ def get_user_time(id):
 
 
 def set_user_time(user_id, new_time):
-    connection = OpenedDB
-    cursor = connection.cursor()
+    cursor = db_connection.cursor()
     try:
-        cursor.execute(f"UPDATE {user_Table} SET time = ? WHERE id = ?", (new_time, user_id))
-        connection.commit()
+        cursor.execute(f"UPDATE {user_table} SET time = ? WHERE id = ?", (new_time, user_id))
+        db_connection.commit()
     except sqlite3.Error as error:
         print(f"Error set time {user_id}: {error}")
 
 
-async def get_users_groups_ids(groups_count, users_in_group_count, delay_second):
-    while True:
-        try:
-            DB = file_manager.read_file(user_db_path)
-            break
-        except Exception as e:
-            print("Error", e)
-            await asyncio.sleep(0.5)
-
+def get_users_groups_ids(groups_count, users_in_group_count, delay_second):
     statuses = [deposit_status, trial_status]
-    signal_users = []
-    for user in DB:
-        if (user["status"] in statuses or user["id"] in manager_module.tester_ids) and user['get_next_signal']:
-            user['time'] = str_to_datetime(user['time'])
-            signal_users.append(user)
+    sql_query = f"""
+        SELECT * FROM {user_table} 
+        WHERE (status IN {tuple(statuses)} OR id IN {tuple(manager_module.tester_ids)}) AND get_next_signal = {True} 
+        ORDER BY time """
+    users_df = read_sql_query(sql_query, db_connection)
 
-    conn = OpenedDB
-    cursor = conn.cursor()
-
-    cursor.execute(f"""SELECT * FROM {user_Table} WHERE (status IN {tuple(statuses)} OR id IN {tuple(manager_module.tester_ids)}) AND get_next_signal = 1 """)
-    columns = [col[0] for col in cursor.description]
-    time_column_index = columns.index('time')
-    signal_users = cursor.fetchall()
-    sorted_users = sorted(signal_users, key=lambda x: x[time_column_index])#нове сортування яке саме автоматично визначає який індекс має колонка (дивитись на 2 радки вище)
     all_users_count = groups_count * users_in_group_count
-    if len(sorted_users) > all_users_count:
-        sorted_users = sorted_users[:all_users_count]
+    if len(users_df) > all_users_count:
+        users_df = users_df[:all_users_count]
 
     result_users_groups = []
     group = []
-    for user in sorted_users:
+    users_df['time'] = to_datetime(users_df['time'])
+    for i, user in users_df.iterrows():
         if len(group) >= users_in_group_count:
             result_users_groups.append(group)
             group = []
@@ -127,22 +110,18 @@ async def get_users_groups_ids(groups_count, users_in_group_count, delay_second)
 
 
 def remove_user_with_id(id):
-    connection = OpenedDB
-    cursor = connection.cursor()
+    cursor = db_connection.cursor()
     try:
         cursor.execute(f'''
-            SELECT name, acount_number, status
-            FROM {user_Table}
+            SELECT name, account_number, status FROM {user_table}
             WHERE id = ? AND status = ?
         ''', (id, deposit_status))
         user = cursor.fetchone()
         if user:
-            cursor.execute(f'''
-                UPDATE {user_Table}
-                SET status = ?
+            cursor.execute(f'''UPDATE {user_table} SET status = ?
                 WHERE id = ? AND status = ?
             ''', (none_status, id, deposit_status))
-            connection.commit()
+            db_connection.commit()
             data = f"{user[0]} | {user[1]} | {none_status}"
             return True, data
         else:
@@ -153,16 +132,15 @@ def remove_user_with_id(id):
 
 
 def get_users_strings():
-    connection = OpenedDB
-    cursor = connection.cursor()
+    cursor = db_connection.cursor()
 
     users_strings_list = []
     users_data = []
 
     try:
         cursor.execute(f'''
-            SELECT id, name, acount_number, tag, status, trial_end_date
-            FROM {user_Table}
+            SELECT id, name, account_number, tag, status, trial_end_date
+            FROM {user_table}
             WHERE status IN (?, ?)
         ''', (deposit_status, trial_status))
 
@@ -247,9 +225,7 @@ def get_current_users_data(manager_id):
 def has_user_status(id, status):
     user = find_user_with_id(id)
 
-    if not (user is None) and user['status'] == status:
-        return True
-    return False
+    return not (user is None) and user['status'] == status
 
 
 def get_user_language(id):
@@ -258,29 +234,27 @@ def get_user_language(id):
     else:
         user = find_user_with_id(id)
         if not (user is None):
-            return user.get('language')
+            return user['language']
     return None
 
 
 def set_user_language(user_id, new_language):
-    connection = DB_path
-    cursor = connection.cursor()
+    cursor = db_connection.cursor()
     try:
         if user_id in manager_module.managers_id:
             manager_module.set_manager_language(user_id, new_language)
         else:
-            cursor.execute(f"UPDATE {user_Table} SET language = ? WHERE id = ?", (new_language, user_id))
-            connection.commit()
+            cursor.execute(f"UPDATE {user_table} SET language = ? WHERE id = ?", (new_language, user_id))
+            db_connection.commit()
     except sqlite3.Error as error:
         print(f"Error change language {user_id}: {error}")
 
 
 def set_next_signal_status(user_id, flag):
-    connection = OpenedDB
-    cursor = connection.cursor()
+    cursor = db_connection.cursor()
     try:
-        cursor.execute(f"UPDATE {user_Table} SET get_next_signal = ? WHERE id = ?", (flag, user_id))
-        connection.commit()
+        cursor.execute(f"UPDATE {user_table} SET get_next_signal = ? WHERE id = ?", (flag, user_id))
+        db_connection.commit()
     except sqlite3.Error as error:
         print(f"Error 'get_next_signal': {error}")
 
@@ -292,13 +266,11 @@ def get_next_signal_status(user_id):
     return None
 
 
-def get_users_with_status(status):
-    connection = OpenedDB
-    cursor = connection.cursor()
+def get_users_ids_with_status(status):
     try:
-        cursor.execute(f"SELECT * FROM {user_Table} WHERE status = ?", (status,))
-        users_with_status = cursor.fetchall()
-        return users_with_status
+        sql_query = f"SELECT * FROM {user_table} WHERE status = '{status}'"
+        users_df = read_sql_query(sql_query, db_connection)
+        return users_df["id"].values.tolist()
     except sqlite3.Error as error:
         print(f"Error get users with status '{status}': {error}")
         return []
@@ -312,39 +284,36 @@ def had_trial_status(user_id):
 
 
 def set_trial_to_user(user_id):
-    connection = OpenedDB
-    cursor = connection.cursor()
+    cursor = db_connection.cursor()
     try:
         trial_end_date = market_info.get_trial_end_date()
         cursor.execute(f'''
-            UPDATE {user_Table}
+            UPDATE {user_table}
             SET had_trial_status = 1, before_trial_status = status, status = ?, trial_end_date = ?
             WHERE id = ?
         ''', (trial_status, trial_end_date, user_id))
-        connection.commit()
+        db_connection.commit()
     except sqlite3.Error as error:
         print(f"Error set trial {user_id}: {error}")
 
 
 def remove_trial_from_user(user_id):
-    connection = OpenedDB
-    cursor = connection.cursor()
+    cursor = db_connection.cursor()
     try:
         cursor.execute(f'''
-            UPDATE {user_Table}
+            UPDATE {user_table}
             SET status = before_trial_status, before_trial_status = ?
             WHERE id = ?
         ''', (none_status, user_id))
-        connection.commit()
+        db_connection.commit()
     except sqlite3.Error as error:
         print(f"Error remove trial {user_id}: {error}")
 
 
 def get_user_trial_end_date(user_id):
-    connection = OpenedDB
-    cursor = connection.cursor()
+    cursor = db_connection.cursor()
     try:
-        cursor.execute(f"SELECT trial_end_date FROM {user_Table} WHERE id = ?", (user_id,))
+        cursor.execute(f"SELECT trial_end_date FROM {user_table} WHERE id = ?", (user_id,))
         trial_end_date = cursor.fetchone()
 
         if trial_end_date:
@@ -356,11 +325,10 @@ def get_user_trial_end_date(user_id):
 
 
 def add_user(id, first_name, last_name, tag):
-    connection = OpenedDB
-    cursor = connection.cursor()
+    cursor = db_connection.cursor()
 
     try:
-        cursor.execute(f"SELECT * FROM {user_Table} WHERE id = ?", (id,))
+        cursor.execute(f"SELECT * FROM {user_table} WHERE id = ?", (id,))
         user_exists = cursor.fetchone()
 
         if not user_exists:
@@ -368,7 +336,7 @@ def add_user(id, first_name, last_name, tag):
         else:
             full_name = f"{first_name} {last_name}"
             cursor.execute(f'''
-                INSERT INTO {user_Table} (
+                INSERT INTO {user_table} (
                     id, name, tag, language, status,
                     account_number, had_trial_status, trial_end_date,
                     before_trial_status, time, get_next_signal
@@ -377,53 +345,53 @@ def add_user(id, first_name, last_name, tag):
                 id, full_name, tag, startLanguage, none_status,
                 0, False, None, "none", datetime_to_str(now_time()), False
             ))
-            connection.commit()
+            db_connection.commit()
     except sqlite3.Error as error:
         print(f"Error add {id}: {error}")
 
 
-async def update_status_user(id, status):
-    connection = OpenedDB
-    cursor = connection.cursor()
-    await cursor.execute(f"UPDATE {user_Table} SET status = ? WHERE id = ?", (status, id))
-    await connection.commit()
+def update_status_user(id, status):
+    cursor = db_connection.cursor()
+    cursor.execute(f"UPDATE {user_table} SET status = ? WHERE id = ?", (status, id))
+    db_connection.commit()
 
 
 async def set_user_tag(user_id, tag):
-    connection = OpenedDB
-    cursor = connection.cursor()
+    cursor = db_connection.cursor()
     try:
-        cursor.execute(f"UPDATE {user_Table} SET tag = ? WHERE id = ?", (tag, user_id))
-        connection.commit()
+        cursor.execute(f"UPDATE {user_table} SET tag = ? WHERE id = ?", (tag, user_id))
+        db_connection.commit()
     except sqlite3.Error as error:
         print(f"Error set 'tag': {error}")
 
 
 async def get_user_with_status(status):
-    try:
-        return get_users_with_status(status)[0]
-    except:
-        return None
+    users_ids_with_status = get_users_ids_with_status(status)
+
+    has_users_with_status = len(users_ids_with_status) > 0
+    result_user = users_ids_with_status[0] if has_users_with_status else None
+
+    return has_users_with_status, result_user
 
 
 def get_user_status(id):
     user = find_user_with_id(id)
     if user:
-        return user.get('status')
+        return user['status']
     return None
 
 
 def get_user_tag(id):
     user = find_user_with_id(id)
     if user:
-        return user.get('tag')
+        return user['tag']
     return None
 
 
 def get_user_account_number(id):
     user = find_user_with_id(id)
     if user:
-        return user.get('acount_number')
+        return user.get('account_number')
     return None
 
 
@@ -433,7 +401,8 @@ def have_user_with_id(id):
 
 
 async def main():
-    await get_users_groups_ids(50, 20, 60 * 5)
+    # find_user_with_id(5418713788)
+    print(get_users_groups_ids(50, 20, 60 * 5))
 
 
 if __name__ == "__main__":

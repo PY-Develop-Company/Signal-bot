@@ -66,10 +66,10 @@ class SignalsTable:
 
 
 SignalsTable.create_signals_info_table()
-SignalsTable.add_sended_signal(PriceData("AUD", "OANDA", Interval.in_1_minute), 4, datetime_to_secs(now_time()), datetime_to_secs(now_time()), "long", 1, 2, True)
-print(SignalsTable.get_all_data())
-start_time = datetime_to_secs(now_time())
-stop_time = datetime_to_secs(now_time() - timedelta(days=1))
-print(start_time)
-print(stop_time)
-print(SignalsTable.get_profit_data_in_period(start_time, start_time))
+# SignalsTable.add_sended_signal(PriceData("AUD", "OANDA", Interval.in_1_minute), 4, datetime_to_secs(now_time()), datetime_to_secs(now_time()), "long", 1, 2, True)
+# print(SignalsTable.get_all_data())
+# start_time = datetime_to_secs(now_time())
+# stop_time = datetime_to_secs(now_time() - timedelta(days=1))
+# print(start_time)
+# print(stop_time)
+# print(SignalsTable.get_profit_data_in_period(start_time, start_time))

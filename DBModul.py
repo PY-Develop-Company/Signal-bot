@@ -1,18 +1,18 @@
 import sqlite3
 
 DB_path = "users/DataBase.db"
-user_Table = "users"
-manager_Table = "managers"
+user_table = "users"
+manager_table = "managers"
 
 
 def create_table(tmp_Table):
     connection = OpenDB()
     cursor = connection.cursor()
-    cursor.execute(f'''
+    cursor.execute(f"""
         CREATE TABLE IF NOT EXISTS {tmp_Table} (
             id INTEGER PRIMARY KEY
         )
-    ''')
+    """)
     connection.commit()
     connection.close()
 
@@ -68,29 +68,27 @@ def CloseDB(connection):
 
 
 def CreateUsersTable():
-    create_table(user_Table)
-    AddColumn(user_Table, "name", "TEXT")
-    AddColumn(user_Table, "tag", "TEXT")
-    AddColumn(user_Table, "language", "TEXT")
-    AddColumn(user_Table, "status", "TEXT")
-    AddColumn(user_Table, "acount_number", "INTEGER")
-    AddColumn(user_Table, "had_trial_status", "INTEGER")
-    AddColumn(user_Table, "trial_end_date", "TEXT")
-    AddColumn(user_Table, "before_trial_status", "TEXT")
-    AddColumn(user_Table, "time", "TEXT")
-    AddColumn(user_Table, "get_next_signal", "INTEGER")
+    create_table(user_table)
+    AddColumn(user_table, "name", "TEXT")
+    AddColumn(user_table, "tag", "TEXT")
+    AddColumn(user_table, "language", "TEXT")
+    AddColumn(user_table, "status", "TEXT")
+    AddColumn(user_table, "account_number", "INTEGER")
+    AddColumn(user_table, "had_trial_status", "INTEGER")
+    AddColumn(user_table, "trial_end_date", "REAL")
+    AddColumn(user_table, "before_trial_status", "TEXT")
+    AddColumn(user_table, "time", "TEXT")
+    AddColumn(user_table, "get_next_signal", "INTEGER")
 
 
 def CreateManagersTable():
-    create_table(manager_Table)
-    AddColumn(manager_Table, "do", "TEXT")
-    AddColumn(manager_Table, "status", "TEXT")
-    AddColumn(manager_Table, "language", "TEXT")
+    create_table(manager_table)
+    AddColumn(manager_table, "do", "TEXT")
+    AddColumn(manager_table, "status", "TEXT")
+    AddColumn(manager_table, "language", "TEXT")
 
-DB_OPEN_WORK = OpenDB()
-
-
-def InsertUserDataFromJSON(tmp_table, json_data):#тимчасово
+#  тимчасово
+def InsertUserDataFromJSON(tmp_table, json_data):
     connection = OpenDB()
     cursor = connection.cursor()
     try:
@@ -109,9 +107,10 @@ def InsertUserDataFromJSON(tmp_table, json_data):#тимчасово
         connection.close()
 
 
+DB_OPEN_WORK = OpenDB()
 # import file_manager
-# CreateManagersTable()
-# CreateUsersTable()
+CreateManagersTable()
+CreateUsersTable()
 # temp = file_manager.read_file("users/db.txt")
 # for json_data in temp:
 #     InsertUserDataFromJSON(user_Table, json_data)

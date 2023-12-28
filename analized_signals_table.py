@@ -1,11 +1,7 @@
-import user_module
 from DBModul import create_table, AddColumn, DB_OPEN_WORK
 from sqlite3 import Error
 from price_parser import PriceData
 from pandas import read_sql_query
-from tvDatafeed import Interval
-from datetime import timedelta
-from my_time import now_time, datetime_to_secs
 
 completed_signals_table = "analizedSignals"
 
@@ -80,12 +76,5 @@ class AnalizedSignalsTable:
         except Error as error:
             print(f"{error}")
 
-# import random
-# AnalizedSignalsTable.create_signals_info_table()
-# AnalizedSignalsTable.add_analized_signal(PriceData("AUD", "OANDA", Interval.in_1_minute), now_time(), True, "long", 4, 1, "msg", now_time())
-# AnalizedSignalsTable.add_analized_signal(PriceData("AUD", "OANDA", Interval.in_1_minute), now_time(), True, "long", 4, 1, "msg", now_time())
-# dfs = AnalizedSignalsTable.get_unchecked_signals()
-# signal_df_id = random.choice(dfs.index)
-#
-# df_row = dfs.iloc[signal_df_id]
-# print(df_row.msg)
+
+AnalizedSignalsTable.create_signals_info_table()
