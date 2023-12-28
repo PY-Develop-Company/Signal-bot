@@ -512,7 +512,8 @@ def handle_signal_msg_controller(signal, msg, pd: PriceData, open_position_price
                                  shared_list):
     async def handle_signal_msg(signal, msg, pd: PriceData, open_position_price, deal_time, start_analize_time,
                                 shared_list):
-        t1 = datetime.strptime(str(start_analize_time).split(".")[0], '%Y-%m-%d %H:%M:%S')
+        print(signal, msg, pd, open_position_price, deal_time, start_analize_time)
+        t1 = str_to_datetime(start_analize_time)
         t2 = now_time()
         print("before_send_delay", t2 - t1)
         user_signal_delay = (deal_time + 3) * 60
@@ -551,10 +552,8 @@ def handle_signal_msg_controller(signal, msg, pd: PriceData, open_position_price
             for user in group:
                 set_next_signal_status(user, False)
 
-        while True:
-            send_close_msg_time = now_time()
-            SignalsTable.add_sended_signal(pd, deal_time, t2, send_close_msg_time, signal.type, open_price, close_price,
-                                           is_profit)
+        send_close_msg_time = now_time()
+        SignalsTable.add_sended_signal(pd, deal_time, t2, send_close_msg_time, signal.type, open_price, close_price, is_profit)
 
     asyncio.run(handle_signal_msg(signal, msg, pd, open_position_price, deal_time, start_analize_time, shared_list))
 
@@ -637,14 +636,15 @@ def signals_message_sender_controller(prices_data, prices_data_all, shared_list)
             if len(real_signals_df) == 0:
                 continue
 
-            df = real_signals_df.sample()
+            df = real_signals_df.sample(n=1)
+            df = df.reset_index(drop=True)
 
-            signal = get_signal_by_type(df.signal_type)
-            pd = PriceData(df.symbol, df.exchange, interval_convertor.str_to_interval(df.interval))
+            signal = get_signal_by_type(df["signal_type"][0])
+            pd = PriceData(df["symbol"][0], df["exchange"][0], interval_convertor.str_to_interval(df["interval"][0]))
 
             multiprocessing.Process(target=handle_signal_msg_controller,
-                                    args=(signal, df.msg, pd, df.open_price, int(df.deal_time),
-                                          df.start_analize_time, shared_list), daemon=True).start()
+                                    args=(signal, df["msg"][0], pd, df["open_price"][0], int(df["deal_time"][0]),
+                                          df["start_analize_time"][0], shared_list), daemon=True).start()
 
             await asyncio.sleep(signal_search_delay)
 

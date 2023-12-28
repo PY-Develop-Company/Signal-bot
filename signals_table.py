@@ -27,7 +27,7 @@ class SignalsTable:
     @staticmethod
     def add_sended_signal(pd: PriceData, deal_time, open_time, close_time, signal_type, open_price, close_price, is_profit):
         columns = ("currency", "interval", "deal_time", "open_time_secs", "open_time", "close_time_secs", "close_time", "signal_type", "open_price", "close_price", "is_profit")
-        data = (pd.symbol, str(pd.interval), deal_time, open_time, secs_to_date(open_time), close_time, secs_to_date(close_time), signal_type, open_price, close_price, is_profit)
+        data = (pd.symbol, str(pd.interval), deal_time, open_time, datetime_to_secs(open_time), close_time, datetime_to_secs(close_time), signal_type, open_price, close_price, is_profit)
         cursor = db_connection.cursor()
         try:
             sql_query = f"""
