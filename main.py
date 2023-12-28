@@ -562,6 +562,7 @@ def handle_signal_msg_controller(signal, msg, pd: PriceData, open_position_price
         for i in range(0, send_msg_repeat_count):
             await send_photo_text_message_to_users(users_groups[i], img_path, close_signal_message,
                                                    args=["signal_deal_text", "signal_min_text"])
+            await send_photo_text_message_to_users(users_groups[i], "./img/Info.jpg")
             await asyncio.sleep(send_msg_delay)
 
         for group in users_groups:
