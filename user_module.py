@@ -56,7 +56,7 @@ def find_user_with_id(id):
 def get_user_time(id):
     user = find_user_with_id(id)
 
-    if user:
+    if not (user is None):
         return str_to_datetime(user.get('time'))
     return None
 
@@ -113,7 +113,8 @@ def remove_user_with_id(id):
             WHERE id = ? AND status = ?
         ''', (id, deposit_status))
         user = cursor.fetchone()
-        if user:
+
+        if not (user is None):
             cursor.execute(f'''UPDATE {user_table} SET status = ?
                 WHERE id = ? AND status = ?
             ''', (none_status, id, deposit_status))
@@ -226,12 +227,14 @@ def has_user_status(id, status):
 
 def get_user_language(id):
     if id in manager_module.managers_id:
-        return manager_module.get_manager_language(id)
+        l = manager_module.get_manager_language(id)
+        return l
     else:
         user = find_user_with_id(id)
         if not (user is None):
-            return user['language']
-    return None
+            l = user['language']
+            return l
+        return startLanguage
 
 
 def set_user_language(user_id, new_language):
@@ -257,7 +260,7 @@ def set_next_signal_status(user_id, flag):
 
 def get_next_signal_status(user_id):
     user = find_user_with_id(user_id)
-    if user:
+    if not (user is None):
         return user.get('get_next_signal')
     return None
 
@@ -274,7 +277,7 @@ def get_users_ids_with_status(status):
 
 def had_trial_status(user_id):
     user = find_user_with_id(user_id)
-    if user:
+    if not (user is None):
         return user.get('had_trial_status')
     return None
 
@@ -312,7 +315,7 @@ def get_user_trial_end_date(user_id):
         cursor.execute(f"SELECT trial_end_date FROM {user_table} WHERE id = ?", (user_id,))
         trial_end_date = cursor.fetchone()
 
-        if trial_end_date:
+        if not (trial_end_date is None):
             return trial_end_date[0]
         return None
     except sqlite3.Error as error:
@@ -327,9 +330,7 @@ def add_user(id, first_name, last_name, tag):
         cursor.execute(f"SELECT * FROM {user_table} WHERE id = ?", (id,))
         user_exists = cursor.fetchone()
 
-        if not user_exists:
-            pass
-        else:
+        if user_exists is None:
             full_name = f"{first_name} {last_name}"
             cursor.execute(f'''
                 INSERT INTO {user_table} (
@@ -372,21 +373,21 @@ async def get_user_with_status(status):
 
 def get_user_status(id):
     user = find_user_with_id(id)
-    if user:
+    if not (user is None):
         return user['status']
     return None
 
 
 def get_user_tag(id):
     user = find_user_with_id(id)
-    if user:
+    if not (user is None):
         return user['tag']
     return None
 
 
 def get_user_account_number(id):
     user = find_user_with_id(id)
-    if user:
+    if not (user is None):
         return user.get('account_number')
     return None
 

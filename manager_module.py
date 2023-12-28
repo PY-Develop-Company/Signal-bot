@@ -15,7 +15,7 @@ async def add_manager(id):
     cursor = db_connection.cursor()
     cursor.execute(f"SELECT id FROM {manager_table} WHERE id = ?", (id,))
     existing_user = cursor.fetchone()
-    if not existing_user:
+    if existing_user is None:
         cursor.execute(f'''INSERT INTO {manager_table} (id, status, do, language) VALUES (?, ?, ?, ?)''', (id, none_manager_status, "none", startLanguage))
         db_connection.commit()
 

@@ -11,7 +11,6 @@ import interval_convertor
 from signals import get_signal_by_type
 from my_time import *
 import configparser
-import random
 from signals_table import SignalsTable
 from analized_signals_table import AnalizedSignalsTable
 
@@ -191,14 +190,13 @@ async def show_users_list_to_user(user_id, is_next=True):
 @dp.message_handler(commands="start")
 async def start_command(message):
     user_id = message.from_user.id
-    user_language = get_user_language(user_id)
 
     if user_id in managers_id:
         await add_manager(message.from_user.id)
     else:
         add_user(user_id, message.from_user.first_name, message.from_user.last_name, message.from_user.username)
 
-    print("user_language", user_language)
+    user_language = get_user_language(user_id)
     if user_language == startLanguage:
         await open_menu(message, get_select_language_markup(), "Select language:")
         return
@@ -320,8 +318,15 @@ async def users_list_command(message):
 
 @dp.message_handler(content_types=["text"])
 async def handle_media(message: types.Message):
+
     user_id = message.from_user.id
+
+    if find_user_with_id(user_id) is None:
+        add_user(user_id, message.from_user.first_name, message.from_user.last_name, message.from_user.username)
+
     user_language = get_user_language(user_id)
+
+    # TAG
     if get_user_tag(user_id) == "none":
         await set_user_tag(user_id, message.from_user.username)
 
@@ -585,26 +590,17 @@ async def check_trial_users():
 def signals_message_sender_controller(prices_data, prices_data_all, shared_list):
     async def signals_message_sender_function(signal_prices_data, all_prices_data, shared_list):
         def reset_seis(all_prices_data):
-            t1 = datetime_to_secs(now_time())
             price_parser.create_parce_currencies_with_intervals_callbacks(all_prices_data)
-            t2 = datetime_to_secs(now_time())
 
-            print("create_parce_currencies_with_intervals_callbacks", t2-t1)
             for pd in all_prices_data:
-                t1 = datetime_to_secs(now_time())
                 pd.reset_chart_data()
-                t2 = datetime_to_secs(now_time())
-                print("pd.reset_chart_data()", t2-t1)
             AnalizedSignalsTable.set_all_checked()
 
             return datetime_to_secs(now_time())
 
-        print("start_reset_seis")
         last_send_message_check = reset_seis(all_prices_data)
-        print("stop_reset_seis")
 
         while True:
-            print("signals_message_sender_function")
             t1 = datetime_to_secs(now_time())
             await check_trial_users()
             t2 = datetime_to_secs(now_time())
