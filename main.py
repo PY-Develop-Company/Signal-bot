@@ -1,6 +1,5 @@
 from aiogram import Bot, Dispatcher
 import logging
-import file_manager
 import price_parser
 from price_parser import PriceData
 import signal_maker
@@ -159,9 +158,9 @@ async def open_menu(message, menu_markup, answer_text="none"):
 
 async def update_account_user(id, account_number):
     try:
-        cursor = DB_OPEN_WORK.cursor()
+        cursor = db_connection.cursor()
         cursor.execute(f"UPDATE {user_table} SET account_number = ? WHERE id = ?", (account_number, id))
-        DB_OPEN_WORK.commit()
+        db_connection.commit()
         user_language = get_user_language(id)
         if user_language:
             if account_number == deposit_status:
@@ -561,8 +560,8 @@ def handle_signal_msg_controller(signal, msg, pd: PriceData, open_position_price
 
 
 async def check_trial_users():
+    users_ids = get_users_ids_with_status(trial_status)
     try:
-        users_ids = get_users_ids_with_status(trial_status)
         for user_id in users_ids:
             userLanguage = get_user_language(user_id)
             if market_info.is_trial_ended(get_user_trial_end_date(user_id)):
@@ -587,16 +586,26 @@ async def check_trial_users():
 def signals_message_sender_controller(prices_data, prices_data_all, shared_list):
     async def signals_message_sender_function(signal_prices_data, all_prices_data, shared_list):
         def reset_seis(all_prices_data):
+            t1 = datetime_to_secs(now_time())
             price_parser.create_parce_currencies_with_intervals_callbacks(all_prices_data)
+            t2 = datetime_to_secs(now_time())
+
+            print("create_parce_currencies_with_intervals_callbacks", t2-t1)
             for pd in all_prices_data:
+                t1 = datetime_to_secs(now_time())
                 pd.reset_chart_data()
+                t2 = datetime_to_secs(now_time())
+                print("pd.reset_chart_data()", t2-t1)
             AnalizedSignalsTable.set_all_checked()
 
             return datetime_to_secs(now_time())
 
+        print("start_reset_seis")
         last_send_message_check = reset_seis(all_prices_data)
+        print("stop_reset_seis")
 
         while True:
+            print("signals_message_sender_function")
             t1 = datetime_to_secs(now_time())
             await check_trial_users()
             t2 = datetime_to_secs(now_time())
@@ -624,12 +633,11 @@ def signals_message_sender_controller(prices_data, prices_data_all, shared_list)
                 continue
 
             unchecked_signals_df = AnalizedSignalsTable.get_unchecked_signals()
-            real_signals_df = unchecked_signals_df[unchecked_signals_df["has_signal"]]
+            real_signals_df = unchecked_signals_df[unchecked_signals_df["has_signal"] == True]
             if len(real_signals_df) == 0:
                 continue
 
-            signal_df_id = random.choice(real_signals_df.index)
-            df = real_signals_df[signal_df_id]
+            df = real_signals_df.sample()
 
             signal = get_signal_by_type(df.signal_type)
             pd = PriceData(df.symbol, df.exchange, interval_convertor.str_to_interval(df.interval))

@@ -1,6 +1,5 @@
 import asyncio
 
-import DBModul
 from my_time import secs_to_date
 import manager_module
 import market_info
@@ -8,8 +7,6 @@ from datetime import timedelta
 from my_time import datetime_to_str, now_time, str_to_datetime
 from DBModul import *
 from pandas import read_sql_query, to_datetime
-
-db_connection = DBModul.DB_OPEN_WORK
 
 startLanguage = "none"
 

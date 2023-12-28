@@ -4,8 +4,7 @@ from tvDatafeed.seis import Seis
 from pandas import DataFrame, read_csv
 import file_manager
 import interval_convertor
-import pytz
-from my_time import now_time
+from my_time import now_time, datetime_to_secs
 
 trade_pause_wait_time = 600
 
@@ -17,7 +16,7 @@ currencies_last_analize_date = {}
 tv = TvDatafeed()
 tvl = TvDatafeedLive()
 
-timeout_secs = 180
+timeout_secs = 60
 
 currencies_puncts = {
     "EURUSD": 0.00001,
@@ -96,7 +95,10 @@ class PriceData:
     def reset_chart_data(self):
         interval = str(self.interval).replace(".", "")
 
-        df = self.get_price_data(5000)
+        t1 = datetime_to_secs(now_time())
+        df = self.get_price_data(1000)
+        t2 = datetime_to_secs(now_time())
+        print("df = self.get_price_data(1000)", t2 - t1)
         if df is None:
             print("ERROR: No df")
             pass
@@ -116,7 +118,7 @@ class PriceData:
         path = currencies_data_path + self.symbol + interval + ".csv"
         file_manager.delete_file_if_exists(path)
 
-    def get_price_data(self, bars_count=5000):
+    def get_price_data(self, bars_count=1000):
         try:
             priceData = tvl.get_hist(symbol=self.symbol, exchange=self.exchange, interval=self.interval, n_bars=bars_count+1)
             priceData = priceData.reindex(index=priceData.index[::-1]).iloc[1:].reset_index()
@@ -158,7 +160,7 @@ def get_currencies():
     return currencies
 
 
-def get_price_data_frame_seis(seis, bars_count=5000):
+def get_price_data_frame_seis(seis, bars_count=1000):
     price_df = seis.get_hist(n_bars=bars_count)
     price_df = price_df.drop(price_df.index[len(price_df) - 1])
     price_df = price_df.reindex(index=price_df.index[::-1]).reset_index()

@@ -107,7 +107,7 @@ def InsertUserDataFromJSON(tmp_table, json_data):
         connection.close()
 
 
-DB_OPEN_WORK = OpenDB()
+db_connection = OpenDB()
 # import file_manager
 CreateManagersTable()
 CreateUsersTable()

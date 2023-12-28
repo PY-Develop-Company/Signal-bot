@@ -1,4 +1,4 @@
-from DBModul import create_table, AddColumn, DB_OPEN_WORK
+from DBModul import create_table, AddColumn, db_connection
 from sqlite3 import Error
 from price_parser import PriceData
 from tvDatafeed import Interval
@@ -6,8 +6,6 @@ from datetime import timedelta
 from my_time import now_time, datetime_to_secs, secs_to_date
 
 completed_signals_table = "completedSignals"
-
-connection = DB_OPEN_WORK
 
 
 class SignalsTable:
@@ -30,19 +28,19 @@ class SignalsTable:
     def add_sended_signal(pd: PriceData, deal_time, open_time, close_time, signal_type, open_price, close_price, is_profit):
         columns = ("currency", "interval", "deal_time", "open_time_secs", "open_time", "close_time_secs", "close_time", "signal_type", "open_price", "close_price", "is_profit")
         data = (pd.symbol, str(pd.interval), deal_time, open_time, secs_to_date(open_time), close_time, secs_to_date(close_time), signal_type, open_price, close_price, is_profit)
-        cursor = connection.cursor()
+        cursor = db_connection.cursor()
         try:
             sql_query = f"""
                 INSERT INTO {completed_signals_table} {columns}
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);"""
             cursor.execute(sql_query, data)
-            connection.commit()
+            db_connection.commit()
         except Error as error:
             print(f"Error SignalsTable add_sended_signal: {error}")
 
     @staticmethod
     def get_all_data():
-        cursor = connection.cursor()
+        cursor = db_connection.cursor()
         try:
             sql_query = f"""SELECT * FROM {completed_signals_table}"""
             res = cursor.execute(sql_query)
@@ -53,7 +51,7 @@ class SignalsTable:
 
     @staticmethod
     def get_profit_data_in_period(start_period_secs, stop_period_secs):
-        cursor = connection.cursor()
+        cursor = db_connection.cursor()
         try:
             sql_query = f"""
                 SELECT is_profit FROM {completed_signals_table} 
