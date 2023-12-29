@@ -48,31 +48,42 @@ class AnalizedSignalsTable:
             sql_query = f"""SELECT * FROM {completed_signals_table}
                 WHERE is_checked = {False}"""
 
+            # print("sql_query1", sql_query)
             df = read_sql_query(sql_query, db_connection)
             result = df
         except Error as error:
-            print(f"{error}")
+            print(f"Error get_unchecked_signals (select): {error}")
+
 
         cursor = db_connection.cursor()
         try:
             sql_query = f"""UPDATE {completed_signals_table} SET is_checked = {True}
-                        WHERE id IN{tuple(result["id"].values)}"""
+                        WHERE id IN{tuple([result["id"].values, -1])}"""
+            # print("sql_query2", sql_query)
             cursor.execute(sql_query)
             db_connection.commit()
         except Error as error:
-            print(f"{error}")
+            print(f"Error get_unchecked_signals(mark checked): {error}")
         return result
 
     @staticmethod
     def set_all_checked():
         cursor = db_connection.cursor()
         try:
-            sql_query = f"""UPDATE {completed_signals_table} SET is_checked = {None}
-                WHERE is_checked = {False}"""
+            sql_query = f"""UPDATE {completed_signals_table} SET is_checked = NULL
+                WHERE is_checked = 0"""
             cursor.execute(sql_query)
             db_connection.commit()
         except Error as error:
-            print(f"{error}")
+            print(f"set_all_checked {error}")
 
 
 AnalizedSignalsTable.create_signals_info_table()
+
+if __name__ == "__main__":
+    from tvDatafeed import Interval
+    AnalizedSignalsTable.add_analized_signal(PriceData("BTCUSDT", "binance", Interval.in_1_minute), 1, 1, 1, 1, 1, 1, 1)
+    AnalizedSignalsTable.add_analized_signal(PriceData("BTCUSDT", "binance", Interval.in_1_minute), 1, 1, 1, 1, 1, 1, 1)
+
+    # AnalizedSignalsTable.get_unchecked_signals()
+    AnalizedSignalsTable.set_all_checked()
