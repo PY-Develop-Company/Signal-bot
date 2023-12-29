@@ -1,9 +1,0 @@
-,has_signal,signal_type,msg,date,open_price,interval,symbol,exchange,deal_time,debug,start_analize_time
-0,False,neutral,NoneAUD/CAD Нет сигнала 12{},2023-11-22 21:30:00,0.89651,Interval.in_3_minute,AUDCAD,OANDA,12,"
-
-Проверка сигнала:
-                    	Валютная пара: AUDCAD"" таймфрейми: [<Interval.in_3_minute: '3'>, <Interval.in_5_minute: '5'>, <Interval.in_15_minute: '15'>] время свеч: [Timestamp('2023-11-22 21:30:00'), Timestamp('2023-11-22 21:25:00'), Timestamp('2023-11-22 21:15:00')]
-                    	Есть ли сигнал: False
-                    	Показания индикаторов: long_sob_count0 short_sob_count0
-                    		 * SOB -> long [] short []
-                     time_now 2023-11-22 21:33:21.513438+02:00",2023-11-22 21:33:15

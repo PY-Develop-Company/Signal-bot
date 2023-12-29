@@ -184,8 +184,9 @@ fabric.properties
 # idea folder, uncomment if you don't need it
 .idea
 
-signals/
-sended_signals/
-currencies_data/
-
+# my files
 config.ini
+
+currencies_data
+signals
+users/*.db
