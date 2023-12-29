@@ -107,7 +107,7 @@ async def send_message_to_user(user_id, text, markup=None):
         else:
             return await bot.send_message(user_id, text, disable_notification=False, reply_markup=markup)
     except Exception as e:
-        print("Error: bot is blocked by user", e)
+        print("Error:", e)
 
     return None
 
@@ -139,7 +139,7 @@ async def send_photo_text_message_to_user(user_id, img_path, text=" ", markup=No
             else:
                 await bot.send_photo(user_id, photo=file, caption=text, reply_markup=markup)
     except Exception as e:
-        print("Error: bot is blocked by user", e)
+        print("Error:", e)
 
 
 async def send_photo_text_message_to_users(users_ids: [], img_path, text=" ", args=[]):
@@ -385,7 +385,6 @@ async def handle_media(message: types.Message):
                 message_to_user = ""
 
                 user_under_do_language = get_user_language(user_under_do)
-                print("user_under_do_language", user_under_do_language)
                 if is_accept_button and is_search_id_status:
                     status = id_status
                     message_to_user = languageFile[user_under_do_language]["accept_id_message_text"]
@@ -517,21 +516,18 @@ def handle_signal_msg_controller(signal, msg, pd: PriceData, open_position_price
                                  shared_list):
     async def handle_signal_msg(signal, msg, pd: PriceData, open_position_price, deal_time, start_analize_time,
                                 shared_list):
-        print(signal, msg, pd, open_position_price, deal_time, start_analize_time)
         t1 = str_to_datetime(start_analize_time)
         t2 = now_time()
-        print("before_send_delay", t2 - t1)
         user_signal_delay = (deal_time + 3) * 60
 
         users_groups = get_users_groups_ids(send_msg_repeat_count, send_msg_group_count, user_signal_delay)
         t2 = now_time()
-        print("created_users_delay", t2 - t1)
 
         for i in range(0, send_msg_repeat_count):
             await send_photo_text_message_to_users(users_groups[i], signal.photo_path, msg, args=["signal_min_text"])
             await asyncio.sleep(send_msg_delay)
         # print(users_groups)
-        print([len(users_groups[i]) for i in range(send_msg_repeat_count)])
+        # print([len(users_groups[i]) for i in range(send_msg_repeat_count)])
 
         t2 = now_time()
         delay = t2 - t1
@@ -623,7 +619,7 @@ def signals_message_sender_controller(prices_data, prices_data_all, shared_list)
                             continue
             except Exception as e:
                 print("Error", e)
-            print("search signals to send...")
+            # print("search signals to send...")
             if not market_info.is_market_working():
                 continue
 

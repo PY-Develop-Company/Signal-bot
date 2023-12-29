@@ -159,7 +159,7 @@ class NewMultitimeframeAnalizer(Analizer):
 
     def analize(self, parent_dfs, pds) -> (bool, Signal, str, int):
         has_signal, signal, debug_text, deal_time = self.analize_func(parent_dfs, pds)
-        print(debug_text)
+        # print(debug_text)
         return has_signal, signal, debug_text, deal_time
 
 

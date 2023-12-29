@@ -95,7 +95,7 @@ def analize_currency_data_controller(analize_pds, additional_pds):
 
     async def analize_currency_data_loop(analize_pds, additional_pds):
         while True:
-            print("analize_loop")
+            # print("analize_loop")
             tasks = []
             for i in range(len(analize_pds)):
                 task = asyncio.create_task(analize_currency_data_function(analize_pds[i], additional_pds[i]))

@@ -88,23 +88,23 @@ def CreateManagersTable():
     AddColumn(manager_table, "language", "TEXT")
 
 #  тимчасово
-def InsertUserDataFromJSON(tmp_table, json_data):
-    connection = OpenDB()
-    cursor = connection.cursor()
-    try:
-        columns = ', '.join(json_data.keys())
-        placeholders = ', '.join('?' * len(json_data))
-        values = tuple(json_data.values())
-
-        query = f"INSERT INTO {tmp_table} ({columns}) VALUES ({placeholders})"
-        cursor.execute(query, values)
-
-        connection.commit()
-        print("Дані з JSON успішно вставлені в таблицю users.")
-    except sqlite3.Error as error:
-        print("Помилка під час вставки даних з JSON:", error)
-    finally:
-        connection.close()
+# def InsertUserDataFromJSON(tmp_table, json_data):
+#     connection = OpenDB()
+#     cursor = connection.cursor()
+#     try:
+#         columns = ', '.join(json_data.keys())
+#         placeholders = ', '.join('?' * len(json_data))
+#         values = tuple(json_data.values())
+#
+#         query = f"INSERT INTO {tmp_table} ({columns}) VALUES ({placeholders})"
+#         cursor.execute(query, values)
+#
+#         connection.commit()
+#         print("Дані з JSON успішно вставлені в таблицю users.")
+#     except sqlite3.Error as error:
+#         print("Помилка під час вставки даних з JSON:", error)
+#     finally:
+#         connection.close()
 
 
 db_connection = OpenDB()

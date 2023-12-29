@@ -46,7 +46,7 @@ class SignalsTable:
             res = cursor.execute(sql_query)
             return res.fetchall()
         except Error as error:
-            print(f"Error SignalsTable add_sended_signal: {error}")
+            print(f"Error SignalsTable get_all_data: {error}")
             return None
 
     @staticmethod
@@ -59,7 +59,7 @@ class SignalsTable:
             res = cursor.execute(sql_query)
             return res.fetchall()
         except Error as error:
-            print(f"Error SignalsTable add_sended_signal: {error}")
+            print(f"Error SignalsTable get_profit_data_in_period: {error}")
             return None
 
 

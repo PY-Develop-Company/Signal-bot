@@ -39,7 +39,7 @@ class AnalizedSignalsTable:
             cursor.execute(sql_query, data)
             db_connection.commit()
         except Error as error:
-            print(f"{error}")
+            print(f"add_analized_signal {error}")
 
     @staticmethod
     def get_unchecked_signals():
@@ -53,7 +53,6 @@ class AnalizedSignalsTable:
             result = df
         except Error as error:
             print(f"Error get_unchecked_signals (select): {error}")
-
 
         cursor = db_connection.cursor()
         try:

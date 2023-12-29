@@ -186,7 +186,6 @@ class SuperOrderBlockIndicator(Indicator):
 
         def print_info(self):
             print("Created box: ", self.left, self.top, self.right, self.bottom)
-            print("Created box: ", self.left, self.top, self.right, self.bottom)
 
         def set_early_created(self):
             self.is_early_created = True

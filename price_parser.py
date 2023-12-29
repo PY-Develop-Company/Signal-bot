@@ -95,15 +95,10 @@ class PriceData:
     def reset_chart_data(self):
         interval = str(self.interval).replace(".", "")
 
-        t1 = datetime_to_secs(now_time())
         df = self.get_price_data(5000)
-        t2 = datetime_to_secs(now_time())
-        print("df = self.get_price_data(5000)", t2 - t1)
         if df is None:
-            print("ERROR: No df")
             pass
         else:
-            print("updated pd")
             path = currency_check_ended + self.symbol + interval + ".txt"
             file_manager.delete_file_if_exists(path)
             path = currencies_data_path + self.symbol + interval + ".csv"
@@ -129,8 +124,6 @@ class PriceData:
 
     def is_analize_time(self, update_date: datetime, debug=False):
         minutes = interval_convertor.interval_to_int(self.interval)
-        if debug:
-            print("is_analize_time", (update_date.minute + 1), minutes, (update_date.minute + 1) % minutes)
 
         return (update_date.minute + 1) % minutes == 0
 
