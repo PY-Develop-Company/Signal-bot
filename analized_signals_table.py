@@ -57,8 +57,7 @@ class AnalizedSignalsTable:
         cursor = db_connection.cursor()
         try:
             sql_query = f"""UPDATE {completed_signals_table} SET is_checked = {True}
-                        WHERE id IN{tuple([result["id"].values, -1])}"""
-            # print("sql_query2", sql_query)
+                            WHERE is_checked = 0"""
             cursor.execute(sql_query)
             db_connection.commit()
         except Error as error:

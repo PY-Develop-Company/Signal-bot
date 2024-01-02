@@ -91,7 +91,7 @@ def analize_currency_data_controller(analize_pds, additional_pds):
         AnalizedSignalsTable.add_analized_signal(main_pd, main_price_df.datetime[0], has_signal, signal.type,
                                                  deal_time, open_position_price, msg, start_analize_time)
 
-        print("Created signal file:", msg, main_price_df.datetime[0])
+        # print("Created signal file:", msg, main_price_df.datetime[0])
 
     async def analize_currency_data_loop(analize_pds, additional_pds):
         while True:

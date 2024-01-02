@@ -385,6 +385,7 @@ async def handle_media(message: types.Message):
                 message_to_user = ""
 
                 user_under_do_language = get_user_language(user_under_do)
+
                 if is_accept_button and is_search_id_status:
                     status = id_status
                     message_to_user = languageFile[user_under_do_language]["accept_id_message_text"]
@@ -597,10 +598,7 @@ def signals_message_sender_controller(prices_data, prices_data_all, shared_list)
         last_send_message_check = reset_seis(all_prices_data)
 
         while True:
-            t1 = datetime_to_secs(now_time())
             await check_trial_users()
-            t2 = datetime_to_secs(now_time())
-            print("check_trial_users delay", t2 - t1)
 
             need_to_reset_seis = last_send_message_check + reset_seis_wait_time < datetime_to_secs(now_time())
             if need_to_reset_seis:

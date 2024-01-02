@@ -73,13 +73,13 @@ def get_manager_user_account(manager_id):
     return get_user_account_number(get_manager_do(manager_id))
 
 
-def is_manager_status(manager_id, status):
+def is_manager_status(manager_id, needed_status):
     connection = db_connection
     cursor = connection.cursor()
     try:
         cursor.execute(f"SELECT status FROM {manager_table} WHERE id = ?", (manager_id,))
         status = cursor.fetchone()
-        return status and status[0] == status
+        return status[0] == needed_status
     except sqlite3.Error as error:
         print(f"Error fetching manager's status: {error}")
         return False
