@@ -1,14 +1,15 @@
-from pandas import Timedelta
 from datetime import datetime
-from tvDatafeed import Interval
-from analizer import MultitimeframeAnalizer, NewMultitimeframeAnalizer
-import interval_convertor
-from analized_signals_table import AnalyzedSignalsTable
-import asyncio
-from signals import *
 
-username = 't4331662@gmail.com'
-password = 'Pxp626AmH7_'
+from tv_signals.analizer import NewMultitimeframeAnalizer
+from tv_signals.analized_signals_table import AnalyzedSignalsTable
+from tv_signals.signal_types import *
+
+from utils import interval_convertor
+
+from pandas import Timedelta
+from tvDatafeed import Interval
+import asyncio
+
 
 signals_analysis_last_date = {}
 signal_last_update = datetime.now()

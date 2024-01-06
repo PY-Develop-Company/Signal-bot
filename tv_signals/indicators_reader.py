@@ -1,15 +1,13 @@
-import my_time
+import math
+
+from tv_signals.signal_types import *
+from tv_signals.price_parser import PriceData
+from utils import interval_convertor
 
 import numpy as np
-import pandas
-import math
+from pandas import Series, to_datetime
 from tvDatafeed import Interval, TvDatafeed
-from datetime import timedelta
-from pandas import Series
 import plotly.graph_objects as go
-from signals import *
-from price_parser import PriceData
-import interval_convertor
 
 
 blocks_delta = {
@@ -148,7 +146,7 @@ class SuperOrderBlockIndicator(Indicator):
     def __init__(self, src, open, close, high, low, price_data: PriceData, include_delta=True, ob_max_box_set=100,
                  fvg_max_box_set=100):
         super().__init__(src, open, close, high, low)
-        self.src.datetime = pandas.to_datetime(self.src.datetime)
+        self.src.datetime = to_datetime(self.src.datetime)
         self.interval = interval_convertor.interval_to_datetime(price_data.interval)
         self.obMaxBoxSet = clamp(ob_max_box_set, 1, 100)
         self.fvgMaxBoxSet = clamp(fvg_max_box_set, 1, 100)
@@ -254,10 +252,10 @@ class SuperOrderBlockIndicator(Indicator):
 
         prices_count = len(self.src) - 3
 
-        bear_boxes_index_OB = 0
-        bull_boxes_index_OB = 0
-        bear_boxes_index_FVG = 0
-        bull_boxes_index_FVG = 0
+        bear_boxes_index_ob = 0
+        bull_boxes_index_ob = 0
+        bear_boxes_index_fvg = 0
+        bull_boxes_index_fvg = 0
 
         last_added_box_index = 0
         for i in range(0, prices_count + 1):
@@ -269,44 +267,44 @@ class SuperOrderBlockIndicator(Indicator):
             l2 = self.low[i + 1]
             _left = right - self.interval
 
-            if self.is_ob_box_up(i) and bull_boxes_index_OB <= self.obMaxBoxSet:
+            if self.is_ob_box_up(i) and bull_boxes_index_ob <= self.obMaxBoxSet:
                 _t = h2
                 _b = min(l2, self.low[i])
                 if _t-_b >= self.min_sob_size:
                     _bullboxOB = self.Box(left=_left, top=_t, right=right, bottom=_b, signal=LongSignal())
                     _bullBoxesOB.append(_bullboxOB)
-                    bull_boxes_index_OB += 1
+                    bull_boxes_index_ob += 1
                     last_added_box_index = i
 
-            if self.is_ob_box_down(i) and bear_boxes_index_OB <= self.obMaxBoxSet:
+            if self.is_ob_box_down(i) and bear_boxes_index_ob <= self.obMaxBoxSet:
                 _t = max(h2, self.high[i])
                 _b = l2
                 if _t-_b >= self.min_sob_size:
                     _bearboxOB = self.Box(left=_left, top=_t, right=right, bottom=_b, signal=ShortSignal())
                     _bearBoxesOB.append(_bearboxOB)
-                    bear_boxes_index_OB += 1
+                    bear_boxes_index_ob += 1
                     last_added_box_index = i
 
             # # # # # # # # # Fair Value Gap # # # # # # # # #
             h = self.high[i]
             l = self.low[i]
 
-            if self.is_fvg_box_up(i) and bull_boxes_index_FVG <= self.fvgMaxBoxSet:
+            if self.is_fvg_box_up(i) and bull_boxes_index_fvg <= self.fvgMaxBoxSet:
                 t = l
                 b = self.high[i + 2]
                 if t - b >= self.min_sob_size:
                     _bullboxFVG = self.Box(left=left, top=t, right=right, bottom=b, signal=LongSignal())
                     _bullBoxesFVG.append(_bullboxFVG)
-                    bull_boxes_index_FVG += 1
+                    bull_boxes_index_fvg += 1
                     last_added_box_index = i
 
-            if self.is_fvg_box_down(i) and bear_boxes_index_FVG <= self.fvgMaxBoxSet:
+            if self.is_fvg_box_down(i) and bear_boxes_index_fvg <= self.fvgMaxBoxSet:
                 t = self.low[i + 2]
                 b = h
                 if t - b >= self.min_sob_size:
                     _bearboxFVG = self.Box(left=left, top=t, right=right, bottom=b, signal=ShortSignal())
                     _bearBoxesFVG.append(_bearboxFVG)
-                    bear_boxes_index_FVG += 1
+                    bear_boxes_index_fvg += 1
                     last_added_box_index = i
 
         for i, box in enumerate(_bullBoxesOB):
@@ -908,9 +906,10 @@ class OBVolumeIndicator(Indicator):
                     left_value = self.src["datetime"][self.tuning - 1 + i]
                     right_value = self.src["datetime"][i]
 
-                    new_order_block = self.OrderBlock(self.amount_of_boxes, top_value, bot_value, left_value, right_value,
-                                                      [0 for _ in range(self.amount_of_boxes)],
-                                                      LongSignal() if is_bull else ShortSignal(), self.price_data.interval)
+                    new_order_block = self.OrderBlock(self.amount_of_boxes, top_value, bot_value, left_value,
+                                                      right_value, [0 for _ in range(self.amount_of_boxes)],
+                                                      LongSignal() if is_bull else ShortSignal(),
+                                                      self.price_data.interval)
 
                     vol = new_order_block.generate_volume(v[self.tuning - 1 + i], h[self.tuning - 1 + i], l[self.tuning - 1 + i])
                     new_order_block.generate_boxes(right_value)

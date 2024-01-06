@@ -1,18 +1,20 @@
-from aiogram import Bot, Dispatcher
 import logging
-import price_parser
-from price_parser import PriceData
-import signal_maker
-from tvDatafeed import Interval
 import multiprocessing
+
+from tv_signals.price_parser import PriceData
+from tv_signals import signal_maker, price_parser
+from tv_signals.signal_types import get_signal_by_type
+from tv_signals.signals_table import SignalsTable
+from tv_signals.analized_signals_table import AnalyzedSignalsTable
 from manager_module import *
 from menu_text import *
-import interval_convertor
-from signals import get_signal_by_type
-from my_time import *
+
+from utils import interval_convertor
+from utils.time import *
+
+from aiogram import Bot, Dispatcher
+from tvDatafeed import Interval
 import configparser
-from signals_table import SignalsTable
-from analized_signals_table import AnalyzedSignalsTable
 
 config = configparser.ConfigParser()
 config.read("config.ini")

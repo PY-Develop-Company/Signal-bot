@@ -1,7 +1,8 @@
-from DBModul import db_connection
-from sqlite3 import Error
-from price_parser import PriceData
+from db_modul import db_connection
+from tv_signals.price_parser import PriceData
+
 from pandas import read_sql_query
+from sqlite3 import Error
 
 table_name = "analizedSignals"
 

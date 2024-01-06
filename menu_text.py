@@ -1,6 +1,7 @@
-from aiogram import types
-from file_manager import *
+from utils.file_manager import *
 from user_module import *
+
+from aiogram import types
 
 
 def get_language_file(path="language.json"):

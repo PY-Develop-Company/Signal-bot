@@ -1,8 +1,8 @@
-from pandas import Timedelta
-from tvDatafeed import Interval
-
 import math
 from datetime import timedelta
+
+from pandas import Timedelta
+from tvDatafeed import Interval
 
 
 def timedelta_to_close_string(interval, bars_count=3):

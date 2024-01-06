@@ -1,5 +1,6 @@
 from user_module import *
-from DBModul import *
+from db_modul import *
+
 
 manager_username = "@bwg_Golden"
 tester_ids = [741867026, 693562775, 5359645780]

@@ -1,9 +1,10 @@
-from DBModul import db_connection
+from db_modul import db_connection
+from tv_signals.price_parser import PriceData
+
+from utils.time import datetime_to_secs
+
 from sqlite3 import Error
-from price_parser import PriceData
-from tvDatafeed import Interval
-from datetime import timedelta
-from my_time import now_time, datetime_to_secs, secs_to_date
+
 
 table_name = "completedSignals"
 

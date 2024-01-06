@@ -1,12 +1,13 @@
-import asyncio
+from datetime import timedelta
 
-from my_time import secs_to_date
+from utils.time import datetime_to_str, now_time, str_to_datetime, secs_to_date
 import manager_module
 import market_info
-from datetime import timedelta
-from my_time import datetime_to_str, now_time, str_to_datetime
-from DBModul import *
+from db_modul import *
+
 from pandas import read_sql_query, to_datetime
+import asyncio
+
 
 startLanguage = "none"
 

@@ -1,16 +1,18 @@
 from datetime import datetime, timedelta
+
+from utils import file_manager, interval_convertor
+from utils.time import now_time
+
 from tvDatafeed import TvDatafeed, TvDatafeedLive, Interval
 from tvDatafeed.seis import Seis
 from pandas import DataFrame, read_csv
-import file_manager
-import interval_convertor
-from my_time import now_time, datetime_to_secs
+
 
 trade_pause_wait_time = 600
 
-currencies_path = "users/currencies.txt"
-currencies_data_path = "currencies_data/"
-currency_check_ended = "currencies_data/check_ended/"
+currencies_path = "./users/currencies.txt"
+currencies_data_path = "./currencies_data/"
+currency_check_ended = "./currencies_data/check_ended/"
 
 currencies_last_analize_date = {}
 tv = TvDatafeed()

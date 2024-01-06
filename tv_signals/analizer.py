@@ -1,10 +1,11 @@
-from indicators_reader import VolumeIndicator, SuperOrderBlockIndicator, ScalpProIndicator, NadarayaWatsonIndicator, \
-    UMAIndicator, OBVolumeIndicator
-from signals import *
-from signals import Signal
-from interval_convertor import interval_to_int
-from price_parser import PriceData
-from my_time import now_time
+from tv_signals.indicators_reader import (VolumeIndicator, SuperOrderBlockIndicator, ScalpProIndicator,
+                                          NadarayaWatsonIndicator, UMAIndicator, OBVolumeIndicator)
+from tv_signals.signal_types import *
+from tv_signals.signal_types import Signal
+from tv_signals.price_parser import PriceData
+
+from utils.interval_convertor import interval_to_int
+from utils.time import now_time
 
 
 def has_multitimeframe_signal(needed_count, long_count, short_count):

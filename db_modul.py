@@ -64,9 +64,7 @@ def create_managers_table():
 
 
 db_connection = open_db()
-# import file_manager
 create_managers_table()
 create_users_table()
-# temp = file_manager.read_file("users/db.txt")
 # for json_data in temp:
 #     InsertUserDataFromJSON(user_Table, json_data)

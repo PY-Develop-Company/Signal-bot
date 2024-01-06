@@ -1,5 +1,7 @@
-from my_time import date_by_adding_business_days, now_time
 from datetime import datetime
+
+from utils.time import date_by_adding_business_days, now_time
+
 import configparser
 
 

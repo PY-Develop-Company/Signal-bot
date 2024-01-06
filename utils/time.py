@@ -1,5 +1,7 @@
-import pytz
 from datetime import datetime, timedelta
+
+import pytz
+
 
 time_zone = pytz.timezone("Europe/Bucharest")
 origin_date_time_zone = datetime(1900, 1, 1, tzinfo=time_zone)
