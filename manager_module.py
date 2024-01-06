@@ -1,10 +1,17 @@
+import json
+
 from user_module import *
 from db_modul import *
 
+import configparser
 
-manager_username = "@bwg_Golden"
-tester_ids = [741867026, 693562775, 5359645780]
-managers_id = [5964166439, 741867026, 693562775, 5359645780]
+config = configparser.ConfigParser()
+config.read("config.ini")
+
+
+manager_username = config["ADMIN"]["ManagerUsername"]
+tester_ids = json.loads(config.get("ADMIN", "TesterIds"))
+managers_ids = json.loads(config.get("ADMIN", "ManagersIds"))
 manager_url = f"https://t.me/{manager_username[1:]}"
 
 search_id_manager_status = "пошук ID статус"

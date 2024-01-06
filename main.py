@@ -193,7 +193,7 @@ async def show_users_list_to_user(user_id, is_next=True):
 async def start_command(message):
     user_id = message.from_user.id
 
-    if user_id in managers_id:
+    if user_id in managers_ids:
         await add_manager(message.from_user.id)
     else:
         add_user(user_id, message.from_user.first_name, message.from_user.last_name, message.from_user.username)
@@ -206,7 +206,7 @@ async def start_command(message):
     if get_user_status(user_id) == wait_id_input_status:
         update_status_user(user_id, none_status)
 
-    if user_id in managers_id:
+    if user_id in managers_ids:
         markup = get_manager_markup(user_language)
     else:
         markup = get_markup_with_status(user_id, get_user_status(user_id))
@@ -252,7 +252,7 @@ async def stop_test_command(message):
 
 @dp.message_handler(commands="checkDeposit")
 async def check_deposit_command(message):
-    if message.from_user.id in managers_id:
+    if message.from_user.id in managers_ids:
         return
 
     if has_user_status(message.from_user.id, id_status):
@@ -295,7 +295,7 @@ async def remove_user_command(call: types.CallbackQuery):
 @dp.message_handler(commands="trial")
 async def get_trial_command(message):
     userLanguage = get_user_language(message.from_user.id)
-    if has_user_status(message.from_user.id, deposit_status) or message.from_user.id in managers_id:
+    if has_user_status(message.from_user.id, deposit_status) or message.from_user.id in managers_ids:
         await send_message_to_user(message.from_user.id, languageFile[userLanguage]["cant_get_trial_error_text"])
         return
     elif had_trial_status(message.from_user.id):
@@ -310,7 +310,7 @@ async def get_trial_command(message):
 @dp.message_handler(commands="users")
 async def users_list_command(message):
     global last_user_list_message
-    if message.from_user.id in managers_id:
+    if message.from_user.id in managers_ids:
         await remove_last_user_list_message(message.chat.id)
         await remove_last_user_manage_message(last_user_manage_message.get(message.chat.id))
 
@@ -353,7 +353,7 @@ async def handle_media(message: types.Message):
         return
 
     # MANAGER
-    if user_id in managers_id:
+    if user_id in managers_ids:
         if message.text == languageFile[user_language]["user_management_button"]:
             await users_list_command(message)
         elif message.text == languageFile[user_language]["search_id_request"]:
@@ -538,7 +538,7 @@ def handle_signal_msg_controller(signal, msg, pd: PriceData, open_position_price
 
         try:
             debug_msg = "delay: " + str(delay) + "; analize_time: " + str(t1) + "; send_msg_time: " + str(t2)
-            await send_message_to_users(managers_id, debug_msg)
+            await send_message_to_users(managers_ids, debug_msg)
         except Exception as e:
             print(e)
 

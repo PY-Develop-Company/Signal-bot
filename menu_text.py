@@ -4,8 +4,8 @@ from user_module import *
 from aiogram import types
 
 
-def get_language_file(path="language.json"):
-    return read_file(path)
+def get_language_file():
+    return read_file("language.json")
 
 
 languageFile = get_language_file()
@@ -95,7 +95,7 @@ def get_users_markup(languageCode):
 
 def get_markup_with_status(user_id, status):
     user_language = get_user_language(user_id)
-    if user_id in manager_module.managers_id:
+    if user_id in manager_module.managers_ids:
         return get_manager_markup(user_language)
     else:
         if status in [none_status]:

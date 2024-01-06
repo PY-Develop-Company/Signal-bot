@@ -227,7 +227,7 @@ def has_user_status(id, status):
 
 
 def get_user_language(id):
-    if id in manager_module.managers_id:
+    if id in manager_module.managers_ids:
         l = manager_module.get_manager_language(id)
         return l
     else:
@@ -241,7 +241,7 @@ def get_user_language(id):
 def set_user_language(user_id, new_language):
     cursor = db_connection.cursor()
     try:
-        if user_id in manager_module.managers_id:
+        if user_id in manager_module.managers_ids:
             manager_module.set_manager_language(user_id, new_language)
         else:
             cursor.execute(f"UPDATE {user_table} SET language = ? WHERE id = ?", (new_language, user_id))
