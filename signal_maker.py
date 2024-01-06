@@ -3,7 +3,7 @@ from datetime import datetime
 from tvDatafeed import Interval
 from analizer import MultitimeframeAnalizer, NewMultitimeframeAnalizer
 import interval_convertor
-from analized_signals_table import AnalizedSignalsTable
+from analized_signals_table import AnalyzedSignalsTable
 import asyncio
 from signals import *
 
@@ -88,7 +88,7 @@ def analize_currency_data_controller(analize_pds, additional_pds):
         open_position_price = main_price_df.close[0]
         msg = signal.get_open_msg_text(main_pd, deal_time)
         
-        AnalizedSignalsTable.add_analized_signal(main_pd, main_price_df.datetime[0], has_signal, signal.type,
+        AnalyzedSignalsTable.add_analyzed_signal(main_pd, main_price_df.datetime[0], has_signal, signal.type,
                                                  deal_time, open_position_price, msg, start_analize_time)
 
         # print("Created signal file:", msg, main_price_df.datetime[0])

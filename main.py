@@ -12,7 +12,7 @@ from signals import get_signal_by_type
 from my_time import *
 import configparser
 from signals_table import SignalsTable
-from analized_signals_table import AnalizedSignalsTable
+from analized_signals_table import AnalyzedSignalsTable
 
 config = configparser.ConfigParser()
 config.read("config.ini")
@@ -591,7 +591,7 @@ def signals_message_sender_controller(prices_data, prices_data_all, shared_list)
 
             for pd in all_prices_data:
                 pd.reset_chart_data()
-            AnalizedSignalsTable.set_all_checked()
+            AnalyzedSignalsTable.set_all_checked()
 
             return datetime_to_secs(now_time())
 
@@ -621,7 +621,7 @@ def signals_message_sender_controller(prices_data, prices_data_all, shared_list)
             if not market_info.is_market_working():
                 continue
 
-            unchecked_signals_df = AnalizedSignalsTable.get_unchecked_signals()
+            unchecked_signals_df = AnalyzedSignalsTable.get_unchecked_signals()
             real_signals_df = unchecked_signals_df[unchecked_signals_df["has_signal"] == True]
             if len(real_signals_df) == 0:
                 continue
@@ -638,7 +638,7 @@ def signals_message_sender_controller(prices_data, prices_data_all, shared_list)
 
             await asyncio.sleep(signal_search_delay)
 
-            AnalizedSignalsTable.set_all_checked()
+            AnalyzedSignalsTable.set_all_checked()
             last_send_message_check = datetime_to_secs(now_time())
 
     asyncio.run(signals_message_sender_function(prices_data, prices_data_all, shared_list))
