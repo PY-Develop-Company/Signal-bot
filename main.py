@@ -515,9 +515,9 @@ async def manage_user_callback(call: types.CallbackQuery):
     await call.answer(call.data)
 
 
-def handle_signal_msg_controller(signal, msg, pd: PriceData, open_position_price, deal_time, start_analize_time,
+def handle_signal_msg_controller(analized_signal_id, signal, msg, pd: PriceData, open_position_price, deal_time, start_analize_time,
                                  shared_list):
-    async def handle_signal_msg(signal, msg, pd: PriceData, open_position_price, deal_time, start_analize_time,
+    async def handle_signal_msg(analized_signal_id, signal, msg, pd: PriceData, open_position_price, deal_time, start_analize_time,
                                 shared_list):
         t1 = str_to_datetime(start_analize_time)
         t2 = now_time()
@@ -557,9 +557,9 @@ def handle_signal_msg_controller(signal, msg, pd: PriceData, open_position_price
                 set_next_signal_status(user, False)
 
         send_close_msg_time = now_time()
-        SignalsTable.add_sended_signal(pd, deal_time, t2, send_close_msg_time, signal.type, open_price, close_price, is_profit)
+        SignalsTable.add_sended_signal(analized_signal_id, t2, send_close_msg_time, open_price, close_price, is_profit)
 
-    asyncio.run(handle_signal_msg(signal, msg, pd, open_position_price, deal_time, start_analize_time, shared_list))
+    asyncio.run(handle_signal_msg(analized_signal_id, signal, msg, pd, open_position_price, deal_time, start_analize_time, shared_list))
 
 
 async def check_trial_users():
@@ -635,7 +635,7 @@ def signals_message_sender_controller(prices_data, prices_data_all, shared_list)
             pd = PriceData(df["symbol"][0], df["exchange"][0], interval_convertor.str_to_interval(df["interval"][0]))
 
             multiprocessing.Process(target=handle_signal_msg_controller,
-                                    args=(signal, df["msg"][0], pd, df["open_price"][0], int(df["deal_time"][0]),
+                                    args=(df["id"][0], signal, df["msg"][0], pd, df["open_price"][0], int(df["deal_time"][0]),
                                           df["start_analize_time"][0], shared_list), daemon=True).start()
 
             await asyncio.sleep(signal_search_delay)
@@ -656,7 +656,8 @@ if __name__ == '__main__':
     shared_list.append(0)
     shared_list.append(0)
 
-    currencies = price_parser.get_currencies()
+    currencies = price_parser.get_currencies().copy()
+    print("currencies", currencies)
 
     intervals = [Interval.in_1_minute, Interval.in_3_minute, Interval.in_5_minute, Interval.in_15_minute,
                  Interval.in_30_minute, Interval.in_45_minute, Interval.in_1_hour]

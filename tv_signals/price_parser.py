@@ -5,12 +5,16 @@ from utils.time import now_time
 
 from tvDatafeed import TvDatafeed, TvDatafeedLive, Interval
 from tvDatafeed.seis import Seis
-from pandas import DataFrame, read_csv
+from pandas import DataFrame, read_csv, read_sql_query
+
+import sqlite3
+from db_modul import db_connection
 
 
 trade_pause_wait_time = 600
 
-currencies_path = "./users/currencies.txt"
+currencies_table_name = "currencies"
+
 currencies_data_path = "./currencies_data/"
 currency_check_ended = "./currencies_data/check_ended/"
 
@@ -20,30 +24,29 @@ tvl = TvDatafeedLive()
 
 timeout_secs = 60
 
-currencies_puncts = {
-    "EURUSD": 0.00001,
-    "AUDUSD": 0.00001,
-    "AUDCAD": 0.00001,
-    "EURJPY": 0.001,
-    "EURCAD": 0.00001,
-    "AUDCHF": 0.00001,
-    "GBPUSD": 0.00001,
-    "AUDJPY": 0.001,
-    "GBPAUD": 0.00001
-}
-
 
 class PriceData:
     def __init__(self, symbol: str, exchange: str, interval: Interval):
         self.symbol = symbol
         self.exchange = exchange
         self.interval = interval
+        try:
+            cursor = db_connection.cursor()
+            sql_query = f"""SELECT puncts FROM {currencies_table_name}
+                            WHERE symbol = "{self.symbol}" AND exchange = "{self.exchange}";"""
+            cursor.execute(sql_query)
+            puncts = cursor.fetchone()
+            self.puncts = puncts[0]
+        except sqlite3.Error as error:
+            print(f"Error PriceData creation: {error}")
+            self.puncts = None
+        print("created PriceData", symbol, exchange, interval)
 
     def print(self):
         print("\t", self.symbol, self.interval)
 
-    def get_real_puncts(self, puncts):
-        return currencies_puncts[self.symbol] * puncts
+    def get_real_puncts(self, pucts):
+        return self.puncts * pucts
 
     def save_chart_data(self, df: DataFrame):
         interval = str(self.interval).replace(".", "")
@@ -147,11 +150,20 @@ class PriceData:
 
 def get_currencies():
     currencies = []
-    currencies_file_content = file_manager.read_file(currencies_path)
-    for currency in currencies_file_content:
-        symbol = currency['symbol']
-        exchange = currency['exchange']
-        currencies.append((symbol, exchange))
+    # currencies_file_content = file_manager.read_file(currencies_path)
+
+    try:
+        sql_query = f"""SELECT * FROM {currencies_table_name};"""
+        df = read_sql_query(sql_query, db_connection)
+
+        for currency in df.index:
+            if df["is_in_use"][currency] == 1:
+                symbol = df['symbol'][currency]
+                exchange = df['exchange'][currency]
+                currencies.append((symbol, exchange))
+    except sqlite3.Error as error:
+        print(f"Error get_currencies: {error}")
+
     return currencies
 
 
