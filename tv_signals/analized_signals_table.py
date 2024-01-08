@@ -5,6 +5,9 @@ from tv_signals.price_parser import currencies_table_name
 from pandas import read_sql_query
 from sqlite3 import Error
 
+from my_debuger import debug_error, debug_info
+
+
 table_name = "analizedSignals"
 
 
@@ -29,20 +32,20 @@ class AnalyzedSignalsTable:
                 );
                 """)
         except Error as error:
-            print(f"Error create_table AnalyzedSignalsTable: ", error)
+            debug_error(f"{error}", f"Error create_table AnalyzedSignalsTable")
 
     @staticmethod
     def add_analyzed_signal(pd: PriceData, candle_time, has_signal, signal_type, deal_time, open_price, msg, start_analize_time):
         cursor = db_connection.cursor()
+        sql_query = f"""
+                        INSERT INTO analizedSignals (currency, interval, candle_time, has_signal, signal_type, deal_time, open_price, msg, start_analize_time)
+                        VALUES ((SELECT id FROM currencies WHERE symbol = "EURUSD" AND exchange = "OANDA"), "{str(pd.interval)}", 
+                        "{str(candle_time)}", {has_signal}, "{signal_type}", {deal_time}, {open_price}, "{msg}", "{start_analize_time}");"""
         try:
-            sql_query = f"""
-                INSERT INTO analizedSignals (currency, interval, candle_time, has_signal, signal_type, deal_time, open_price, msg, start_analize_time)
-                VALUES ((SELECT id FROM currencies WHERE symbol = "EURUSD" AND exchange = "OANDA"), "{str(pd.interval)}", 
-                "{str(candle_time)}", {has_signal}, "{signal_type}", {deal_time}, {open_price}, "{msg}", {start_analize_time});"""
             cursor.execute(sql_query)
             db_connection.commit()
         except Error as error:
-            print(f"add_analized_signal {error}")
+            debug_error(f"{error} {sql_query}", f"Error add_analized_signal")
 
     @staticmethod
     def get_unchecked_signals():
@@ -57,7 +60,7 @@ class AnalyzedSignalsTable:
             df = read_sql_query(sql_query, db_connection)
             result = df
         except Error as error:
-            print(f"Error get_unchecked_signals (select): {error}")
+            debug_error(f"{error}", f"Error get_unchecked_signals (select)")
 
         cursor = db_connection.cursor()
         try:
@@ -66,7 +69,7 @@ class AnalyzedSignalsTable:
             cursor.execute(sql_query)
             db_connection.commit()
         except Error as error:
-            print(f"Error get_unchecked_signals(mark checked): {error}")
+            debug_error(f"{error}", f"Error get_unchecked_signals(mark checked)")
         return result
 
     @staticmethod
@@ -78,7 +81,7 @@ class AnalyzedSignalsTable:
             cursor.execute(sql_query)
             db_connection.commit()
         except Error as error:
-            print(f"set_all_checked {error}")
+            debug_error(f"{error}", f"Error set_all_checked")
 
 
 AnalyzedSignalsTable.create_table()
@@ -95,4 +98,4 @@ def update_currencies():
                    """)
         db_connection.commit()
     except Error as error:
-        print(f"Error create_table AnalyzedSignalsTable: ", error)
+        debug_error(f"{error}", f"Error update AnalyzedSignalsTable")

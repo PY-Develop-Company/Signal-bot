@@ -16,6 +16,8 @@ from aiogram import Bot, Dispatcher
 from tvDatafeed import Interval
 import configparser
 
+from my_debuger import debug_error, debug_info, debug_temp
+
 config = configparser.ConfigParser()
 config.read("config.ini")
 
@@ -109,7 +111,7 @@ async def send_message_to_user(user_id, text, markup=None):
         else:
             return await bot.send_message(user_id, text, disable_notification=False, reply_markup=markup)
     except Exception as e:
-        print("Error:", e)
+        debug_error(str(e))
 
     return None
 
@@ -141,7 +143,7 @@ async def send_photo_text_message_to_user(user_id, img_path, text=" ", markup=No
             else:
                 await bot.send_photo(user_id, photo=file, caption=text, reply_markup=markup)
     except Exception as e:
-        print("Error:", e)
+        debug_error(str(e))
 
 
 async def send_photo_text_message_to_users(users_ids: [], img_path, text=" ", args=[]):
@@ -168,8 +170,8 @@ async def update_account_user(id, account_number):
                 await send_message_to_user(id, languageFile[user_language]["get_vip_text"])
             elif account_number == none_status:
                 await send_message_to_user(id, languageFile[user_language]["reject_vip_text"])
-    except sqlite3.Error as error:
-        print(f"Error update account {id}: {error}")
+    except sqlite3.Error as e:
+        debug_error(str(e), error_name=f"Error update account {id}")
 
 
 async def show_users_list_to_user(user_id, is_next=True):
@@ -529,18 +531,18 @@ def handle_signal_msg_controller(analized_signal_id, signal, msg, pd: PriceData,
         for i in range(0, send_msg_repeat_count):
             await send_photo_text_message_to_users(users_groups[i], signal.photo_path, msg, args=["signal_min_text"])
             await asyncio.sleep(send_msg_delay)
-        # print(users_groups)
-        # print([len(users_groups[i]) for i in range(send_msg_repeat_count)])
+        # debug_info(f"{users_groups}")
+        # debug_info(f"{[len(users_groups[i]) for i in range(send_msg_repeat_count)]})
 
         t2 = now_time()
         delay = t2 - t1
-        print("after_send_delay", delay)
+        debug_info("after_send_delay" + " " + str(delay))
 
         try:
             debug_msg = "delay: " + str(delay) + "; analize_time: " + str(t1) + "; send_msg_time: " + str(t2)
             await send_message_to_users(managers_ids, debug_msg)
         except Exception as e:
-            print(e)
+            debug_error(str(e))
 
         close_signal_message, is_profit, open_price, close_price = await signal_maker.close_position(
             open_position_price, signal, pd, bars_count=deal_time)
@@ -583,7 +585,7 @@ async def check_trial_users():
                 elif get_user_status(user_id) == wait_id_status:
                     await send_message_to_user(user_id, languageFile[userLanguage]["wait_id_status"])
     except Exception as e:
-        print("check_trial_users_ERROR", e)
+        debug_error(str(e), "check_trial_users_ERROR")
 
 
 def signals_message_sender_controller(prices_data, prices_data_all, shared_list):
@@ -607,7 +609,7 @@ def signals_message_sender_controller(prices_data, prices_data_all, shared_list)
                 last_send_message_check = reset_seis(all_prices_data)
                 continue
 
-            await asyncio.sleep(3)
+            await asyncio.sleep(10)
             try:
                 with open("users/test.txt", "r") as file:
                     cont = file.read().split(".")[0]
@@ -615,11 +617,12 @@ def signals_message_sender_controller(prices_data, prices_data_all, shared_list)
                         cont = float(cont)
                         if cont > datetime_to_secs(now_time()):
                             last_send_message_check = datetime_to_secs(now_time())
-                            print("wait for signal", cont, datetime_to_secs(now_time()))
+                            debug_info("wait for signal" + " " + str(cont) +" "+ str(datetime_to_secs(now_time())))
                             continue
             except Exception as e:
-                print("Error", e)
-            # print("search signals to send...")
+                debug_error(str(e))
+
+            debug_temp("search signals to send...")
             if not market_info.is_market_working():
                 continue
 
@@ -638,6 +641,7 @@ def signals_message_sender_controller(prices_data, prices_data_all, shared_list)
                                     args=(df["id"][0], signal, df["msg"][0], pd, df["open_price"][0], int(df["deal_time"][0]),
                                           df["start_analize_time"][0], shared_list), daemon=True).start()
 
+            debug_temp(f"wait for new signal search... ({signal_search_delay} s)")
             await asyncio.sleep(signal_search_delay)
 
             AnalyzedSignalsTable.set_all_checked()
@@ -656,8 +660,7 @@ if __name__ == '__main__':
     shared_list.append(0)
     shared_list.append(0)
 
-    currencies = price_parser.get_currencies().copy()
-    print("currencies", currencies)
+    currencies = price_parser.get_currencies()
 
     intervals = [Interval.in_1_minute, Interval.in_3_minute, Interval.in_5_minute, Interval.in_15_minute,
                  Interval.in_30_minute, Interval.in_45_minute, Interval.in_1_hour]

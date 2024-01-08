@@ -10,6 +10,7 @@ from pandas import DataFrame, read_csv, read_sql_query
 import sqlite3
 from db_modul import db_connection
 
+from my_debuger import debug_error, debug_info, debug_tv_data_feed
 
 trade_pause_wait_time = 600
 
@@ -37,13 +38,12 @@ class PriceData:
             cursor.execute(sql_query)
             puncts = cursor.fetchone()
             self.puncts = puncts[0]
-        except sqlite3.Error as error:
-            print(f"Error PriceData creation: {error}")
+        except sqlite3.Error as e:
+            debug_error(str(e), f"Error PriceData creation")
             self.puncts = None
-        print("created PriceData", symbol, exchange, interval)
 
     def print(self):
-        print("\t", self.symbol, self.interval)
+        debug_info(f"\t {self.symbol} seis {self.interval}")
 
     def get_real_puncts(self, pucts):
         return self.puncts * pucts
@@ -76,12 +76,12 @@ class PriceData:
         try:
             df = read_csv(path)
         except Exception as e:
-            print("3Error chart not exists", path, e)
+            debug_error(str(e), f"Error get_chart_data_if_exists with path ({path})")
             return None
         try:
             df["datetime"] = df.apply(lambda row: datetime.strptime(row["datetime"], '%Y-%m-%d %H:%M:%S'), axis=1)
         except Exception as e:
-            print("Error date time is wrong formated", e, df.to_string())
+            debug_error(str(e) + " " + str(df.to_string()), f"Error get_chart_data_if_exists date time is wrong formatted")
             return None
         return df
 
@@ -124,7 +124,7 @@ class PriceData:
             priceData = priceData.reindex(index=priceData.index[::-1]).iloc[1:].reset_index()
             return priceData
         except Exception as e:
-            print("Error cant get price data", e)
+            debug_error(str(e), "Error cant get price data")
             return None
 
     def is_analize_time(self, update_date: datetime, debug=False):
@@ -161,8 +161,8 @@ def get_currencies():
                 symbol = df['symbol'][currency]
                 exchange = df['exchange'][currency]
                 currencies.append((symbol, exchange))
-    except sqlite3.Error as error:
-        print(f"Error get_currencies: {error}")
+    except sqlite3.Error as e:
+        debug_error(str(e), "Error get_currencies")
 
     return currencies
 
@@ -182,27 +182,27 @@ def create_parce_currencies_with_intervals_callbacks(pds: [PriceData]):
             price_df = get_price_data_frame_seis(seis)
 
             pd = PriceData(seis.symbol, seis.exchange, seis.interval)
-            print("update file", pd.symbol, pd.interval)
+            debug_tv_data_feed("update file" + pd.symbol + str(pd.interval))
             pd.save_chart_data(price_df)
         except Exception as e:
-            print("bbb", e)
+            debug_error(str(e), "Error update_currency_file_consumer")
 
-    print(f"creating new seis {datetime.now()}")
+    debug_tv_data_feed(f"creating new seis")
 
     try:
         tvl.del_tvdatafeed()
     except Exception as e:
-        print("Error tvl", e)
+        debug_error(str(e), "Error tvl.del_tvdatafeed()")
     tvl = TvDatafeedLive()
     tv = TvDatafeed()
     try:
         for pd in pds:
             seis = tvl.new_seis(pd.symbol, pd.exchange, pd.interval, timeout=timeout_secs)
-            print("seis", seis)
+            debug_tv_data_feed("seis" + str(seis))
             consumer = tvl.new_consumer(seis, update_currency_file_consumer, timeout=timeout_secs)
     except ValueError as e:
-        print("Error1", e)
+        debug_error(str(e), "ValueError creating seis")
     except Exception as e:
-        print("Error3", e)
+        debug_error(str(e), "Error creating seis")
 
-    print(f"created new seis {datetime.now()}")
+    debug_tv_data_feed(f"created new seis")

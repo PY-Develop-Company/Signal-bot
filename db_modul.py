@@ -66,7 +66,7 @@ def create_managers_table():
 db_connection = open_db()
 if __name__ == "__main__":
     from tv_signals.analized_signals_table import update_currencies, AnalyzedSignalsTable
-    from tv_signals.signals_table import update_analized_signals
+    from tv_signals.signals_table import update_signals
     from tv_signals.price_parser import PriceData
     from tvDatafeed import Interval
     from utils.time import now_time

@@ -10,6 +10,7 @@ from pandas import Timedelta
 from tvDatafeed import Interval
 import asyncio
 
+from my_debuger import debug_tv_data_feed, debug_temp, debug_info
 
 signals_analysis_last_date = {}
 signal_last_update = datetime.now()
@@ -61,7 +62,7 @@ def is_all_charts_collected(main_pd: PriceData, parent_pds: [PriceData]):
         if not (parent_df_last_bar_checked == needed_bar):
             res = False
             break
-    # print(real_bars, expected_bars)
+    # debug_info(f"{real_bars} {expected_bars}")
     return res
 
 
@@ -92,16 +93,16 @@ def analize_currency_data_controller(analize_pds, additional_pds):
         AnalyzedSignalsTable.add_analyzed_signal(main_pd, main_price_df.datetime[0], has_signal, signal.type,
                                                  deal_time, open_position_price, msg, start_analize_time)
 
-        # print("Created signal file:", msg, main_price_df.datetime[0])
+        debug_tv_data_feed(f"Created signal file {msg} {main_price_df.datetime[0]}")
 
     async def analize_currency_data_loop(analize_pds, additional_pds):
         while True:
-            # print("analize_loop")
+            debug_temp(f"analize_loop")
             tasks = []
             for i in range(len(analize_pds)):
                 task = asyncio.create_task(analize_currency_data_function(analize_pds[i], additional_pds[i]))
                 tasks.append(task)
             await asyncio.gather(*tasks)
-            await asyncio.sleep(3)
+            await asyncio.sleep(10)
 
     asyncio.run(analize_currency_data_loop(analize_pds, additional_pds))

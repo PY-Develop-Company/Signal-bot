@@ -4,6 +4,7 @@ from utils.time import datetime_to_secs
 
 from sqlite3 import Error
 
+from my_debuger import debug_error, debug_info
 
 table_name = "completedSignals"
 
@@ -27,7 +28,7 @@ class SignalsTable:
                             )
                         """)
         except Error as error:
-            print(f"Error create_table SignalsTable: ", error)
+            debug_error(f"{error}", f"Error create_table SignalsTable")
 
     @staticmethod
     def add_sended_signal(analized_signal_id, open_time, close_time,open_price, close_price, is_profit):
@@ -41,7 +42,7 @@ class SignalsTable:
             cursor.execute(sql_query, data)
             db_connection.commit()
         except Error as error:
-            print(f"Error SignalsTable add_sended_signal: {error}")
+            debug_error(f"{error}", f"Error SignalsTable add_sended_signal")
 
     @staticmethod
     def get_all_data():
@@ -51,7 +52,7 @@ class SignalsTable:
             res = cursor.execute(sql_query)
             return res.fetchall()
         except Error as error:
-            print(f"Error SignalsTable get_all_data: {error}")
+            debug_error(f"{error}", f"Error SignalsTable get_all_data")
             return None
 
     @staticmethod
@@ -64,11 +65,11 @@ class SignalsTable:
             res = cursor.execute(sql_query)
             return res.fetchall()
         except Error as error:
-            print(f"Error SignalsTable get_profit_data_in_period: {error}")
+            debug_error(f"{error}", f"Error SignalsTable get_profit_data_in_period")
             return None
 
 
-def update_analized_signals():
+def update_signals():
     from tv_signals.analized_signals_table import table_name as analized_table_name, currencies_table_name
     cursor = db_connection.cursor()
     try:
@@ -85,7 +86,7 @@ def update_analized_signals():
                    """)
         db_connection.commit()
     except Error as error:
-        print(f"Error create_table AnalyzedSignalsTable: ", error)
+        debug_error(f"{error}", f"Error update SignalsTable")
 
 
 SignalsTable.create_table()
