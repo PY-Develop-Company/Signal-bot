@@ -33,17 +33,17 @@ class SignalsTable:
     @staticmethod
     def add_sended_signal(analized_signal_id, open_time, close_time,open_price, close_price, is_profit):
         columns = ("analized_signal_id", "open_time_secs", "open_time", "close_time_secs", "close_time", "open_price", "close_price", "is_profit")
-        data = (analized_signal_id, open_time, datetime_to_secs(open_time), close_time, datetime_to_secs(close_time), open_price, close_price, is_profit)
+        data = (open_time, datetime_to_secs(open_time), close_time, datetime_to_secs(close_time), open_price, close_price, is_profit)
         cursor = db_connection.cursor()
         try:
             sql_query = f"""
                 INSERT INTO {table_name} {columns}
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?);"""
+                VALUES ({analized_signal_id}, ?, ?, ?, ?, ?, ?, ?);"""
             cursor.execute(sql_query, data)
             db_connection.commit()
         except Error as error:
             debug_error(f"{error}", f"Error SignalsTable add_sended_signal")
-
+    
     @staticmethod
     def get_all_data():
         cursor = db_connection.cursor()

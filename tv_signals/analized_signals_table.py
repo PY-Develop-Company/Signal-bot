@@ -39,7 +39,7 @@ class AnalyzedSignalsTable:
         cursor = db_connection.cursor()
         sql_query = f"""
                         INSERT INTO analizedSignals (currency, interval, candle_time, has_signal, signal_type, deal_time, open_price, msg, start_analize_time)
-                        VALUES ((SELECT id FROM currencies WHERE symbol = "EURUSD" AND exchange = "OANDA"), "{str(pd.interval)}", 
+                        VALUES ((SELECT id FROM currencies WHERE symbol = "{pd.symbol}" AND exchange = "{pd.exchange}"), "{str(pd.interval)}", 
                         "{str(candle_time)}", {has_signal}, "{signal_type}", {deal_time}, {open_price}, "{msg}", "{start_analize_time}");"""
         try:
             cursor.execute(sql_query)
@@ -51,7 +51,7 @@ class AnalyzedSignalsTable:
     def get_unchecked_signals():
         result = None
         try:
-            sql_query = f"""SELECT id, has_signal, signal_type, symbol, exchange, interval, open_price, deal_time, 
+            sql_query = f"""SELECT {table_name}.id, has_signal, signal_type, symbol, exchange, interval, open_price, deal_time, 
                 start_analize_time, msg
                 FROM {table_name}
                 LEFT JOIN {currencies_table_name} ON {table_name}.currency = {currencies_table_name}.id
