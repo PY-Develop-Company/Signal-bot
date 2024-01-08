@@ -43,7 +43,7 @@ class SignalsTable:
             db_connection.commit()
         except Error as error:
             debug_error(f"{error}", f"Error SignalsTable add_sended_signal")
-    
+
     @staticmethod
     def get_all_data():
         cursor = db_connection.cursor()
