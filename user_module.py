@@ -8,6 +8,7 @@ from db_modul import *
 from pandas import read_sql_query, to_datetime
 import asyncio
 
+from my_debuger import debug_error, debug_info
 
 startLanguage = "none"
 
@@ -50,7 +51,7 @@ def find_user_with_id(id):
         }
         return user_dict
     except sqlite3.Error as error:
-        print(f"Error find user: {error}")
+        debug_error(str(error), "Error find user with id")
         return None
 
 
@@ -68,7 +69,7 @@ def set_user_time(user_id, new_time):
         cursor.execute(f"UPDATE {user_table} SET time = ? WHERE id = ?", (new_time, user_id))
         db_connection.commit()
     except sqlite3.Error as error:
-        print(f"Error set time {user_id}: {error}")
+        debug_error(str(error), f"Error set user time {user_id}")
 
 
 def get_users_groups_ids(groups_count, users_in_group_count, delay_second):
@@ -125,7 +126,7 @@ def remove_user_with_id(id):
         else:
             return False, ""
     except sqlite3.Error as error:
-        print(f"Error delete {id}: {error}")
+        debug_error(str(error), f"Error delete user with id {id}")
         return False, ""
 
 
@@ -157,7 +158,7 @@ def get_users_strings():
             user_number += 1
         return users_strings_list, users_data
     except sqlite3.Error as error:
-        print(f"Error  get users string: {error}")
+        debug_error(str(error), f"Error get users string")
         return [], []
 
 
@@ -247,7 +248,7 @@ def set_user_language(user_id, new_language):
             cursor.execute(f"UPDATE {user_table} SET language = ? WHERE id = ?", (new_language, user_id))
             db_connection.commit()
     except sqlite3.Error as error:
-        print(f"Error change language {user_id}: {error}")
+        debug_error(str(error), f"Error change language {user_id}")
 
 
 def set_next_signal_status(user_id, flag):
@@ -256,7 +257,7 @@ def set_next_signal_status(user_id, flag):
         cursor.execute(f"UPDATE {user_table} SET get_next_signal = ? WHERE id = ?", (flag, user_id))
         db_connection.commit()
     except sqlite3.Error as error:
-        print(f"Error 'get_next_signal': {error}")
+        debug_error(str(error), f"Error set_next_signal_status")
 
 
 def get_next_signal_status(user_id):
@@ -272,7 +273,7 @@ def get_users_ids_with_status(status):
         users_df = read_sql_query(sql_query, db_connection)
         return users_df["id"].values.tolist()
     except sqlite3.Error as error:
-        print(f"Error get users with status '{status}': {error}")
+        debug_error(str(error), f"Error get users with status '{status}'")
         return []
 
 
@@ -294,7 +295,7 @@ def set_trial_to_user(user_id):
         ''', (trial_status, trial_end_date, user_id))
         db_connection.commit()
     except sqlite3.Error as error:
-        print(f"Error set trial {user_id}: {error}")
+        debug_error(str(error), f"Error set trial {user_id}")
 
 
 def remove_trial_from_user(user_id):
@@ -307,7 +308,7 @@ def remove_trial_from_user(user_id):
         ''', (none_status, user_id))
         db_connection.commit()
     except sqlite3.Error as error:
-        print(f"Error remove trial {user_id}: {error}")
+        debug_error(str(error), f"Error remove trial {user_id}")
 
 
 def get_user_trial_end_date(user_id):
@@ -320,7 +321,7 @@ def get_user_trial_end_date(user_id):
             return trial_end_date[0]
         return None
     except sqlite3.Error as error:
-        print(f"Error get trial end time {user_id}: {error}")
+        debug_error(str(error), f"Error get trial end time {user_id}")
         return None
 
 
@@ -345,7 +346,7 @@ def add_user(id, first_name, last_name, tag):
             ))
             db_connection.commit()
     except sqlite3.Error as error:
-        print(f"Error add {id}: {error}")
+        debug_error(str(error), f"Error add user with {id}")
 
 
 def update_status_user(id, status):
@@ -360,7 +361,7 @@ async def set_user_tag(user_id, tag):
         cursor.execute(f"UPDATE {user_table} SET tag = ? WHERE id = ?", (tag, user_id))
         db_connection.commit()
     except sqlite3.Error as error:
-        print(f"Error set 'tag': {error}")
+        debug_error(str(error), f"Error set tag")
 
 
 async def get_user_with_status(status):
