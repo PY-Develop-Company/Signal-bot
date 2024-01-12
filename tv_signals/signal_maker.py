@@ -5,6 +5,7 @@ from tv_signals.analized_signals_table import AnalyzedSignalsTable
 from tv_signals.signal_types import *
 
 from utils import interval_convertor
+from utils.time import origin_date
 
 from pandas import Timedelta
 from tvDatafeed import Interval
@@ -23,18 +24,18 @@ async def close_position_delay(interval: Interval, bars_count=3):
 
 async def close_position(position_open_price_original, signal: Signal, pd: PriceData, bars_count):
     position_open_price = pd.get_price_data(bars_count=2)
+
+    open_price = position_open_price_original if position_open_price is None else position_open_price.close[0]
+    open_price_date = origin_date if position_open_price is None else position_open_price.datetime[0]
+
     await close_position_delay(Interval.in_1_minute, bars_count)
 
     price_data = pd.get_price_data(bars_count=2)
-    if (price_data is None) or (position_open_price is None):
-        open_price = position_open_price_original
-        close_price = position_open_price_original
-    else:
-        open_price = position_open_price.close[0]
-        close_price = price_data.close[0]
+    close_price = position_open_price_original if price_data is None else price_data.close[0]
+    close_price_date = origin_date if price_data is None else price_data.datetime[0]
 
     msg, is_profit_position = signal.get_close_position_signal_message(pd, open_price, close_price, bars_count)
-    return msg, is_profit_position, open_price, close_price
+    return msg, is_profit_position, open_price, close_price, open_price_date, close_price_date
 
 
 def is_all_charts_collected(main_pd: PriceData, parent_pds: [PriceData]):
@@ -87,13 +88,17 @@ def analize_currency_data_controller(analize_pds, additional_pds):
 
         analizer = NewMultitimeframeAnalizer(1, 1)
         has_signal, signal, debug, deal_time = analizer.analize(prices_dfs, check_pds)
+        has_signal = True
+        signal = LongSignal()
+        deal_time = 3
+
         open_position_price = main_price_df.close[0]
         msg = signal.get_open_msg_text(main_pd, deal_time)
         
         AnalyzedSignalsTable.add_analyzed_signal(main_pd, main_price_df.datetime[0], has_signal, signal.type,
                                                  deal_time, open_position_price, msg, start_analize_time)
 
-        debug_tv_data_feed(f"Created signal file {msg} {main_price_df.datetime[0]}")
+        # debug_tv_data_feed(f"Created signal file {msg} {main_price_df.datetime[0]}")
 
     async def analize_currency_data_loop(analize_pds, additional_pds):
         while True:

@@ -544,7 +544,7 @@ def handle_signal_msg_controller(analized_signal_id, signal, msg, pd: PriceData,
         except Exception as e:
             debug_error(str(e))
 
-        close_signal_message, is_profit, open_price, close_price = await signal_maker.close_position(
+        close_signal_message, is_profit, open_price, close_price, open_price_date, close_price_date = await signal_maker.close_position(
             open_position_price, signal, pd, bars_count=deal_time)
         shared_list[is_profit] += 1
         img_path = "./img/profit.jpg" if is_profit else "./img/loss.jpg"
@@ -559,7 +559,7 @@ def handle_signal_msg_controller(analized_signal_id, signal, msg, pd: PriceData,
                 set_next_signal_status(user, False)
 
         send_close_msg_time = now_time()
-        SignalsTable.add_sended_signal(analized_signal_id, t2, send_close_msg_time, open_price, close_price, is_profit)
+        SignalsTable.add_sended_signal(analized_signal_id, t2, send_close_msg_time, open_price, close_price, is_profit, open_price_date, close_price_date)
 
     asyncio.run(handle_signal_msg(analized_signal_id, signal, msg, pd, open_position_price, deal_time, start_analize_time, shared_list))
 

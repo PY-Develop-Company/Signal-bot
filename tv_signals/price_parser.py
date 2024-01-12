@@ -182,7 +182,7 @@ def create_parce_currencies_with_intervals_callbacks(pds: [PriceData]):
             price_df = get_price_data_frame_seis(seis)
 
             pd = PriceData(seis.symbol, seis.exchange, seis.interval)
-            debug_tv_data_feed("update file" + pd.symbol + str(pd.interval))
+            # debug_tv_data_feed("update file" + pd.symbol + str(pd.interval))
             pd.save_chart_data(price_df)
         except Exception as e:
             debug_error(str(e), "Error update_currency_file_consumer")
@@ -198,7 +198,7 @@ def create_parce_currencies_with_intervals_callbacks(pds: [PriceData]):
     try:
         for pd in pds:
             seis = tvl.new_seis(pd.symbol, pd.exchange, pd.interval, timeout=timeout_secs)
-            debug_tv_data_feed("seis" + str(seis))
+            # debug_tv_data_feed("seis" + str(seis))
             consumer = tvl.new_consumer(seis, update_currency_file_consumer, timeout=timeout_secs)
     except ValueError as e:
         debug_error(str(e), "ValueError creating seis")
