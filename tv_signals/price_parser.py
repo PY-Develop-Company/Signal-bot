@@ -191,10 +191,11 @@ def create_parce_currencies_with_intervals_callbacks(pds: [PriceData]):
 
     try:
         tvl.del_tvdatafeed()
+        tvl = TvDatafeedLive()
+        tv = TvDatafeed()
     except Exception as e:
         debug_error(str(e), "Error tvl.del_tvdatafeed()")
-    tvl = TvDatafeedLive()
-    tv = TvDatafeed()
+
     try:
         for pd in pds:
             seis = tvl.new_seis(pd.symbol, pd.exchange, pd.interval, timeout=timeout_secs)
