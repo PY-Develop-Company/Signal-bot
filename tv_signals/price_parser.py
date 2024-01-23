@@ -20,7 +20,6 @@ currencies_data_path = "./currencies_data/"
 currency_check_ended = "./currencies_data/check_ended/"
 
 currencies_last_analize_date = {}
-tv = TvDatafeed()
 tvl = TvDatafeedLive()
 
 timeout_secs = 60
@@ -39,7 +38,7 @@ class PriceData:
             puncts = cursor.fetchone()
             self.puncts = puncts[0]
         except sqlite3.Error as e:
-            debug_error(str(e), f"Error PriceData creation")
+            debug_error(e, f"Error PriceData creation")
             self.puncts = None
 
     def print(self):
@@ -76,12 +75,12 @@ class PriceData:
         try:
             df = read_csv(path)
         except Exception as e:
-            debug_error(str(e), f"Error get_chart_data_if_exists with path ({path})")
+            debug_error(e, f"Error get_chart_data_if_exists with path ({path})")
             return None
         try:
             df["datetime"] = df.apply(lambda row: datetime.strptime(row["datetime"], '%Y-%m-%d %H:%M:%S'), axis=1)
         except Exception as e:
-            debug_error(str(e) + " " + str(df.to_string()), f"Error get_chart_data_if_exists date time is wrong formatted")
+            debug_error(e, f"Error get_chart_data_if_exists date time is wrong formatted")
             return None
         return df
 
@@ -120,11 +119,12 @@ class PriceData:
 
     def get_price_data(self, bars_count=5000):
         try:
-            priceData = tvl.get_hist(symbol=self.symbol, exchange=self.exchange, interval=self.interval, n_bars=bars_count+1)
+            priceData = tvl.get_hist(symbol=self.symbol, exchange=self.exchange, interval=self.interval, n_bars=bars_count)
             priceData = priceData.reindex(index=priceData.index[::-1]).iloc[1:].reset_index()
             return priceData
         except Exception as e:
-            debug_error(str(e), "Error cant get price data")
+            print(self.symbol, self.exchange, self.interval)
+            debug_error(e, "Error cant get price data")
             return None
 
     def is_analize_time(self, update_date: datetime, debug=False):
@@ -162,13 +162,15 @@ def get_currencies():
                 exchange = df['exchange'][currency]
                 currencies.append((symbol, exchange))
     except sqlite3.Error as e:
-        debug_error(str(e), "Error get_currencies")
+        debug_error(e, "Error get_currencies")
 
     return currencies
 
 
 def get_price_data_frame_seis(seis, bars_count=5000):
     price_df = seis.get_hist(n_bars=bars_count)
+    if price_df is None:
+        return None
     price_df = price_df.drop(price_df.index[len(price_df) - 1])
     price_df = price_df.reindex(index=price_df.index[::-1]).reset_index()
     return price_df
@@ -178,32 +180,25 @@ def create_parce_currencies_with_intervals_callbacks(pds: [PriceData]):
     global tvl, tv
 
     def update_currency_file_consumer(seis: Seis, data):
-        try:
-            price_df = get_price_data_frame_seis(seis)
+        price_df = get_price_data_frame_seis(seis)
 
-            pd = PriceData(seis.symbol, seis.exchange, seis.interval)
-            # debug_tv_data_feed("update file" + pd.symbol + str(pd.interval))
-            pd.save_chart_data(price_df)
-        except Exception as e:
-            debug_error(str(e), "Error update_currency_file_consumer")
+        pd = PriceData(seis.symbol, seis.exchange, seis.interval)
+        if price_df is None:
+            return
+        pd.save_chart_data(price_df)
 
     debug_tv_data_feed(f"creating new seis")
 
     try:
-        tvl.del_tvdatafeed()
-        tvl = TvDatafeedLive()
-        tv = TvDatafeed()
-    except Exception as e:
-        debug_error(str(e), "Error tvl.del_tvdatafeed()")
-
-    try:
+        if tvl is None:
+            tvl = TvDatafeedLive()
         for pd in pds:
             seis = tvl.new_seis(pd.symbol, pd.exchange, pd.interval, timeout=timeout_secs)
-            # debug_tv_data_feed("seis" + str(seis))
+            print("seis " + str(seis))
             consumer = tvl.new_consumer(seis, update_currency_file_consumer, timeout=timeout_secs)
     except ValueError as e:
-        debug_error(str(e), "ValueError creating seis")
+        debug_error(e, "ValueError creating seis")
     except Exception as e:
-        debug_error(str(e), "Error creating seis")
+        debug_error(e, "Error creating seis")
 
     debug_tv_data_feed(f"created new seis")

@@ -37,7 +37,7 @@ def get_manager_language(id):
         language = cursor.fetchone()[0]
         return language
     except sqlite3.Error as error:
-        debug_error(str(error), f"Error fetching manager's language")
+        debug_error(error, f"Error fetching manager's language")
         return None
 
 
@@ -47,7 +47,7 @@ def set_manager_language(id, language):
         cursor.execute(f"UPDATE {manager_table} SET language = ? WHERE id = ?", (language, id))
         db_connection.commit()
     except sqlite3.Error as error:
-        debug_error(str(error), f"Error set language manager {id}")
+        debug_error(error, f"Error set language manager {id}")
 
 
 def update_manager_do(manager_id, do):
@@ -56,7 +56,7 @@ def update_manager_do(manager_id, do):
         cursor.execute(f"UPDATE {manager_table} SET do = ? WHERE id = ?", (do, manager_id))
         db_connection.commit()
     except sqlite3.Error as error:
-        debug_error(f"{error}, {(do, manager_id)}", f"Error updating manager's 'do'")
+        debug_error(error, f"Error updating manager's 'do'")
 
 
 async def update_manager_status(manager_id, status):
@@ -65,7 +65,7 @@ async def update_manager_status(manager_id, status):
         cursor.execute(f"UPDATE {manager_table} SET status = ? WHERE id = ?", (status, manager_id))
         db_connection.commit()
     except sqlite3.Error as error:
-        debug_error(f"{error}", f"Error updating manager's 'status'")
+        debug_error(error, f"Error updating manager's 'status'")
 
 
 def get_manager_do(manager_id):
@@ -75,7 +75,7 @@ def get_manager_do(manager_id):
         do = cursor.fetchone()[0]
         return do
     except sqlite3.Error as error:
-        debug_error(f"{error} {manager_id}", f"Error get manager 'do'")
+        debug_error(error, f"Error get manager 'do'")
         return None
 
 
@@ -91,5 +91,5 @@ def is_manager_status(manager_id, needed_status):
         status = cursor.fetchone()
         return status[0] == needed_status
     except sqlite3.Error as error:
-        debug_error(f"{error}", f"Error fetching manager's status")
+        debug_error(error, f"Error fetching manager's status")
         return False

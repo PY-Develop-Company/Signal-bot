@@ -28,7 +28,7 @@ class SignalsTable:
                             )
                         """)
         except Error as error:
-            debug_error(f"{error}", f"Error create_table SignalsTable")
+            debug_error(error, f"Error create_table SignalsTable")
 
     @staticmethod
     def add_sended_signal(analized_signal_id, open_time, close_time,open_price, close_price, is_profit, open_price_date, close_price_date):
@@ -42,7 +42,7 @@ class SignalsTable:
             cursor.execute(sql_query, data)
             db_connection.commit()
         except Error as error:
-            debug_error(f"{error}", f"Error SignalsTable add_sended_signal")
+            debug_error(error, f"Error SignalsTable add_sended_signal")
 
     @staticmethod
     def get_all_data():
@@ -52,7 +52,7 @@ class SignalsTable:
             res = cursor.execute(sql_query)
             return res.fetchall()
         except Error as error:
-            debug_error(f"{error}", f"Error SignalsTable get_all_data")
+            debug_error(error, f"Error SignalsTable get_all_data")
             return None
 
     @staticmethod
@@ -65,7 +65,7 @@ class SignalsTable:
             res = cursor.execute(sql_query)
             return res.fetchall()
         except Error as error:
-            debug_error(f"{error}", f"Error SignalsTable get_profit_data_in_period")
+            debug_error(error, f"Error SignalsTable get_profit_data_in_period")
             return None
 
 
@@ -86,7 +86,7 @@ def update_signals():
                    """)
         db_connection.commit()
     except Error as error:
-        debug_error(f"{error}", f"Error update SignalsTable")
+        debug_error(error, f"Error update SignalsTable")
 
 
 SignalsTable.create_table()

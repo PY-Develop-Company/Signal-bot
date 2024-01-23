@@ -1,5 +1,6 @@
 import logging
 import multiprocessing
+import time
 
 from tv_signals.price_parser import PriceData
 from tv_signals import signal_maker, price_parser
@@ -111,7 +112,7 @@ async def send_message_to_user(user_id, text, markup=None):
         else:
             return await bot.send_message(user_id, text, disable_notification=False, reply_markup=markup)
     except Exception as e:
-        debug_error(str(e))
+        debug_error(e)
 
     return None
 
@@ -143,7 +144,7 @@ async def send_photo_text_message_to_user(user_id, img_path, text=" ", markup=No
             else:
                 await bot.send_photo(user_id, photo=file, caption=text, reply_markup=markup)
     except Exception as e:
-        debug_error(str(e))
+        debug_error(e)
 
 
 async def send_photo_text_message_to_users(users_ids: [], img_path, text=" ", args=[]):
@@ -171,7 +172,7 @@ async def update_account_user(id, account_number):
             elif account_number == none_status:
                 await send_message_to_user(id, languageFile[user_language]["reject_vip_text"])
     except sqlite3.Error as e:
-        debug_error(str(e), error_name=f"Error update account {id}")
+        debug_error(e, error_name=f"Error update account {id}")
 
 
 async def show_users_list_to_user(user_id, is_next=True):
@@ -542,7 +543,7 @@ def handle_signal_msg_controller(analized_signal_id, signal, msg, pd: PriceData,
             debug_msg = "delay: " + str(delay) + "; analize_time: " + str(t1) + "; send_msg_time: " + str(t2)
             await send_message_to_users(managers_ids, debug_msg)
         except Exception as e:
-            debug_error(str(e))
+            debug_error(e)
 
         close_signal_message, is_profit, open_price, close_price, open_price_date, close_price_date = await signal_maker.close_position(
             open_position_price, signal, pd, bars_count=deal_time)
@@ -585,22 +586,25 @@ async def check_trial_users():
                 elif get_user_status(user_id) == wait_id_status:
                     await send_message_to_user(user_id, languageFile[userLanguage]["wait_id_status"])
     except Exception as e:
-        debug_error(str(e), "check_trial_users_ERROR")
+        debug_error(e, "check_trial_users_ERROR")
 
 
 def signals_message_sender_controller(prices_data, prices_data_all, shared_list):
     async def signals_message_sender_function(signal_prices_data, all_prices_data, shared_list):
         def reset_seis(all_prices_data):
+            print("create_parce_currencies_with_intervals_callbacks", time.time())
             price_parser.create_parce_currencies_with_intervals_callbacks(all_prices_data)
+            print("end create_parce_currencies_with_intervals_callbacks", time.time())
 
+            print("reset_chart_data", time.time())
             for pd in all_prices_data:
                 pd.reset_chart_data()
             AnalyzedSignalsTable.set_all_checked()
+            print("end reset_chart_data", time.time())
 
             return datetime_to_secs(now_time())
 
-        last_send_message_check = reset_seis(all_prices_data)
-
+        last_send_message_check = datetime_to_secs(now_time() - timedelta(days=1))
         while True:
             await check_trial_users()
 
@@ -620,9 +624,9 @@ def signals_message_sender_controller(prices_data, prices_data_all, shared_list)
                             debug_info("wait for signal" + " " + str(cont) +" "+ str(datetime_to_secs(now_time())))
                             continue
             except Exception as e:
-                debug_error(str(e))
+                debug_error(e)
 
-            debug_temp("search signals to send...")
+            print("search signals to send...")
             if not market_info.is_market_working():
                 continue
 

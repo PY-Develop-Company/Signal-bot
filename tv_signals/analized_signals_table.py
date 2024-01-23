@@ -32,7 +32,7 @@ class AnalyzedSignalsTable:
                 );
                 """)
         except Error as error:
-            debug_error(f"{error}", f"Error create_table AnalyzedSignalsTable")
+            debug_error(error, f"Error create_table AnalyzedSignalsTable")
 
     @staticmethod
     def add_analyzed_signal(pd: PriceData, candle_time, has_signal, signal_type, deal_time, open_price, msg, start_analize_time):
@@ -45,7 +45,7 @@ class AnalyzedSignalsTable:
             cursor.execute(sql_query)
             db_connection.commit()
         except Error as error:
-            debug_error(f"{error} {sql_query}", f"Error add_analized_signal")
+            debug_error(error, f"Error add_analized_signal")
 
     @staticmethod
     def get_unchecked_signals():
@@ -60,7 +60,7 @@ class AnalyzedSignalsTable:
             df = read_sql_query(sql_query, db_connection)
             result = df
         except Error as error:
-            debug_error(f"{error}", f"Error get_unchecked_signals (select)")
+            debug_error(error, f"Error get_unchecked_signals (select)")
 
         cursor = db_connection.cursor()
         try:
@@ -69,7 +69,7 @@ class AnalyzedSignalsTable:
             cursor.execute(sql_query)
             db_connection.commit()
         except Error as error:
-            debug_error(f"{error}", f"Error get_unchecked_signals(mark checked)")
+            debug_error(error, f"Error get_unchecked_signals(mark checked)")
         return result
 
     @staticmethod
@@ -81,7 +81,7 @@ class AnalyzedSignalsTable:
             cursor.execute(sql_query)
             db_connection.commit()
         except Error as error:
-            debug_error(f"{error}", f"Error set_all_checked")
+            debug_error(error, f"Error set_all_checked")
 
 
 AnalyzedSignalsTable.create_table()
@@ -98,4 +98,4 @@ def update_currencies():
                    """)
         db_connection.commit()
     except Error as error:
-        debug_error(f"{error}", f"Error update AnalyzedSignalsTable")
+        debug_error(error, f"Error update AnalyzedSignalsTable")
