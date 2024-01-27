@@ -19,11 +19,11 @@ puncts_pohibka = 5
 class Signal:
     type = None
 
-    def __init__(self):
-        self.signal = None
-        self.photo_path = None
-        self.smile = None
-        self.text = None
+    def __init__(self, signal, photo_path, smile, text):
+        self.signal = signal
+        self.photo_path = photo_path
+        self.smile = smile
+        self.text = text
 
     def get_open_msg_text(self, pd, minutes):
         return self.smile + pd.symbol[:3] + "/" + pd.symbol[3:] + " " + self.text + " " + str(minutes) + "{}"
@@ -47,20 +47,14 @@ class NeutralSignal(Signal):
     type = "neutral"
 
     def __init__(self):
-        self.signal = type(self)
-        self.photo_path = "None"
-        self.smile = "None"
-        self.text = neutral_signal_text
+        super().__init__(type(self), "None", "None", neutral_signal_text)
 
 
 class LongSignal(Signal):
     type = "long"
 
     def __init__(self):
-        self.signal = type(self)
-        self.photo_path = photo_long_path
-        self.smile = long_signal_smile
-        self.text = long_signal_text
+        super().__init__(type(self), photo_long_path, long_signal_smile, long_signal_text)
 
     def is_profit(self, open_price, close_price, pd: PriceData):
         return True if close_price + pd.get_real_puncts(puncts_pohibka) >= open_price else False
@@ -70,10 +64,7 @@ class ShortSignal(Signal):
     type = "short"
 
     def __init__(self):
-        self.signal = type(self)
-        self.photo_path = photo_short_path
-        self.smile = short_signal_smile
-        self.text = short_signal_text
+        super().__init__(type(self), photo_short_path, short_signal_smile, short_signal_text)
 
     def is_profit(self, open_price, close_price, pd: PriceData):
         return True if close_price - pd.get_real_puncts(puncts_pohibka) <= open_price else False

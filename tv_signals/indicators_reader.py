@@ -110,6 +110,86 @@ blocks_delta = {
         Interval.in_45_minute: 0,
         Interval.in_1_hour: 0,
         Interval.in_2_hour: 0
+    },
+    "ETHUSD": {
+        Interval.in_1_minute: 0,
+        Interval.in_3_minute: 0,
+        Interval.in_5_minute: 0,
+        Interval.in_15_minute: 0,
+        Interval.in_30_minute: 0,
+        Interval.in_45_minute: 0,
+        Interval.in_1_hour: 0,
+        Interval.in_2_hour: 0
+    },
+    "ATOMUSD": {
+        Interval.in_1_minute: 0,
+        Interval.in_3_minute: 0,
+        Interval.in_5_minute: 0,
+        Interval.in_15_minute: 0,
+        Interval.in_30_minute: 0,
+        Interval.in_45_minute: 0,
+        Interval.in_1_hour: 0,
+        Interval.in_2_hour: 0
+    },
+    "ADAUSD": {
+        Interval.in_1_minute: 0,
+        Interval.in_3_minute: 0,
+        Interval.in_5_minute: 0,
+        Interval.in_15_minute: 0,
+        Interval.in_30_minute: 0,
+        Interval.in_45_minute: 0,
+        Interval.in_1_hour: 0,
+        Interval.in_2_hour: 0
+    },
+    "AVAXUSD": {
+        Interval.in_1_minute: 0,
+        Interval.in_3_minute: 0,
+        Interval.in_5_minute: 0,
+        Interval.in_15_minute: 0,
+        Interval.in_30_minute: 0,
+        Interval.in_45_minute: 0,
+        Interval.in_1_hour: 0,
+        Interval.in_2_hour: 0
+    },
+    "DOTUSD": {
+        Interval.in_1_minute: 0,
+        Interval.in_3_minute: 0,
+        Interval.in_5_minute: 0,
+        Interval.in_15_minute: 0,
+        Interval.in_30_minute: 0,
+        Interval.in_45_minute: 0,
+        Interval.in_1_hour: 0,
+        Interval.in_2_hour: 0
+    },
+    "USDTUSD": {
+        Interval.in_1_minute: 0,
+        Interval.in_3_minute: 0,
+        Interval.in_5_minute: 0,
+        Interval.in_15_minute: 0,
+        Interval.in_30_minute: 0,
+        Interval.in_45_minute: 0,
+        Interval.in_1_hour: 0,
+        Interval.in_2_hour: 0
+    },
+    "USDTUSD": {
+        Interval.in_1_minute: 0,
+        Interval.in_3_minute: 0,
+        Interval.in_5_minute: 0,
+        Interval.in_15_minute: 0,
+        Interval.in_30_minute: 0,
+        Interval.in_45_minute: 0,
+        Interval.in_1_hour: 0,
+        Interval.in_2_hour: 0
+    },
+    "NEARUSD": {
+        Interval.in_1_minute: 0,
+        Interval.in_3_minute: 0,
+        Interval.in_5_minute: 0,
+        Interval.in_15_minute: 0,
+        Interval.in_30_minute: 0,
+        Interval.in_45_minute: 0,
+        Interval.in_1_hour: 0,
+        Interval.in_2_hour: 0
     }
 }
 
@@ -174,7 +254,7 @@ class SuperOrderBlockIndicator(Indicator):
         return self.high[index] < self.low[index + 2]
 
     class Box:
-        def __init__(self, left=0, top=0, right=0, bottom=0, signal=Signal()):
+        def __init__(self, left=0, top=0, right=0, bottom=0, signal=None):
             self.left = left
             self.top = top
             self.right = right
@@ -789,10 +869,11 @@ class OBVolumeIndicator(Indicator):
         def get_time_ratio(self):
             highest_volume = max(self.boxes_volumes)
             candles_count = (self.right_time - self.left_time) / interval_convertor.interval_to_datetime(self.interval)
-            try:
-                time_ratio = candles_count / highest_volume
-            except ZeroDivisionError:
+            if highest_volume < 0.01:
+                print("highest_volume < 0.01")
                 time_ratio = 0
+            else:
+                time_ratio = candles_count / highest_volume
 
             return time_ratio
 
@@ -808,6 +889,7 @@ class OBVolumeIndicator(Indicator):
                 box_bot = box_top - increment
 
                 right = self.left_time + interval_convertor.interval_to_datetime(self.interval) * math.ceil(self.boxes_volumes[i] * time_ratio)
+
                 if right > current_time:
                     right -= interval_convertor.interval_to_datetime(self.interval)
                 new_box = Box(left=self.left_time, top=box_top, right=right, bottom=box_bot)
@@ -1016,17 +1098,3 @@ class OBVolumeIndicator(Indicator):
 
 def clamp(value, min_value, max_value):
     return max(min(value, max_value), min_value)
-
-
-if __name__ == "__main__":
-    tv = TvDatafeed()
-    pd = PriceData("AUDCAD", "OANDA", Interval.in_45_minute)
-    data = tv.get_hist(pd.symbol, pd.exchange, interval=pd.interval, n_bars=5000)
-    data = data.reindex(index=data.index[::-1]).iloc[0:].reset_index()
-
-    alt_interval = OBVolumeIndicator.get_alt_interval(pd.interval)
-    alt_data = tv.get_hist(pd.symbol, pd.exchange, interval=alt_interval, n_bars=5000)
-    alt_data = alt_data.reindex(index=alt_data.index[::-1]).iloc[0:].reset_index()
-    obv = OBVolumeIndicator(data, alt_data, data["open"], data["close"], data["high"], data["low"], pd)
-    res = obv.get_signal()
-    print(res)

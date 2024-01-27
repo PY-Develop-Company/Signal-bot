@@ -231,7 +231,7 @@ class SOBAnalizer(Analizer):
 class VOBAnalizer(Analizer):
     def analize_func(self, df, pd: PriceData) -> (bool, Signal, str):
         alt_pd = PriceData(pd.symbol, pd.exchange, OBVolumeIndicator.get_alt_interval(pd.interval))
-        alt_df = alt_pd.get_chart_data_if_exists()
+        alt_df = alt_pd.get_chart_data(5000)
         vob_ind = OBVolumeIndicator(df, alt_df, df.open, df.close, df.high, df.low, pd)
         # if alt_df is not None:
         #     print("vob analize", pd.symbol, pd.interval, alt_pd.interval, len(alt_df))
