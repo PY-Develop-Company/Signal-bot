@@ -26,7 +26,7 @@ class Signal:
         self.text = text
 
     def get_open_msg_text(self, pd, minutes):
-        return self.smile + pd.symbol[:3] + "/" + pd.symbol[3:] + " " + self.text + " " + str(minutes) + "{}"
+        return self.smile + pd.symbol + " " + self.text + " " + str(minutes) + "{}"
 
     def get_photo_path(self):
         return self.photo_path

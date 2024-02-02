@@ -6,203 +6,176 @@ from utils import interval_convertor
 
 import numpy as np
 from pandas import Series, to_datetime
-from tvDatafeed import Interval, TvDatafeed
+from tv_signals.interval import Interval
 import plotly.graph_objects as go
 
+min_sob_size_dict = {
+    Interval.in_1_minute: 5,
+    Interval.in_5_minute: 20,
+    Interval.in_15_minute: 34,
+    Interval.in_30_minute: 50,
+    Interval.in_1_hour: 55,
+    Interval.in_2_hour: 55,
+    Interval.in_daily: 55,
+    Interval.in_weekly: 55,
+    Interval.in_monthly: 55
+}
 
-blocks_delta = {
-    "EURUSD": {
+
+blocks_delta_dict = {
+    "EUR/USD": {
         Interval.in_1_minute: 35,
-        Interval.in_3_minute: 70,
         Interval.in_5_minute: 100,
         Interval.in_15_minute: 140,
         Interval.in_30_minute: 200,
-        Interval.in_45_minute: 200,
         Interval.in_1_hour: 200,
         Interval.in_2_hour: 200
     },
-    "AUDUSD": {
+    "AUD/USD": {
         Interval.in_1_minute: 35,
-        Interval.in_3_minute: 75,
         Interval.in_5_minute: 110,
         Interval.in_15_minute: 140,
         Interval.in_30_minute: 220,
-        Interval.in_45_minute: 220,
         Interval.in_1_hour: 220,
         Interval.in_2_hour: 220
     },
-    "AUDCAD": {
+    "AUD/CAD": {
         Interval.in_1_minute: 40,
-        Interval.in_3_minute: 94,
         Interval.in_5_minute: 130,
         Interval.in_15_minute: 140,
         Interval.in_30_minute: 200,
-        Interval.in_45_minute: 200,
         Interval.in_1_hour: 200,
         Interval.in_2_hour: 200
     },
-    "EURJPY": {
+    "EUR/JPY": {
         Interval.in_1_minute: 40,
-        Interval.in_3_minute: 90,
         Interval.in_5_minute: 110,
         Interval.in_15_minute: 140,
         Interval.in_30_minute: 199,
-        Interval.in_45_minute: 199,
         Interval.in_1_hour: 199,
         Interval.in_2_hour: 199
     },
-    "EURCAD": {
+    "EUR/CAD": {
         Interval.in_1_minute: 85,
-        Interval.in_3_minute: 146,
         Interval.in_5_minute: 160,
         Interval.in_15_minute: 220,
         Interval.in_30_minute: 260,
-        Interval.in_45_minute: 260,
         Interval.in_1_hour: 260,
         Interval.in_2_hour: 260
     },
-    "AUDCHF": {
+    "AUD/CHF": {
         Interval.in_1_minute: 30,
-        Interval.in_3_minute: 79,
         Interval.in_5_minute: 110,
         Interval.in_15_minute: 160,
         Interval.in_30_minute: 190,
-        Interval.in_45_minute: 190,
         Interval.in_1_hour: 190,
         Interval.in_2_hour: 190
     },
-    "GBPUSD": {
+    "GBP/USD": {
         Interval.in_1_minute: 85,
-        Interval.in_3_minute: 99,
         Interval.in_5_minute: 110,
         Interval.in_15_minute: 170,
         Interval.in_30_minute: 200,
-        Interval.in_45_minute: 200,
         Interval.in_1_hour: 200,
         Interval.in_2_hour: 200
     },
-    "AUDJPY": {
+    "AUD/JPY": {
         Interval.in_1_minute: 50,
-        Interval.in_3_minute: 120,
         Interval.in_5_minute: 150,
         Interval.in_15_minute: 200,
         Interval.in_30_minute: 220,
-        Interval.in_45_minute: 220,
         Interval.in_1_hour: 220,
         Interval.in_2_hour: 220
     },
-    "GBPAUD": {
+    "GBP/AUD": {
         Interval.in_1_minute: 77,
-        Interval.in_3_minute: 155,
         Interval.in_5_minute: 200,
         Interval.in_15_minute: 300,
         Interval.in_30_minute: 350,
-        Interval.in_45_minute: 350,
         Interval.in_1_hour: 350,
         Interval.in_2_hour: 350
     },
-    "BTCUSD": {
+    "BTC/USD": {
         Interval.in_1_minute: 0,
-        Interval.in_3_minute: 0,
         Interval.in_5_minute: 0,
         Interval.in_15_minute: 0,
         Interval.in_30_minute: 0,
-        Interval.in_45_minute: 0,
         Interval.in_1_hour: 0,
         Interval.in_2_hour: 0
     },
-    "ETHUSD": {
+    "ETH/USD": {
         Interval.in_1_minute: 0,
-        Interval.in_3_minute: 0,
         Interval.in_5_minute: 0,
         Interval.in_15_minute: 0,
         Interval.in_30_minute: 0,
-        Interval.in_45_minute: 0,
         Interval.in_1_hour: 0,
         Interval.in_2_hour: 0
     },
-    "ATOMUSD": {
+    "ATOM/USD": {
         Interval.in_1_minute: 0,
-        Interval.in_3_minute: 0,
         Interval.in_5_minute: 0,
         Interval.in_15_minute: 0,
         Interval.in_30_minute: 0,
-        Interval.in_45_minute: 0,
         Interval.in_1_hour: 0,
         Interval.in_2_hour: 0
     },
-    "ADAUSD": {
+    "ADA/USD": {
         Interval.in_1_minute: 0,
-        Interval.in_3_minute: 0,
         Interval.in_5_minute: 0,
         Interval.in_15_minute: 0,
         Interval.in_30_minute: 0,
-        Interval.in_45_minute: 0,
         Interval.in_1_hour: 0,
         Interval.in_2_hour: 0
     },
-    "AVAXUSD": {
+    "AVAX/USD": {
         Interval.in_1_minute: 0,
-        Interval.in_3_minute: 0,
         Interval.in_5_minute: 0,
         Interval.in_15_minute: 0,
         Interval.in_30_minute: 0,
-        Interval.in_45_minute: 0,
         Interval.in_1_hour: 0,
         Interval.in_2_hour: 0
     },
-    "DOTUSD": {
+    "DOT/USD": {
         Interval.in_1_minute: 0,
-        Interval.in_3_minute: 0,
         Interval.in_5_minute: 0,
         Interval.in_15_minute: 0,
         Interval.in_30_minute: 0,
-        Interval.in_45_minute: 0,
         Interval.in_1_hour: 0,
         Interval.in_2_hour: 0
     },
-    "USDTUSD": {
+    "USDT/USD": {
         Interval.in_1_minute: 0,
-        Interval.in_3_minute: 0,
         Interval.in_5_minute: 0,
         Interval.in_15_minute: 0,
         Interval.in_30_minute: 0,
-        Interval.in_45_minute: 0,
         Interval.in_1_hour: 0,
         Interval.in_2_hour: 0
     },
-    "USDTUSD": {
+    "USDT/USD": {
         Interval.in_1_minute: 0,
-        Interval.in_3_minute: 0,
         Interval.in_5_minute: 0,
         Interval.in_15_minute: 0,
         Interval.in_30_minute: 0,
-        Interval.in_45_minute: 0,
         Interval.in_1_hour: 0,
         Interval.in_2_hour: 0
     },
-    "NEARUSD": {
+    "NEAR/USD": {
         Interval.in_1_minute: 0,
-        Interval.in_3_minute: 0,
         Interval.in_5_minute: 0,
         Interval.in_15_minute: 0,
         Interval.in_30_minute: 0,
-        Interval.in_45_minute: 0,
         Interval.in_1_hour: 0,
         Interval.in_2_hour: 0
     }
 }
 
-min_sob_size = {
-    Interval.in_1_minute: 5,
-    Interval.in_3_minute: 15,
-    Interval.in_5_minute: 20,
-    Interval.in_15_minute: 34,
-    Interval.in_30_minute: 50,
-    Interval.in_45_minute: 55,
-    Interval.in_1_hour: 55,
-    Interval.in_2_hour: 55
-}
+
+def get_min_sob_size(interval: Interval):
+    return min_sob_size_dict.get(interval)
+
+
+def get_blocks_delta(currency: str, interval: Interval):
+    return blocks_delta_dict.get(currency).get(interval)
 
 
 class Indicator:
@@ -227,11 +200,11 @@ class SuperOrderBlockIndicator(Indicator):
                  fvg_max_box_set=100):
         super().__init__(src, open, close, high, low)
         self.src.datetime = to_datetime(self.src.datetime)
-        self.interval = interval_convertor.interval_to_datetime(price_data.interval)
+        self.interval = interval_convertor.my_interval_to_datetime(price_data.interval)
         self.obMaxBoxSet = clamp(ob_max_box_set, 1, 100)
         self.fvgMaxBoxSet = clamp(fvg_max_box_set, 1, 100)
-        self.analize_block_delta = price_data.get_real_puncts(blocks_delta.get(price_data.symbol).get(price_data.interval))
-        self.min_sob_size = price_data.get_real_puncts(min_sob_size.get(price_data.interval))
+        self.analize_block_delta = price_data.get_real_puncts(get_blocks_delta(price_data.symbol, price_data.interval))
+        self.min_sob_size = price_data.get_real_puncts(get_min_sob_size(price_data.interval))
         self.name = "SuperOrderBlock"
         self.include_delta = include_delta
 
@@ -765,35 +738,25 @@ class OBVolumeIndicator(Indicator):
         self.alt_src = alt_src
         self.price_data = pd
 
-        self.analize_block_delta = pd.get_real_puncts(blocks_delta.get(pd.symbol).get(pd.interval))
+        self.analize_block_delta = pd.get_real_puncts(get_blocks_delta(pd.symbol, pd.interval))
         self.name = "OBVolumeIndicator"
 
     @staticmethod
-    def get_alt_interval(interval):
-        if interval == str(Interval.in_1_minute):
+    def get_alt_interval(interval: Interval):
+        if interval == Interval.in_1_minute:
             return Interval.in_1_minute
-        elif interval == str(Interval.in_3_minute):
+        elif interval == Interval.in_5_minute:
             return Interval.in_1_minute
-        elif interval == str(Interval.in_5_minute):
+        elif interval == Interval.in_15_minute:
             return Interval.in_1_minute
-        elif interval == str(Interval.in_15_minute):
-            return Interval.in_1_minute
-        elif interval == str(Interval.in_30_minute):
-            return Interval.in_3_minute
-        elif interval == str(Interval.in_45_minute):
-            return Interval.in_3_minute
-        elif interval == str(Interval.in_1_hour):
+        elif interval == Interval.in_30_minute:
             return Interval.in_5_minute
-        elif interval == str(Interval.in_2_hour):
+        elif interval == Interval.in_1_hour:
+            return Interval.in_5_minute
+        elif interval == Interval.in_2_hour:
             return Interval.in_15_minute
         else:
             return Interval.in_1_minute
-        # raw_timeframe = interval_convertor.interval_to_int(interval)
-        # tmp = round(raw_timeframe / 15)
-        # fixed_timeframe = 1 if tmp < 1 else tmp
-        # alt_interval = interval_convertor.int_to_interval(fixed_timeframe)
-        #
-        # return alt_interval
 
     def get_timeframe_data(self):
         i = 0
@@ -868,9 +831,8 @@ class OBVolumeIndicator(Indicator):
 
         def get_time_ratio(self):
             highest_volume = max(self.boxes_volumes)
-            candles_count = (self.right_time - self.left_time) / interval_convertor.interval_to_datetime(self.interval)
-            if highest_volume < 0.01:
-                print("highest_volume < 0.01")
+            candles_count = (self.right_time - self.left_time) / self.interval
+            if highest_volume < 0.001:
                 time_ratio = 0
             else:
                 time_ratio = candles_count / highest_volume
@@ -888,10 +850,10 @@ class OBVolumeIndicator(Indicator):
                 box_top = starting_value - (increment * i)
                 box_bot = box_top - increment
 
-                right = self.left_time + interval_convertor.interval_to_datetime(self.interval) * math.ceil(self.boxes_volumes[i] * time_ratio)
+                right = self.left_time + self.interval * math.ceil(self.boxes_volumes[i] * time_ratio)
 
                 if right > current_time:
-                    right -= interval_convertor.interval_to_datetime(self.interval)
+                    right -= self.interval
                 new_box = Box(left=self.left_time, top=box_top, right=right, bottom=box_bot)
                 new_boxes_array.append(new_box)
 
@@ -904,9 +866,9 @@ class OBVolumeIndicator(Indicator):
             time_ratio = self.get_time_ratio()
 
             for i in range(0, self.amount_of_boxes):
-                right = self.left_time + interval_convertor.interval_to_datetime(self.interval) * math.ceil(self.boxes_volumes[i] * time_ratio)
+                right = self.left_time + self.interval * math.ceil(self.boxes_volumes[i] * time_ratio)
                 if right > current_time:
-                    right -= interval_convertor.interval_to_datetime(self.interval)
+                    right -= self.interval
                 self.boxes[i].set_right(right)
                 if self.boxes_volumes[i] == highest_volume:
                     self.highest_top = self.boxes[i].top
@@ -991,7 +953,7 @@ class OBVolumeIndicator(Indicator):
                     new_order_block = self.OrderBlock(self.amount_of_boxes, top_value, bot_value, left_value,
                                                       right_value, [0 for _ in range(self.amount_of_boxes)],
                                                       LongSignal() if is_bull else ShortSignal(),
-                                                      self.price_data.interval)
+                                                      interval_convertor.my_interval_to_datetime(self.price_data.interval))
 
                     vol = new_order_block.generate_volume(v[self.tuning - 1 + i], h[self.tuning - 1 + i], l[self.tuning - 1 + i])
                     new_order_block.generate_boxes(right_value)

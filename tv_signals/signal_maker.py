@@ -1,16 +1,16 @@
 import time
 from datetime import datetime
 
-from tv_signals.price_parser import update_prices
+from tv_signals.price_updater import FCSForexPriceUpdater
 from tv_signals.analizer import NewMultitimeframeAnalizer
 from tv_signals.analized_signals_table import AnalyzedSignalsTable
 from tv_signals.signal_types import *
 
 from utils import interval_convertor
-from utils.time import origin_date
+from utils.time import origin_date, now_time
 
 from pandas import Timedelta
-from tvDatafeed import Interval
+from tv_signals.interval import Interval as MyInterval
 import asyncio
 
 from my_debuger import debug_info
@@ -19,102 +19,41 @@ signals_analysis_last_date = {}
 signal_last_update = datetime.now()
 
 
-async def close_position_delay(interval: Interval, bars_count=3):
-    delay_seconds = interval_convertor.interval_to_datetime(interval) / Timedelta(seconds=1) * bars_count
+async def close_position_delay(interval: MyInterval, bars_count=3):
+    delay_seconds = interval_convertor.my_interval_to_datetime(interval) / Timedelta(seconds=1) * bars_count
     await asyncio.sleep(delay_seconds)
 
 
-async def close_position(position_open_price_original, signal: Signal, pd: PriceData, bars_count):
-    pd = PriceData(pd.symbol, pd.exchange, Interval.in_1_minute)
-    position_open_price = pd.get_chart_data(bars_count=1)
+async def close_position(position_open_price_original, signal: Signal, pd: PriceData, bars_count, price_updater: FCSForexPriceUpdater):
+    open_price, open_price_date = price_updater.latest_price_and_date(pd.symbol)
 
-    print("position_open_price", position_open_price.to_string())
-    open_price = position_open_price_original if position_open_price is None else position_open_price.iloc[0].loc["close"]
-    open_price_date = origin_date if position_open_price is None else position_open_price.iloc[0].loc["datetime"]
+    await close_position_delay(MyInterval.in_1_minute, bars_count)
 
-    await close_position_delay(Interval.in_1_minute, bars_count)
-
-    price_data = pd.get_chart_data(bars_count=1)
-    print("price_data", price_data.to_string())
-    close_price = position_open_price_original if price_data is None else price_data.close[0]
-    close_price_date = origin_date if price_data is None else price_data.datetime[0]
-
+    close_price, close_price_date = price_updater.latest_price_and_date(pd.symbol)
+    print("closing_position", open_price, open_price_date, close_price, close_price_date)
     msg, is_profit_position = signal.get_close_position_signal_message(pd, open_price, close_price, bars_count)
     return msg, is_profit_position, open_price, close_price, open_price_date, close_price_date
 
 
 def analyze_currency_data_controller(analyze_pair, lock):
-    while True:
-        is_updated = update_prices(analyze_pair.get_all_pds())
-        if is_updated:
-            main_pd = analyze_pair.main_pd
-            all_pds = analyze_pair.get_all_pds()
+    main_pd = analyze_pair.main_pd
+    all_pds = analyze_pair.get_all_pds()
 
-            lock.acquire()
-            main_price_df = main_pd.get_chart_data(5000)
-            all_dfs = [pd.get_chart_data(5000) for pd in analyze_pair.get_all_pds()]
-            lock.release()
+    lock.acquire()
+    main_price_df = main_pd.get_saved_chart_data(5000)
+    all_dfs = [pd.get_saved_chart_data(5000) for pd in analyze_pair.get_all_pds()]
+    lock.release()
 
-            start_analize_time = main_price_df.iloc[0].loc["download_time"]
+    start_analyze_time = now_time()  # main_price_df.iloc[0].loc["download_time"]
 
-            analizer = NewMultitimeframeAnalizer(1, 1)
-            lock.acquire()
-            has_signal, signal, debug, deal_time = analizer.analize(all_dfs, all_pds)
-            lock.release()
+    analyzer = NewMultitimeframeAnalizer(1, 1)
+    lock.acquire()
+    has_signal, signal, debug, deal_time = analyzer.analize(all_dfs, all_pds)
+    open_position_price = main_pd.get_saved_chart_data(bars_count=1).iloc[0].loc["close"]
+    lock.release()
 
-            open_position_price = main_pd.get_chart_data(bars_count=1).iloc[0].loc["close"]
-            msg = signal.get_open_msg_text(main_pd, deal_time)
+    msg = signal.get_open_msg_text(main_pd, deal_time)
 
-            AnalyzedSignalsTable.add_analyzed_signal(main_pd, main_price_df["datetime"][0], has_signal, signal.type,
-                                                     deal_time, open_position_price, msg, start_analize_time)
-            debug_info(f"analized {[main_pd.symbol, main_pd.exchange, main_pd.interval]}")
-        else:
-            main_pd = analyze_pair.main_pd
-            debug_info(f"not analized {[main_pd.symbol, main_pd.exchange, main_pd.interval]}")
-        time.sleep(analyze_pair.wait_minutes * 60)
-
-    # async def analize_currency_data_function(check_pds: [PriceData], additional_pds):
-    #     print("start_analize")
-    #     main_pd = check_pds[0]
-    #     start_analize_time = check_pds[0].get_chart_download_time()
-    #
-    #     if not is_all_charts_collected(check_pds[0], check_pds[1:]):
-    #         return
-    #
-    #     print("is_all_charts_collected(check_pds[0], check_pds[1:])")
-    #     main_price_df = main_pd.get_chart_data_if_can_analize()
-    #     if main_price_df is None:
-    #         return
-    #
-    #     print("main_price_df is None")
-    #
-    #     prices_dfs = []
-    #     for pd in check_pds:
-    #         ch_data = pd.get_chart_data()
-    #         if ch_data is None:
-    #             continue
-    #         prices_dfs.append(ch_data)
-    #
-    #     print("for loop")
-    #     analizer = NewMultitimeframeAnalizer(1, 1)
-    #     has_signal, signal, debug, deal_time = analizer.analize(prices_dfs, check_pds)
-    #
-    #     open_position_price = main_price_df.close[0]
-    #     msg = signal.get_open_msg_text(main_pd, deal_time)
-    #
-    #     AnalyzedSignalsTable.add_analyzed_signal(main_pd, main_price_df.datetime[0], has_signal, signal.type,
-    #                                              deal_time, open_position_price, msg, start_analize_time)
-    #
-    #     # debug_tv_data_feed(f"Created signal file {msg} {main_price_df.datetime[0]}")
-    #
-    # async def analize_currency_data_loop(analize_pairs: Ana):
-    #     while True:
-    #         debug_temp(f"analize_loop")
-    #         tasks = []
-    #         for i in range(len(analize_pds)):
-    #             task = asyncio.create_task(analize_currency_data_function(analize_pds[i], additional_pds[i]))
-    #             tasks.append(task)
-    #         await asyncio.gather(*tasks)
-    #         await asyncio.sleep(10)
-    #
-    # asyncio.run(analize_currency_data_loop(analize_pairs)
+    AnalyzedSignalsTable.add_analyzed_signal(main_pd, main_price_df["datetime"][0], has_signal, signal.type,
+                                             deal_time, open_position_price, msg, start_analyze_time)
+    debug_info(f"analyzed {[main_pd.symbol, main_pd.exchange, main_pd.interval]}")

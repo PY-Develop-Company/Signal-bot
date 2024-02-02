@@ -1,24 +1,25 @@
 import time
+import json
 from datetime import datetime, timedelta
 
 from utils import interval_convertor
 from utils.time import now_time
 
-from tvDatafeed import TvDatafeedLive, Interval, Seis
+from tv_signals.interval import Interval
 from pandas import DataFrame, read_sql_query
 
 import sqlite3
 from db_modul import db_connection
+from tv_signals.price_updater import TVDatafeedPriceUpdater, FCSForexPriceUpdater
 
 from my_debuger import debug_error, debug_info
-from utils.interval_convertor import interval_to_string
+from utils.interval_convertor import my_interval_to_string
 
 trade_pause_wait_time = 600
 
 currencies_table_name = "currencies"
 
-currencies_last_analize_date = {}
-tvl = TvDatafeedLive()
+price_updater = TVDatafeedPriceUpdater()
 
 
 class PriceData:
@@ -26,7 +27,7 @@ class PriceData:
         self.symbol = symbol
         self.exchange = exchange
         self.interval = interval
-        self.table_name = f"chart_data_{symbol}_{exchange}_{interval_to_string(interval)}"
+        self.table_name = f"chart_data_{symbol.replace('/', '_')}_{exchange}_{interval.value}"
 
         self.create_table()
 
@@ -41,96 +42,61 @@ class PriceData:
     def create_table(self):
         cursor = db_connection.cursor()
         sql_query = (f"CREATE TABLE IF NOT EXISTS {self.table_name} "
-                     f"(datetime TEXT UNIQUE PRIMARY KEY, symbol TEXT, open REAL, high REAL, low REAL, close REAL, "
-                     f"volume REAL, download_time TEXT)")
+                     f"(datetime INT UNIQUE PRIMARY KEY, symbol TEXT, open REAL, high REAL, low REAL, close REAL, "
+                     f"volume REAL, datetime_str TEXT, download_time TEXT)")
         cursor.execute(sql_query)
         db_connection.commit()
 
     def print(self):
-        debug_info(f"\t {self.symbol} seis {self.interval}")
+        debug_info(f"\t {self.symbol} {self.interval}")
 
     def get_real_puncts(self, pucts):
         return self.puncts * pucts
 
     def save_chart_data(self, data: DataFrame):
-        while True:
-            try:
-                cursor = db_connection.cursor()
+        # while True:
+        # try:
+        download_time = now_time()
+        cursor = db_connection.cursor()
 
-                data["download_time"] = str(now_time())
+        data_strs = []
+        for key in data.keys():
+            pd_timestamp_data = data.get(key)
+            volume_str = pd_timestamp_data.get("v")
+            volume_str = pd_timestamp_data.get("v")
+            high = float(pd_timestamp_data.get("h"))
+            low = float(pd_timestamp_data.get("l"))
+            interval_mult = interval_convertor.my_interval_to_int(self.interval)
+            v = (high - low)/self.get_real_puncts(1) * interval_mult
+            if interval_mult >= 60:
+                v *= 0.5
+            volume = float(volume_str) if volume_str.isnumeric() else round(v)
+            data_strs.append(f'({pd_timestamp_data.get("t")}, "{self.symbol}", {pd_timestamp_data.get("o")}, {high}, '
+                             f'{low}, {pd_timestamp_data.get("c")}, {volume}, "{pd_timestamp_data.get("tm")}", "{download_time}")')
 
-                data_strs = []
-                for row in data.iterrows():
-                    data_strs.append(f'("{row[0]}", "{str(row[1]["symbol"])}", {str(row[1]["open"])}, {str(row[1]["high"])}, '
-                                     f'{str(row[1]["low"])}, {str(row[1]["close"])}, {str(row[1]["volume"])}, "{str(row[1]["download_time"])}")')
+        joined_data_str = ",".join(data_strs)
 
-                joined_data_str = ",".join(data_strs)
+        query = f'''
+                INSERT OR IGNORE INTO {self.table_name} (
+                    datetime, symbol, open, high, low, close, volume, datetime_str, download_time
+                ) VALUES {joined_data_str};
+            '''
+        cursor.execute(query)
+        db_connection.commit()
+        print(f"saved {self.symbol} {self.interval}")
+            # break
+        # except sqlite3.OperationalError:
+        #     time.sleep(1)
+        #     print("continue loop")
+        #     continue
 
-                query = f'''
-                        INSERT OR IGNORE INTO {self.table_name} (
-                            datetime, symbol, open, high, low, close, volume, download_time
-                        ) VALUES {joined_data_str};
-                    '''
-                cursor.execute(query)
-                db_connection.commit()
-                break
-            except sqlite3.OperationalError:
-                time.sleep(1)
-                print("continue loop")
-                continue
-
-    def get_chart_download_time(self):
-        df = read_sql_query(f"SELECT * FROM {self.table_name} LIMIT 1", db_connection)
-        try:
-            df["datetime"] = df.apply(lambda row: datetime.strptime(row["download_time"], '%Y-%m-%d %H:%M:%S'), axis=1)
-        except Exception as e:
-            return now_time()
-        return df["datetime"][0]
-
-    def get_chart_data(self, bars_count=5000):
+    def get_saved_chart_data(self, bars_count=5000):
         df = read_sql_query(f"SELECT * FROM {self.table_name} order by datetime desc limit {bars_count};", db_connection)
-        df["datetime"] = df.apply(lambda row: datetime.strptime(row["datetime"], '%Y-%m-%d %H:%M:%S'), axis=1)
+        df["datetime"] = df.apply(lambda row: datetime.strptime(row["datetime_str"], '%Y-%m-%d %H:%M:%S'), axis=1)
         return df
 
-    def get_chart_data_if_can_analize(self):
-        interval = str(self.interval).replace(".", "")
-        df = self.get_chart_data()
-
-        last_check_date = currencies_last_analize_date.get(self.symbol + interval)
-        if not(df is None):
-            current_check_date = df.datetime[0]
-            if current_check_date == last_check_date:
-                return None
-            currencies_last_analize_date.update({self.symbol + interval: current_check_date})
-        return df
-
-    def reset_chart_data(self):
-        df = self.get_price_data(5000)
-        self.save_chart_data(df.tail(-1).copy())
-
-    def get_price_data(self, bars_count=5000):
-        global tvl
-        if tvl is None:
-            debug_info("tvl recreation")
-            tvl = TvDatafeedLive()
-        try:
-            debug_info(f"update price data {self.symbol, self.exchange, self.interval}")
-            return tvl.get_hist(symbol=self.symbol, exchange=self.exchange, interval=self.interval, n_bars=bars_count, timeout=180, extended_session=True)
-        except Exception as e:
-            debug_error(e, "Error get_price_data")
-            return None
-
-    def get_needed_chart_bar_to_analize(self, chart_bar: datetime, main_signal_interval):
-        minutes = interval_convertor.interval_to_int(self.interval)
-        main_minutes = interval_convertor.interval_to_int(main_signal_interval)
-
-        tmp = chart_bar + timedelta(minutes=main_minutes)
-
-        chart_bar = chart_bar + timedelta(minutes=main_minutes)
-        res = chart_bar - timedelta(minutes=(chart_bar.hour * 60 + chart_bar.minute) % minutes) - timedelta(
-            minutes=minutes)
-
-        return res
+    def download_price_data(self, bars_count=5000):
+        return price_updater.download_price_data(self.symbol, self.exchange, self.interval, bars_count)
 
 
 def get_currencies():
@@ -151,35 +117,23 @@ def get_currencies():
     return currencies
 
 
-def update_prices(pds, bars_count=5000):
+def update_prices(symbols: [str], exchanges: [str], periods: [str], price_updater: FCSForexPriceUpdater):
     result = True
-    for pd in pds:
-        data = pd.get_price_data(bars_count)
-        if data is None:
-            result = False
-            debug_error(Exception("data is None"))
-            continue
-        if data is bool:
-            debug_error(Exception(f"data is bool {data}"))
-            continue
-        pd.save_chart_data(data.tail(-1).copy())
+    my_dict = {}
+    for period in periods:
+        res = price_updater.download_price_data(symbols, period, 1)
+        res = json.loads(res)
+        for key in res.keys():
+            data = res.get(key)
+            s = data.get("info").get("symbol")
+            p = data.get("info").get("period")
+            d = data.get("response")
+            my_dict.update({f"{s}_{p}": d})
+
+    for i, symbol in enumerate(symbols):
+        for period in periods:
+            pd = PriceData(symbol, exchanges[i], interval_convertor.str_to_my_interval(period))
+            pd.save_chart_data(my_dict.get(f"{symbol}_{period}"))
 
     return result
 
-
-def create_consumers(pds: [PriceData]):
-    for pd in pds:
-        try:
-            print("update seis", pd.symbol, pd.exchange, pd.interval)
-            seis: Seis = tvl.new_seis(pd.symbol, pd.exchange, pd.interval)
-            seis.new_consumer(update_price_consumer)
-            time.sleep(1)
-        except Exception as e:
-            print("update seis", pd.symbol, pd.exchange, pd.interval, e)
-
-
-def update_price_consumer(seis: Seis, data):
-    pd = PriceData(seis.symbol, seis.exchange, seis.interval)
-    pd.print()
-    df = seis.get_hist(5000)
-    pd.save_chart_data(df)

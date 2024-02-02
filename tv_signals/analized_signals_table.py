@@ -39,7 +39,7 @@ class AnalyzedSignalsTable:
         cursor = db_connection.cursor()
         sql_query = f"""
                         INSERT INTO analizedSignals (currency, interval, candle_time, has_signal, signal_type, deal_time, open_price, msg, start_analize_time)
-                        VALUES ((SELECT id FROM currencies WHERE symbol = "{pd.symbol}" AND exchange = "{pd.exchange}"), "{str(pd.interval)}", 
+                        VALUES ((SELECT id FROM currencies WHERE symbol = "{pd.symbol}" AND exchange = "{pd.exchange}"), "{str(pd.interval.value)}", 
                         "{str(candle_time)}", {has_signal}, "{signal_type}", {deal_time}, {open_price}, "{msg}", "{start_analize_time}");"""
         try:
             cursor.execute(sql_query)

@@ -4,7 +4,7 @@ from tv_signals.signal_types import *
 from tv_signals.signal_types import Signal
 from tv_signals.price_parser import PriceData
 
-from utils.interval_convertor import interval_to_int
+from utils.interval_convertor import my_interval_to_int
 from utils.time import now_time
 
 
@@ -17,7 +17,7 @@ def has_multitimeframe_signal(needed_count, long_count, short_count):
 def get_deal_time(pds):
     deal_time = 0
     for pd in pds:
-        deal_time += interval_to_int(pd.interval)
+        deal_time += my_interval_to_int(pd.interval)
     deal_time /= 2
     deal_time = int(round(deal_time, 0))
     return deal_time
@@ -26,9 +26,11 @@ def get_deal_time(pds):
 def get_deal_time_intervals(intervals):
     deal_time = 0
     for interval in intervals:
-        deal_time += interval_to_int(interval)
+        deal_time += my_interval_to_int(interval)
     deal_time /= (len(intervals) + 1)
     deal_time = int(round(deal_time, 0))
+    if deal_time < 4:
+        deal_time = 4
     return deal_time
 
 
@@ -143,10 +145,6 @@ class NewMultitimeframeAnalizer(Analizer):
             signal = ShortSignal()
             intervals_for_dealtime = [*sob_short_intervals, *vob_short_intervals]
 
-        # if vob_is_long or vob_is_short:
-        #     has_signal = True
-        #     signal = LongSignal() if vob_long_count > vob_short_count else ShortSignal()
-
         deal_time = get_deal_time_intervals(intervals_for_dealtime)
 
         debug_text = f"""\n\nПроверка сигнала:
@@ -231,10 +229,8 @@ class SOBAnalizer(Analizer):
 class VOBAnalizer(Analizer):
     def analize_func(self, df, pd: PriceData) -> (bool, Signal, str):
         alt_pd = PriceData(pd.symbol, pd.exchange, OBVolumeIndicator.get_alt_interval(pd.interval))
-        alt_df = alt_pd.get_chart_data(5000)
+        alt_df = alt_pd.get_saved_chart_data(5000)
         vob_ind = OBVolumeIndicator(df, alt_df, df.open, df.close, df.high, df.low, pd)
-        # if alt_df is not None:
-        #     print("vob analize", pd.symbol, pd.interval, alt_pd.interval, len(alt_df))
 
         signal, debug = vob_ind.get_signal()
         has_signal = not(signal.type == NeutralSignal().type)

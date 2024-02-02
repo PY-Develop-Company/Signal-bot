@@ -1,33 +1,39 @@
+import asyncio
+import time
+
+import requests
 import logging
 import multiprocessing
 
-from tv_signals.price_parser import PriceData
-from tv_signals.analized_signals_table import AnalyzedSignalsTable
+from tv_signals.price_updater import FCSForexPriceUpdater, FCSCryptoPriceUpdater
+from tv_signals.price_parser import PriceData, update_prices
 from tv_signals import signal_maker, price_parser
 from tv_signals.signal_types import get_signal_by_type
 from tv_signals.signals_table import SignalsTable
 from manager_module import *
 from menu_text import *
+from tv_signals.analized_signals_table import AnalyzedSignalsTable
 
 from utils import interval_convertor
 from utils.time import *
 
 from aiogram import Bot, Dispatcher
-from tvDatafeed import Interval
+from tv_signals.interval import Interval
 import configparser
-from utils.interval_convertor import interval_to_int
+from utils.interval_convertor import my_interval_to_int
 
 from my_debuger import debug_error, debug_info, debug_temp
 
 config = configparser.ConfigParser()
 config.read("config.ini")
 
-API_TOKEN = config["BOT"]["Token"]
-
+BOT_TOKEN = config["BOT"]["Token"]
+FOREX_DATA_TOKEN = config["MARKET"]["Token"]
 SEARCH_ANALYZED_SIGNALS_DELAY = config["BOT"].getint("SearchAnalyzedSignalsDelay")
 
+current_price_updater = FCSForexPriceUpdater(FOREX_DATA_TOKEN)
 logging.basicConfig(level=logging.INFO)
-bot = Bot(token=API_TOKEN)
+bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher(bot)
 
 signal_search_delay = config["MESSAGES"].getint("SignalSearchDelay", fallback=60)
@@ -540,8 +546,9 @@ def handle_signal_msg_controller(analyzed_signal_id, signal, msg, pd: PriceData,
         except Exception as e:
             debug_error(e)
 
+        debug_temp(f"open signal {pd.symbol} {pd.interval}")
         close_signal_message, is_profit, open_price, close_price, open_price_date, close_price_date = await signal_maker.close_position(
-            open_position_price, signal, pd, bars_count=deal_time)
+            open_position_price, signal, pd, deal_time, current_price_updater)
         img_path = "./img/profit.jpg" if is_profit else "./img/loss.jpg"
 
         for i in range(0, send_msg_repeat_count):
@@ -553,6 +560,7 @@ def handle_signal_msg_controller(analyzed_signal_id, signal, msg, pd: PriceData,
             for user in group:
                 set_next_signal_status(user, False)
 
+        debug_temp(f"close signal {pd.symbol} {pd.interval}")
         send_close_msg_time = now_time()
         SignalsTable.add_sended_signal(analyzed_signal_id, t2, send_close_msg_time, open_price, close_price, is_profit, open_price_date, close_price_date)
 
@@ -623,7 +631,7 @@ def signals_message_sender_controller():
             df = df.reset_index(drop=True)
 
             signal = get_signal_by_type(df["signal_type"][0])
-            pd = PriceData(df["symbol"][0], df["exchange"][0], interval_convertor.str_to_interval(df["interval"][0]))
+            pd = PriceData(df["symbol"][0], df["exchange"][0], interval_convertor.str_to_my_interval(df["interval"][0]))
 
             multiprocessing.Process(target=handle_signal_msg_controller,
                                     args=(df["id"][0], signal, df["msg"][0], pd, df["open_price"][0], int(df["deal_time"][0]),
@@ -646,7 +654,7 @@ class IntervalGroup:
 
 class AnalyzePair:
     def __init__(self, interval_group: IntervalGroup, symbol: str, exchange: str):
-        self.wait_minutes = interval_to_int(interval_group.main)
+        self.wait_minutes = my_interval_to_int(interval_group.main)
 
         self.main_pd = PriceData(symbol, exchange, interval_group.main)
         self.parent_pds = [PriceData(symbol, exchange, interval_group.parent[i]) for i in range(len(interval_group.parent))]
@@ -656,14 +664,35 @@ class AnalyzePair:
         return [self.main_pd, *self.parent_pds, *self.additional_pds]
 
 
-def analyze_cur(analyze_pairs: [AnalyzePair]):
+def analyze_loop(analyze_pairs: [AnalyzePair], pds: [PriceData], symbols: [str], exchanges: [str], periods: [str]):
     from threading import Thread, Lock
 
-    AnalyzedSignalsTable.set_all_checked()
+    async def analyze_loop_child():
+        AnalyzedSignalsTable.set_all_checked()
+        lock = Lock()
 
-    lock = Lock()
-    for analyze_pair in analyze_pairs:
-        Thread(target=signal_maker.analyze_currency_data_controller, args=(analyze_pair, lock)).start()
+        while True:
+            debug_info("analyze loop...")
+            is_updated = update_prices(symbols, exchanges, periods, current_price_updater)
+
+            if not is_updated:
+                debug_error(Exception(), "not updated prices")
+                continue
+
+            tasks = []
+            for analyze_pair in analyze_pairs:
+                debug_info(f"analyze {analyze_pair.main_pd.symbol, analyze_pair.main_pd.interval}")
+                t = Thread(target=signal_maker.analyze_currency_data_controller, args=(analyze_pair, lock))
+                t.start()
+                tasks.append(t)
+
+            debug_info("analyze wait tasks...")
+            for t in tasks:
+                t.join()
+            debug_info("analyze loop end...")
+            await asyncio.sleep(5 * 60)
+
+    asyncio.run(analyze_loop_child())
 
 
 def main():
@@ -671,20 +700,20 @@ def main():
 
     multiprocessing.freeze_support()
 
+    intervals = [Interval.in_1_minute, Interval.in_5_minute, Interval.in_15_minute, Interval.in_30_minute, Interval.in_1_hour]
     currencies = price_parser.get_currencies()
 
-    groups = [IntervalGroup(Interval.in_5_minute, [Interval.in_15_minute, Interval.in_45_minute],
-                            additional=[Interval.in_1_minute, Interval.in_3_minute, Interval.in_5_minute])]
-              # IntervalGroup(Interval.in_15_minute, [Interval.in_30_minute, Interval.in_1_hour],
-              #               additional=[Interval.in_1_minute, Interval.in_3_minute, Interval.in_5_minute])]
+    groups = [IntervalGroup(Interval.in_5_minute, [Interval.in_15_minute, Interval.in_1_hour],
+                            additional=[Interval.in_1_minute, Interval.in_5_minute, Interval.in_5_minute])]
 
     analyze_pairs = [AnalyzePair(groups[group_index], currency[0], currency[1]) for currency in currencies for
                      group_index in range(len(groups))]
-    pds = list(set(pd for analyze_pair in analyze_pairs for pd in analyze_pair.get_all_pds()))
-    print([(pd.symbol, pd.interval) for pd in pds])
+    pds = [PriceData(currency[0], currency[1], interval) for currency in currencies for interval in intervals]
 
-    # multiprocessing.Process(target=price_parser.create_consumers, args=(pds,)).start()
-    multiprocessing.Process(target=analyze_cur, args=(analyze_pairs,)).start()
+    symbols = [currency[0] for currency in currencies]
+    exchanges = [currency[1] for currency in currencies]
+    periods = ["1m", "5m", "15m", "30m", "1h"]
+    multiprocessing.Process(target=analyze_loop, args=(analyze_pairs, pds, symbols, exchanges, periods)).start()
     multiprocessing.Process(target=signals_message_sender_controller).start()
 
     executor.start_polling(dp, skip_updates=True)
