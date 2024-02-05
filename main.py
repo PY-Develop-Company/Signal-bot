@@ -18,6 +18,7 @@ from utils import interval_convertor
 from utils.time import *
 
 from aiogram import Bot, Dispatcher
+from aiogram.utils.exceptions import BotBlocked, UserDeactivated
 from tv_signals.interval import Interval
 import configparser
 from utils.interval_convertor import my_interval_to_int
@@ -116,6 +117,10 @@ async def send_message_to_user(user_id, text, markup=None):
             return await bot.send_message(user_id, text, disable_notification=False)
         else:
             return await bot.send_message(user_id, text, disable_notification=False, reply_markup=markup)
+    except BotBlocked:
+        pass
+    except UserDeactivated:
+        pass
     except Exception as e:
         debug_error(e)
 
@@ -148,6 +153,10 @@ async def send_photo_text_message_to_user(user_id, img_path, text=" ", markup=No
                 await bot.send_photo(user_id, photo=file, caption=text)
             else:
                 await bot.send_photo(user_id, photo=file, caption=text, reply_markup=markup)
+    except BotBlocked:
+        pass
+    except UserDeactivated:
+        pass
     except Exception as e:
         debug_error(e)
 
