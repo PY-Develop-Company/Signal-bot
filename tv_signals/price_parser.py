@@ -62,15 +62,14 @@ class PriceData:
         data_strs = []
         for key in data.keys():
             pd_timestamp_data = data.get(key)
-            volume_str = pd_timestamp_data.get("v")
-            volume_str = pd_timestamp_data.get("v")
+            volume_str = str(pd_timestamp_data.get("v"))
             high = float(pd_timestamp_data.get("h"))
             low = float(pd_timestamp_data.get("l"))
             interval_mult = interval_convertor.my_interval_to_int(self.interval)
             v = (high - low)/self.get_real_puncts(1) * interval_mult
             if interval_mult >= 60:
                 v *= 0.5
-            volume = float(volume_str) if volume_str.isnumeric() else round(v)
+            volume = float(volume_str) if volume_str.isnumeric() else round(v*0.8)
             data_strs.append(f'({pd_timestamp_data.get("t")}, "{self.symbol}", {pd_timestamp_data.get("o")}, {high}, '
                              f'{low}, {pd_timestamp_data.get("c")}, {volume}, "{pd_timestamp_data.get("tm")}", "{download_time}")')
 
@@ -83,7 +82,6 @@ class PriceData:
             '''
         cursor.execute(query)
         db_connection.commit()
-        print(f"saved {self.symbol} {self.interval}")
             # break
         # except sqlite3.OperationalError:
         #     time.sleep(1)
@@ -97,6 +95,12 @@ class PriceData:
 
     def download_price_data(self, bars_count=5000):
         return price_updater.download_price_data(self.symbol, self.exchange, self.interval, bars_count)
+
+    def update_volume(self):
+        query = f"UPDATE {self.table_name} SET volume = volume * 0.8;"
+        cursor = db_connection.cursor()
+        cursor.execute(query)
+        db_connection.commit()
 
 
 def get_currencies():
@@ -136,4 +140,3 @@ def update_prices(symbols: [str], exchanges: [str], periods: [str], price_update
             pd.save_chart_data(my_dict.get(f"{symbol}_{period}"))
 
     return result
-

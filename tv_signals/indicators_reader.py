@@ -24,76 +24,76 @@ min_sob_size_dict = {
 
 blocks_delta_dict = {
     "EUR/USD": {
-        Interval.in_1_minute: 35,
-        Interval.in_5_minute: 100,
-        Interval.in_15_minute: 140,
-        Interval.in_30_minute: 200,
-        Interval.in_1_hour: 200,
-        Interval.in_2_hour: 200
+        Interval.in_1_minute: 30,
+        Interval.in_5_minute: 90,
+        Interval.in_15_minute: 130,
+        Interval.in_30_minute: 190,
+        Interval.in_1_hour: 190,
+        Interval.in_2_hour: 190
     },
     "AUD/USD": {
-        Interval.in_1_minute: 35,
-        Interval.in_5_minute: 110,
-        Interval.in_15_minute: 140,
-        Interval.in_30_minute: 220,
-        Interval.in_1_hour: 220,
-        Interval.in_2_hour: 220
+        Interval.in_1_minute: 30,
+        Interval.in_5_minute: 100,
+        Interval.in_15_minute: 130,
+        Interval.in_30_minute: 210,
+        Interval.in_1_hour: 210,
+        Interval.in_2_hour: 210
     },
     "AUD/CAD": {
-        Interval.in_1_minute: 40,
-        Interval.in_5_minute: 130,
-        Interval.in_15_minute: 140,
-        Interval.in_30_minute: 200,
-        Interval.in_1_hour: 200,
-        Interval.in_2_hour: 200
+        Interval.in_1_minute: 35,
+        Interval.in_5_minute: 120,
+        Interval.in_15_minute: 130,
+        Interval.in_30_minute: 190,
+        Interval.in_1_hour: 190,
+        Interval.in_2_hour: 190
     },
     "EUR/JPY": {
-        Interval.in_1_minute: 40,
-        Interval.in_5_minute: 110,
-        Interval.in_15_minute: 140,
-        Interval.in_30_minute: 199,
-        Interval.in_1_hour: 199,
-        Interval.in_2_hour: 199
+        Interval.in_1_minute: 35,
+        Interval.in_5_minute: 100,
+        Interval.in_15_minute: 130,
+        Interval.in_30_minute: 189,
+        Interval.in_1_hour: 189,
+        Interval.in_2_hour: 189
     },
     "EUR/CAD": {
-        Interval.in_1_minute: 85,
-        Interval.in_5_minute: 160,
-        Interval.in_15_minute: 220,
-        Interval.in_30_minute: 260,
-        Interval.in_1_hour: 260,
-        Interval.in_2_hour: 260
+        Interval.in_1_minute: 80,
+        Interval.in_5_minute: 150,
+        Interval.in_15_minute: 210,
+        Interval.in_30_minute: 250,
+        Interval.in_1_hour: 250,
+        Interval.in_2_hour: 250
     },
     "AUD/CHF": {
-        Interval.in_1_minute: 30,
-        Interval.in_5_minute: 110,
+        Interval.in_1_minute: 25,
+        Interval.in_5_minute: 100,
+        Interval.in_15_minute: 150,
+        Interval.in_30_minute: 180,
+        Interval.in_1_hour: 180,
+        Interval.in_2_hour: 180
+    },
+    "GBP/USD": {
+        Interval.in_1_minute: 80,
+        Interval.in_5_minute: 100,
         Interval.in_15_minute: 160,
         Interval.in_30_minute: 190,
         Interval.in_1_hour: 190,
         Interval.in_2_hour: 190
     },
-    "GBP/USD": {
-        Interval.in_1_minute: 85,
-        Interval.in_5_minute: 110,
-        Interval.in_15_minute: 170,
-        Interval.in_30_minute: 200,
-        Interval.in_1_hour: 200,
-        Interval.in_2_hour: 200
-    },
     "AUD/JPY": {
-        Interval.in_1_minute: 50,
-        Interval.in_5_minute: 150,
-        Interval.in_15_minute: 200,
-        Interval.in_30_minute: 220,
-        Interval.in_1_hour: 220,
-        Interval.in_2_hour: 220
+        Interval.in_1_minute: 45,
+        Interval.in_5_minute: 140,
+        Interval.in_15_minute: 190,
+        Interval.in_30_minute: 210,
+        Interval.in_1_hour: 210,
+        Interval.in_2_hour: 210
     },
     "GBP/AUD": {
-        Interval.in_1_minute: 77,
-        Interval.in_5_minute: 200,
-        Interval.in_15_minute: 300,
-        Interval.in_30_minute: 350,
-        Interval.in_1_hour: 350,
-        Interval.in_2_hour: 350
+        Interval.in_1_minute: 72,
+        Interval.in_5_minute: 190,
+        Interval.in_15_minute: 290,
+        Interval.in_30_minute: 340,
+        Interval.in_1_hour: 340,
+        Interval.in_2_hour: 340
     },
     "BTC/USD": {
         Interval.in_1_minute: 0,
@@ -175,7 +175,7 @@ def get_min_sob_size(interval: Interval):
 
 
 def get_blocks_delta(currency: str, interval: Interval):
-    return blocks_delta_dict.get(currency).get(interval)
+    return round(blocks_delta_dict.get(currency).get(interval) * 0.5)
 
 
 class Indicator:

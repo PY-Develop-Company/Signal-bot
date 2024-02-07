@@ -128,6 +128,7 @@ class NewMultitimeframeAnalizer(Analizer):
 
     def analize_func(self, parent_dfs, pds) -> (bool, Signal, str, int):
         pds_dfs = dict(zip(pds, parent_dfs))
+
         sob_long_count, sob_short_count, sob_long_intervals, sob_short_intervals, sob_debugs = self.analize_multitimeframe(pds_dfs, self.sob)
         vob_long_count, vob_short_count, vob_long_intervals, vob_short_intervals, vob_debugs = self.analize_multitimeframe(pds_dfs, self.vob)
         has_signal = False

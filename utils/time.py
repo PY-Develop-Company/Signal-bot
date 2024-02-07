@@ -7,6 +7,17 @@ time_zone = pytz.timezone("Europe/Bucharest")
 origin_date_time_zone = datetime(1900, 1, 1, tzinfo=time_zone)
 origin_date = datetime(1900, 1, 1)
 
+day_temp = datetime.now(time_zone)
+
+
+def is_new_day():
+    global day_temp
+    if day_temp.day != datetime.now(time_zone).day:
+        day_temp = now_time()
+        return True
+
+    return False
+
 
 def now_time():
     return str_to_datetime(str(datetime.now(time_zone)).split(".")[0])

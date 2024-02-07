@@ -1,6 +1,6 @@
 import sqlite3
 
-DB_path = "./users/DataBase.db"
+DB_path = "users/DataBase.db"
 user_table = "users"
 manager_table = "managers"
 
