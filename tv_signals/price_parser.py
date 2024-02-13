@@ -125,18 +125,33 @@ def update_prices(symbols: [str], exchanges: [str], periods: [str], price_update
     result = True
     my_dict = {}
     for period in periods:
-        res = price_updater.download_price_data(symbols, period, 1)
-        res = json.loads(res)
-        for key in res.keys():
-            data = res.get(key)
-            s = data.get("info").get("symbol")
-            p = data.get("info").get("period")
-            d = data.get("response")
-            my_dict.update({f"{s}_{p}": d})
+        is_ok, res = price_updater.download_price_data(symbols, period, 1)
+        with open(f"data_{period}.json", "w") as f:
+            f.write(res)
+        if not is_ok:
+            debug_error(Exception(), f"ERROR DOWNLOAD DATA {period} status_code is not 200")
+            return False
+        try:
+            res = json.loads(res)
+            for key in res.keys():
+                data = res.get(key)
+                s = data.get("info").get("symbol")
+                p = data.get("info").get("period")
+                d = data.get("response")
+                my_dict.update({f"{s}_{p}": d})
+        except Exception as e:
+            debug_error(e, f"___ ERROR DOWNLOAD DATA {symbols}_{period}")
 
+    print("updated prices try")
+    with open(f"data_all.json", "w") as f:
+        f.write(str(my_dict))
     for i, symbol in enumerate(symbols):
         for period in periods:
-            pd = PriceData(symbol, exchanges[i], interval_convertor.str_to_my_interval(period))
-            pd.save_chart_data(my_dict.get(f"{symbol}_{period}"))
-
+            try:
+                pd = PriceData(symbol, exchanges[i], interval_convertor.str_to_my_interval(period))
+                data = my_dict.get(f"{symbol}_{period}")
+                pd.save_chart_data(data)
+            except Exception as e:
+                debug_error(e, f"___ ERROR SAVING DATA {symbol}_{period}")
+                result = False
     return result

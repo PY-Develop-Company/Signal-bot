@@ -50,9 +50,10 @@ class FCSForexPriceUpdater:
             self.req_count += 1
             res_url += f"url[{i}]={self.base_url}history?symbol={symbol}&period={period}&level={level}&"
         res_url += f"access_key={self.token}"
-
+        print("get req", res_url)
         res = requests.get(res_url)
-        return res.text
+        print("get req", res.status_code)
+        return res.status_code == 200, res.text
 
     def show_all_currencies(self):
         if self.req_count >= self.max_req_count:

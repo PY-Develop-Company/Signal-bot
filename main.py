@@ -6,7 +6,7 @@ import logging
 import multiprocessing
 
 import market_info
-from tv_signals.price_updater import FCSForexPriceUpdater, FCSCryptoPriceUpdater, TVDatafeedPriceUpdater
+from tv_signals.price_updater import FCSForexPriceUpdater
 from tv_signals.price_parser import PriceData, update_prices
 from tv_signals import signal_maker, price_parser
 from tv_signals.signal_types import get_signal_by_type
@@ -678,6 +678,7 @@ def analyze_loop(analyze_pairs: [AnalyzePair], pds: [PriceData], symbols: [str],
     from threading import Thread, Lock
 
     async def analyze_loop_child():
+        print("init")
         AnalyzedSignalsTable.set_all_checked()
         lock = Lock()
 
@@ -689,9 +690,12 @@ def analyze_loop(analyze_pairs: [AnalyzePair], pds: [PriceData], symbols: [str],
                 is_updated = update_prices(symbols, exchanges, [periods[0]], current_price_updater)
                 debug_info("analyze loop end... market is sleeping")
             else:
+                debug_info("update_prices...")
                 is_updated = update_prices(symbols, exchanges, periods, current_price_updater)
+                debug_info("updated_prices...")
 
                 if is_updated:
+                    debug_info("is_updated...")
                     tasks = []
                     for analyze_pair in analyze_pairs:
                         debug_info(f"analyze {analyze_pair.main_pd.symbol, analyze_pair.main_pd.interval}")
@@ -737,13 +741,10 @@ def main():
 
 
 if __name__ == '__main__':
-    # intervals = [Interval.in_1_minute, Interval.in_5_minute, Interval.in_15_minute, Interval.in_30_minute, Interval.in_1_hour, Interval.in_2_hour]
-    # currencies = price_parser.get_currencies()
-    # symbols = [currency[0] for currency in currencies]
-    # exchanges = [currency[1] for currency in currencies]
-    # periods = ["1m", "5m", "15m", "30m", "1h", "2h"]
-    # for i in range(len(currencies)):
-    #     for j in range(len(intervals)):
-    #         PriceData(currencies[i][0], currencies[i][1], intervals[j]).update_volume()
+    intervals = [Interval.in_1_minute, Interval.in_5_minute, Interval.in_15_minute, Interval.in_30_minute, Interval.in_1_hour, Interval.in_2_hour]
+    currencies = price_parser.get_currencies()
+    symbols = [currency[0] for currency in currencies]
+    exchanges = [currency[1] for currency in currencies]
+    periods = ["1m", "5m", "15m", "30m", "1h", "2h"]
 
     main()
