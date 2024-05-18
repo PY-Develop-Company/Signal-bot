@@ -1,5 +1,7 @@
 from utils.file_manager import *
-from user_module import *
+from user_status_type import UserStatusType
+
+import config
 
 from aiogram import types
 
@@ -93,16 +95,15 @@ def get_users_markup(languageCode):
     return users_markup
 
 
-def get_markup_with_status(user_id, status):
-    user_language = get_user_language(user_id)
-    if user_id in manager_module.managers_ids:
+def get_markup_with_status(user_id, user_language, status: UserStatusType):
+    if user_id in config.managers_ids:
         return get_manager_markup(user_language)
     else:
-        if status in [none_status]:
+        if status in [UserStatusType.none_status]:
             return get_no_vip_markup(user_language)
-        elif status in [deposit_status, trial_status]:
+        elif status in [UserStatusType.deposit_status, UserStatusType.trial_status]:
             return get_vip_markup(user_language)
-        elif status in [wait_id_status, wait_deposit_status, id_status]:
+        elif status in [UserStatusType.wait_id_status, UserStatusType.wait_deposit_status, UserStatusType.id_status]:
             return get_half_vip_markup(user_language)
-        elif status in [wait_id_input_status]:
+        elif status in [UserStatusType.wait_id_input_status]:
             return get_empty_markup()

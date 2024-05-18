@@ -1,5 +1,6 @@
 import time
 from datetime import datetime
+from icecream import ic
 
 from tv_signals.price_updater import FCSForexPriceUpdater
 from tv_signals.analizer import NewMultitimeframeAnalizer
@@ -36,24 +37,27 @@ async def close_position(position_open_price_original, signal: Signal, pd: Price
 
 
 def analyze_currency_data_controller(analyze_pair, lock):
-    main_pd = analyze_pair.main_pd
-    all_pds = analyze_pair.get_all_pds()
+    try:
+        main_pd = analyze_pair.main_pd
+        all_pds = analyze_pair.get_all_pds()
 
-    lock.acquire()
-    main_price_df = main_pd.get_saved_chart_data(5000)
-    all_dfs = [pd.get_saved_chart_data(5000) for pd in analyze_pair.get_all_pds()]
-    lock.release()
+        lock.acquire()
+        main_price_df = main_pd.get_saved_chart_data(5000)
+        all_dfs = [pd.get_saved_chart_data(5000) for pd in analyze_pair.get_all_pds()]
+        lock.release()
 
-    start_analyze_time = now_time()  # main_price_df.iloc[0].loc["download_time"]
+        start_analyze_time = now_time()  # main_price_df.iloc[0].loc["download_time"]
 
-    analyzer = NewMultitimeframeAnalizer(1, 1)
-    lock.acquire()
-    has_signal, signal, debug, deal_time = analyzer.analize(all_dfs, all_pds)
-    open_position_price = main_pd.get_saved_chart_data(bars_count=1).iloc[0].loc["close"]
-    lock.release()
+        analyzer = NewMultitimeframeAnalizer(1, 1)
+        lock.acquire()
+        has_signal, signal, debug, deal_time = analyzer.analize(all_dfs, all_pds)
+        open_position_price = main_pd.get_saved_chart_data(bars_count=1).iloc[0].loc["close"]
+        lock.release()
 
-    msg = signal.get_open_msg_text(main_pd, deal_time)
+        msg = signal.get_open_msg_text(main_pd, deal_time)
 
-    AnalyzedSignalsTable.add_analyzed_signal(main_pd, main_price_df["datetime"][0], has_signal, signal.type,
-                                             deal_time, open_position_price, msg, start_analyze_time)
-    debug_info(f"analyzed {[main_pd.symbol, main_pd.exchange, main_pd.interval]}")
+        AnalyzedSignalsTable.add_analyzed_signal(main_pd, main_price_df["datetime"][0], has_signal, signal.type,
+                                                 deal_time, open_position_price, msg, start_analyze_time)
+        debug_info(f"analyzed {[main_pd.symbol, main_pd.exchange, main_pd.interval]}")
+    except Exception as e:
+        print(e)

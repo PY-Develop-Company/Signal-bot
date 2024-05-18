@@ -93,9 +93,6 @@ class PriceData:
         df["datetime"] = df.apply(lambda row: datetime.strptime(row["datetime_str"], '%Y-%m-%d %H:%M:%S'), axis=1)
         return df
 
-    def download_price_data(self, bars_count=5000):
-        return price_updater.download_price_data(self.symbol, self.exchange, self.interval, bars_count)
-
     def update_volume(self):
         query = f"UPDATE {self.table_name} SET volume = volume * 0.8;"
         cursor = db_connection.cursor()
@@ -125,12 +122,11 @@ def update_prices(symbols: [str], exchanges: [str], periods: [str], price_update
     result = True
     my_dict = {}
     for period in periods:
-        is_ok, res = price_updater.download_price_data(symbols, period, 1)
-        with open(f"data_{period}.json", "w") as f:
-            f.write(res)
+        is_ok, res, url = price_updater.download_price_data(symbols, period, 1)
+        # with open(f"data_{str(time.time()).split('.')[0]}_{str(period)}.txt", "w") as f:
+        #     f.write(url + "\n" + str(res))
         if not is_ok:
             debug_error(Exception(), f"ERROR DOWNLOAD DATA {period} status_code is not 200")
-            return False
         try:
             res = json.loads(res)
             for key in res.keys():
@@ -143,8 +139,6 @@ def update_prices(symbols: [str], exchanges: [str], periods: [str], price_update
             debug_error(e, f"___ ERROR DOWNLOAD DATA {symbols}_{period}")
 
     print("updated prices try")
-    with open(f"data_all.json", "w") as f:
-        f.write(str(my_dict))
     for i, symbol in enumerate(symbols):
         for period in periods:
             try:
@@ -153,5 +147,7 @@ def update_prices(symbols: [str], exchanges: [str], periods: [str], price_update
                 pd.save_chart_data(data)
             except Exception as e:
                 debug_error(e, f"___ ERROR SAVING DATA {symbol}_{period}")
-                result = False
+                # with open(f"data_{str(time.time()).replace('.', '_')}_{symbol.replace('/', '')}_{period}.txt", "w") as f:
+                #     f.write(str(my_dict))
+                # result = False
     return result

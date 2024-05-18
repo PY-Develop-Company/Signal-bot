@@ -1,12 +1,15 @@
 from datetime import timedelta
 
+import config
+
 from utils.time import datetime_to_str, now_time, str_to_datetime, secs_to_date
 import manager_module
 import market_info
 from db_modul import *
+from user_status_type import UserStatusType
 
 from pandas import read_sql_query, to_datetime
-import asyncio
+import menu_text
 
 from my_debuger import debug_error, debug_info
 
@@ -16,15 +19,6 @@ current_users_pointer_max_dict = dict()
 current_users_pointer_min_dict = dict()
 
 current_users_data_dict = dict()
-
-# STATUSES
-deposit_status = "status Deposit"
-trial_status = 'status Trial'
-id_status = "status ID"
-none_status = "status none"
-wait_id_status = 'status wait check ID'
-wait_id_input_status = 'status wait input ID'
-wait_deposit_status = 'status wait check Deposit'
 
 
 def find_user_with_id(id):
@@ -73,10 +67,10 @@ def set_user_time(user_id, new_time):
 
 
 def get_users_groups_ids(groups_count, users_in_group_count, delay_second):
-    statuses = [deposit_status, trial_status]
+    statuses = [UserStatusType.deposit_status.value, UserStatusType.trial_status.value]
     sql_query = f"""
         SELECT * FROM {user_table} 
-        WHERE (status IN {tuple(statuses)} OR id IN {tuple(manager_module.tester_ids)}) AND get_next_signal = {True} 
+        WHERE (status IN {tuple(statuses)} OR id IN {tuple(config.tester_ids)}) AND get_next_signal = {True} 
         ORDER BY time """
     users_df = read_sql_query(sql_query, db_connection)
 
@@ -113,15 +107,15 @@ def remove_user_with_id(id):
         cursor.execute(f'''
             SELECT name, account_number, status FROM {user_table}
             WHERE id = ? AND status = ?
-        ''', (id, deposit_status))
+        ''', (id, UserStatusType.deposit_status.value))
         user = cursor.fetchone()
 
         if not (user is None):
             cursor.execute(f'''UPDATE {user_table} SET status = ?
                 WHERE id = ? AND status = ?
-            ''', (none_status, id, deposit_status))
+            ''', (UserStatusType.none_status.value, id, UserStatusType.deposit_status.value))
             db_connection.commit()
-            data = f"{user[0]} | {user[1]} | {none_status}"
+            data = f"{user[0]} | {user[1]} | {UserStatusType.none_status}"
             return True, data
         else:
             return False, ""
@@ -141,17 +135,17 @@ def get_users_strings():
             SELECT id, name, account_number, tag, status, trial_end_date
             FROM {user_table}
             WHERE status IN (?, ?)
-        ''', (deposit_status, trial_status))
+        ''', (UserStatusType.deposit_status.value, UserStatusType.trial_status.value))
 
         rows = cursor.fetchall()
         user_number = 1
 
         for row in rows:
             telegram_id, telegram_name, account_number, tag, status, trial_end_date = row
-            if status == deposit_status:
+            if status == UserStatusType.deposit_status.value:
                 users_data.append((telegram_id, telegram_name, account_number))
                 users_strings_list.append(f"{user_number}. @{tag} | {telegram_name} | {account_number} | {status}")
-            elif status == trial_status:
+            elif status == UserStatusType.trial_status.value:
                 formatted_end_date = secs_to_date(trial_end_date)
                 users_data.append((telegram_id, telegram_name, account_number))
                 users_strings_list.append(f"{user_number}. @{tag} | {telegram_name} | {account_number} | {status} | {formatted_end_date}")
@@ -221,28 +215,27 @@ def get_current_users_data(manager_id):
     return current_users_data_dict.get(manager_id, [])
 
 
-def has_user_status(id, status):
+def has_user_status(id, status: UserStatusType):
     user = find_user_with_id(id)
-
-    return not (user is None) and user['status'] == status
+    return not (user is None) and user['status'] == status.value
 
 
 def get_user_language(id):
-    if id in manager_module.managers_ids:
+    if id in config.managers_ids:
         l = manager_module.get_manager_language(id)
         return l
     else:
         user = find_user_with_id(id)
-        if not (user is None):
+        if user:
             l = user['language']
             return l
-        return startLanguage
+        return menu_text.select_language_eng
 
 
 def set_user_language(user_id, new_language):
     cursor = db_connection.cursor()
     try:
-        if user_id in manager_module.managers_ids:
+        if user_id in config.managers_ids:
             manager_module.set_manager_language(user_id, new_language)
         else:
             cursor.execute(f"UPDATE {user_table} SET language = ? WHERE id = ?", (new_language, user_id))
@@ -267,13 +260,13 @@ def get_next_signal_status(user_id):
     return None
 
 
-def get_users_ids_with_status(status):
+def get_users_ids_with_status(status: UserStatusType):
     try:
-        sql_query = f"SELECT * FROM {user_table} WHERE status = '{status}'"
+        sql_query = f"SELECT * FROM {user_table} WHERE status = '{status.value}'"
         users_df = read_sql_query(sql_query, db_connection)
         return users_df["id"].values.tolist()
     except sqlite3.Error as error:
-        debug_error(error, f"Error get users with status '{status}'")
+        debug_error(error, f"Error get users with status '{status.value}'")
         return []
 
 
@@ -292,7 +285,7 @@ def set_trial_to_user(user_id):
             UPDATE {user_table}
             SET had_trial_status = 1, before_trial_status = status, status = ?, trial_end_date = ?
             WHERE id = ?
-        ''', (trial_status, trial_end_date, user_id))
+        ''', (UserStatusType.trial_status.value, trial_end_date, user_id))
         db_connection.commit()
     except sqlite3.Error as error:
         debug_error(error, f"Error set trial {user_id}")
@@ -305,7 +298,7 @@ def remove_trial_from_user(user_id):
             UPDATE {user_table}
             SET status = before_trial_status, before_trial_status = ?
             WHERE id = ?
-        ''', (none_status, user_id))
+        ''', (UserStatusType.none_status.value, user_id))
         db_connection.commit()
     except sqlite3.Error as error:
         debug_error(error, f"Error remove trial {user_id}")
@@ -341,7 +334,7 @@ def add_user(id, first_name, last_name, tag):
                     before_trial_status, time, get_next_signal
                 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ''', (
-                id, full_name, tag, startLanguage, none_status,
+                id, full_name, tag, startLanguage, UserStatusType.none_status.value,
                 0, False, None, "none", datetime_to_str(now_time()), False
             ))
             db_connection.commit()
@@ -349,9 +342,9 @@ def add_user(id, first_name, last_name, tag):
         debug_error(error, f"Error add user with {id}")
 
 
-def update_status_user(id, status):
+def update_status_user(id, status: UserStatusType):
     cursor = db_connection.cursor()
-    cursor.execute(f"UPDATE {user_table} SET status = ? WHERE id = ?", (status, id))
+    cursor.execute(f"UPDATE {user_table} SET status = ? WHERE id = ?", (status.value, id))
     db_connection.commit()
 
 
@@ -364,7 +357,7 @@ async def set_user_tag(user_id, tag):
         debug_error(error, f"Error set tag")
 
 
-async def get_user_with_status(status):
+async def get_user_with_status(status: UserStatusType):
     users_ids_with_status = get_users_ids_with_status(status)
 
     has_users_with_status = len(users_ids_with_status) > 0
@@ -376,7 +369,7 @@ async def get_user_with_status(status):
 def get_user_status(id):
     user = find_user_with_id(id)
     if not (user is None):
-        return user['status']
+        return UserStatusType(user['status'])
     return None
 
 
@@ -397,12 +390,3 @@ def get_user_account_number(id):
 def have_user_with_id(id):
     user = find_user_with_id(id)
     return not (user is None)
-
-
-async def main():
-    # find_user_with_id(5418713788)
-    print(get_users_groups_ids(50, 20, 60 * 5))
-
-
-if __name__ == "__main__":
-    asyncio.run(main())

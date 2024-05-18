@@ -41,7 +41,7 @@ class FCSForexPriceUpdater:
     def download_price_data(self, symbols, period, level):
         if self.req_count >= self.max_req_count:
             debug_error(Exception(), f"ERROR Max req count limit per day reached {self.max_req_count}")
-            return None
+            return False, None, ""
 
         res_url = f"{self.base_url}multi_url?"
         i = 0
@@ -50,10 +50,9 @@ class FCSForexPriceUpdater:
             self.req_count += 1
             res_url += f"url[{i}]={self.base_url}history?symbol={symbol}&period={period}&level={level}&"
         res_url += f"access_key={self.token}"
-        print("get req", res_url)
         res = requests.get(res_url)
         print("get req", res.status_code)
-        return res.status_code == 200, res.text
+        return res.status_code == 200, res.text, res_url
 
     def show_all_currencies(self):
         if self.req_count >= self.max_req_count:
@@ -81,33 +80,32 @@ class FCSForexPriceUpdater:
         self.req_count = 0
 
 
-class FCSCryptoPriceUpdater(FCSForexPriceUpdater):
-    def __init__(self, token, max_req_count):
-        super().__init__(token, max_req_count)
-        self.base_url = "https://fcsapi.com/api-v3/crypto/"
-
-    def download_price_data(self, symbols, period, level):
-        if self.req_count >= self.max_req_count:
-            debug_error(Exception(), f"ERROR Max req count limit per day reached {self.max_req_count}")
-            return None
-
-        i = 0
-        res = ""
-        for symbol in symbols:
-            i += 1
-            res_url = f"{self.base_url}history?symbol={symbol}&period={period}&level={level}&access_key={self.token}"
-
-            self.req_count += 1
-            res += ", " + requests.get(res_url).text
-        return res
-
-    def show_all_currencies(self):
-        if self.req_count >= self.max_req_count:
-            debug_error(Exception(), f"ERROR Max req count limit per day reached {self.max_req_count}")
-            return None
-
-        res_url = f"{self.base_url}list?type=crypto&access_key={self.token}"
-
-        self.req_count += 1
-        res = requests.get(res_url)
-        return res.text
+# class FCSCryptoPriceUpdater(FCSForexPriceUpdater):
+#     def __init__(self, token, max_req_count):
+#         super().__init__(token, max_req_count)
+#         self.base_url = "https://fcsapi.com/api-v3/crypto/"
+#
+#     def download_price_data(self, symbols, period, level):
+#         if self.req_count >= self.max_req_count:
+#             debug_error(Exception(), f"ERROR Max req count limit per day reached {self.max_req_count}")
+#             return None
+#
+#         i = 0
+#         res = ""
+#         for symbol in symbols:
+#             i += 1
+#             res_url = f"{self.base_url}history?symbol={symbol}&period={period}&level={level}&access_key={self.token}"
+#             self.req_count += 1
+#             res += ", " + requests.get(res_url).text
+#         return res
+#
+#     def show_all_currencies(self):
+#         if self.req_count >= self.max_req_count:
+#             debug_error(Exception(), f"ERROR Max req count limit per day reached {self.max_req_count}")
+#             return None
+#
+#         res_url = f"{self.base_url}list?type=crypto&access_key={self.token}"
+#
+#         self.req_count += 1
+#         res = requests.get(res_url)
+#         return res.text

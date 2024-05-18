@@ -1,20 +1,7 @@
-import json
-
-from user_module import *
+from user import *
 from db_modul import *
 
-import configparser
 from my_debuger import debug_error, debug_info
-
-
-config = configparser.ConfigParser()
-config.read("config.ini")
-
-
-manager_username = config["ADMIN"]["ManagerUsername"]
-tester_ids = json.loads(config.get("ADMIN", "TesterIds"))
-managers_ids = json.loads(config.get("ADMIN", "ManagersIds"))
-manager_url = f"https://t.me/{manager_username[1:]}"
 
 search_id_manager_status = "пошук ID статус"
 search_deposit_manager_status = "пошук депозиту статус"
