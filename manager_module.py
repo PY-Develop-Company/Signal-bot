@@ -1,82 +1,88 @@
 from user import *
+from user_status_type import ManagerStatusType
 from db_modul import *
 
 from my_debuger import debug_error, debug_info
 
-search_id_manager_status = "пошук ID статус"
-search_deposit_manager_status = "пошук депозиту статус"
-none_manager_status = "none"
 
+class ManagerUser(GenericUser):
+    def __init__(self, id, full_name, tag):
+        super().__init__(id, full_name, tag)
 
-async def add_manager(id):
-    cursor = db_connection.cursor()
-    cursor.execute(f"SELECT id FROM {manager_table} WHERE id = ?", (id,))
-    existing_user = cursor.fetchone()
-    if existing_user is None:
-        cursor.execute(f'''INSERT INTO {manager_table} (id, status, do, language) VALUES (?, ?, ?, ?)''', (id, none_manager_status, "none", startLanguage))
-        db_connection.commit()
+        self.status = ManagerStatusType.none_manager_status.value
+        self.do = "none"
 
+        if not self.load_user():
+            self.add_user(id, full_name, tag)
+            self.load_user()
 
-def get_manager_language(id):
-    cursor = db_connection.cursor()
-    try:
-        cursor.execute(f"SELECT language FROM {manager_table} WHERE id = ?", (id,))
-        language = cursor.fetchone()[0]
-        return language
-    except sqlite3.Error as error:
-        debug_error(error, f"Error fetching manager's language")
-        return None
-
-
-def set_manager_language(id, language):
-    cursor = db_connection.cursor()
-    try:
-        cursor.execute(f"UPDATE {manager_table} SET language = ? WHERE id = ?", (language, id))
-        db_connection.commit()
-    except sqlite3.Error as error:
-        debug_error(error, f"Error set language manager {id}")
-
-
-def update_manager_do(manager_id, do):
-    cursor = db_connection.cursor()
-    try:
-        cursor.execute(f"UPDATE {manager_table} SET do = ? WHERE id = ?", (do, manager_id))
-        db_connection.commit()
-    except sqlite3.Error as error:
-        debug_error(error, f"Error updating manager's 'do'")
-
-
-async def update_manager_status(manager_id, status):
-    cursor = db_connection.cursor()
-    try:
-        cursor.execute(f"UPDATE {manager_table} SET status = ? WHERE id = ?", (status, manager_id))
-        db_connection.commit()
-    except sqlite3.Error as error:
-        debug_error(error, f"Error updating manager's 'status'")
-
-
-def get_manager_do(manager_id):
-    try:
+    def add_user(self, id, full_name, tag):
         cursor = db_connection.cursor()
-        cursor.execute(f"SELECT do FROM {manager_table} WHERE id = {manager_id}")
-        do = cursor.fetchone()[0]
-        return do
-    except sqlite3.Error as error:
-        debug_error(error, f"Error get manager 'do'")
-        return None
+        cursor.execute(f'''INSERT INTO {manager_table} (id, status, do, language) VALUES (?, ?, ?, ?)''',
+                       (self.id, self.status, self.do, self.language))
+        db_connection.commit()
 
+    def load_user(self):
+        user_data = self.find_user_with_id(self.id)
 
-def get_manager_user_account(manager_id):
-    return get_user_account_number(get_manager_do(manager_id))
+        if user_data is None:
+            return False
 
+        self.id = user_data["id"]
+        self.status = user_data["status"]
+        self.do = user_data["do"]
+        self.language = user_data["language"]
 
-def is_manager_status(manager_id, needed_status):
-    connection = db_connection
-    cursor = connection.cursor()
-    try:
-        cursor.execute(f"SELECT status FROM {manager_table} WHERE id = ?", (manager_id,))
-        status = cursor.fetchone()
-        return status[0] == needed_status
-    except sqlite3.Error as error:
-        debug_error(error, f"Error fetching manager's status")
-        return False
+        return True
+
+    @staticmethod
+    def find_user_with_id(id):
+        cursor = db_connection.cursor()
+        cursor.execute(f"SELECT id, status, do, language FROM {manager_table} WHERE id = ?", (id,))
+        existing_user = cursor.fetchone()
+
+        if existing_user is None:
+            return None
+
+        user_dict = {
+            "id": existing_user[0],
+            "status": existing_user[1],
+            "do": existing_user[2],
+            "language": existing_user[3],
+        }
+
+        return user_dict
+
+    def set_language(self, new_language):
+        cursor = db_connection.cursor()
+        try:
+            cursor.execute(f"UPDATE {manager_table} SET language = ? WHERE id = ?", (new_language, self.id))
+            db_connection.commit()
+            self.language = new_language
+        except sqlite3.Error as error:
+            debug_error(error, f"Error set language manager {self.id}")
+
+    def set_do(self, do):
+        cursor = db_connection.cursor()
+        try:
+            cursor.execute(f"UPDATE {manager_table} SET do = ? WHERE id = ?", (do, self.id))
+            db_connection.commit()
+            self.do = do
+        except sqlite3.Error as error:
+            debug_error(error, f"Error updating manager's 'do'")
+
+    def set_status(self, status: ManagerStatusType):
+        cursor = db_connection.cursor()
+        try:
+            cursor.execute(f"UPDATE {manager_table} SET status = ? WHERE id = ?", (status.value, self.id))
+            db_connection.commit()
+            self.status = status.value
+        except sqlite3.Error as error:
+            debug_error(error, f"Error updating manager's 'status'")
+
+    def get_do_account_number(self):
+        user = User(self.do, None, None)
+        return user.account_number
+
+    def has_status(self, status: ManagerStatusType):
+        return self.status == status.value
