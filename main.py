@@ -20,6 +20,7 @@ from aiogram import Bot, Dispatcher
 from aiogram.utils.exceptions import BotBlocked, UserDeactivated
 from tv_signals.interval import Interval
 from utils.interval_convertor import my_interval_to_int
+from utils.general import is_valid_id_format
 
 from my_debuger import debug_error, debug_info, debug_temp
 
@@ -404,9 +405,9 @@ async def handle_media(message: types.Message):
             await message.answer(languageFile[user_instance.language]["contact_manager_text"] + "\n" + config.manager_url)
         elif user_instance.has_status(UserStatusType.wait_id_input_status):
             # get id
-            if message.text.isdigit() and len(message.text) == 8:
+            if is_valid_id_format(message.text):
                 user_instance.set_status(UserStatusType.wait_id_status)
-                user_instance.set_account_number(message.text)
+                user_instance.set_account_number(message.text.upper())
                 await open_menu(message, get_half_vip_markup(user_instance.language),
                                 languageFile[user_instance.language]["wait_id_status"])
             else:
