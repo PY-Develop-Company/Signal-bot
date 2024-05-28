@@ -149,7 +149,7 @@ async def send_photo_text_message_to_user(user_instance, img_path, text=" ", mar
 async def send_photo_text_message_to_users(users_ids: [], img_path, text=" ", args=[]):
     send_signal_message_tasks = []
     for user_id in users_ids:
-        user_instance = create_user(user_id, None, None, None)
+        user_instance = create_user(user_id, None, None)
         t = asyncio.create_task(send_photo_text_message_to_user(user_instance, img_path, text, args=args))
         send_signal_message_tasks.append(t)
 
@@ -177,11 +177,11 @@ async def show_users_list_to_user(user_instance, is_next=True):
     return await send_message_to_user(user_instance.id, print_str, get_users_markup(user_instance.language))
 
 
-def create_user(msg_user):
-    if msg_user.id in config.managers_ids:
-        user_instance = ManagerUser(msg_user.id, msg_user.full_name, msg_user.username)
+def create_user(id, full_name, username):
+    if id in config.managers_ids:
+        user_instance = ManagerUser(id, full_name, username)
     else:
-        user_instance = User(msg_user.id, msg_user.full_name, msg_user.username)
+        user_instance = User(id, full_name, username)
 
     return user_instance
 
@@ -191,7 +191,7 @@ async def start_command(message):
     msg_user = message.from_user
     user_id = msg_user.id
 
-    user_instance = create_user(msg_user)
+    user_instance = create_user(msg_user.id, msg_user.full_name, msg_user.username)
 
     if user_instance.language == startLanguage:
         await open_menu(message, get_select_language_markup(), "Select language:")
@@ -221,7 +221,8 @@ async def start_command(message):
 
 @dp.message_handler(commands="language")
 async def open_language_command(message):
-    user_instance = create_user(message.from_user)
+    msg_user = message.from_user
+    user_instance = create_user(msg_user.id, msg_user.full_name, msg_user.username)
     if user_instance.has_status(UserStatusType.wait_id_input_status):
         user_instance.set_status(UserStatusType.none_status)
     user_instance.set_language(startLanguage)
@@ -247,7 +248,8 @@ async def stop_test_command(message):
 
 @dp.message_handler(commands="checkDeposit")
 async def check_deposit_command(message):
-    user_instance = create_user(message.from_user)
+    msg_user = message.from_user
+    user_instance = create_user(msg_user.id, msg_user.full_name, msg_user.username)
     if user_instance.id in config.managers_ids:
         return
 
@@ -317,8 +319,8 @@ async def users_list_command(message):
 
 @dp.message_handler(content_types=["text"])
 async def handle_media(message: types.Message):
-    user_id = message.from_user.id
-    user_instance = create_user(message.from_user)
+    msg_user = message.from_user
+    user_instance = create_user(msg_user.id, msg_user.full_name, msg_user.username)
 
     # LANGUAGE
     if message.text not in [select_language_eng, select_language_ru,
