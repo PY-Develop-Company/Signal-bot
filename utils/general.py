@@ -2,8 +2,11 @@ from icecream import ic
 
 
 def is_valid_id_format(id_str: str) -> bool:
-    return id_str[:4].upper() == "ICUP" and id_str[4:].isdigit()
-    # return id_str.isdigit() and len(id_str) == 8
+    is_pocket_option = len(id_str) == 8 and id_str.isdigit()
+    is_iq_cent = id_str[:4].upper() == "ICUP" and id_str[4:].isdigit()
+    is_binarium = len(id_str) == 7 and id_str.isdigit()
+
+    return is_pocket_option or is_iq_cent or is_binarium
 
 
 if __name__ == "__main__":
