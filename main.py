@@ -20,7 +20,7 @@ from aiogram import Bot, Dispatcher
 from aiogram.utils.exceptions import BotBlocked, UserDeactivated
 from tv_signals.interval import Interval
 from utils.interval_convertor import my_interval_to_int
-from utils.general import is_valid_id_format
+from utils.general import is_valid_id_format, is_valid_pocket_option_id, is_valid_binarium_id, is_valid_iq_cent_id
 
 from my_debuger import debug_error, debug_info, debug_temp
 
@@ -319,6 +319,19 @@ async def users_list_command(message):
 
 @dp.message_handler(content_types=["text"])
 async def handle_media(message: types.Message):
+    async def handle_id_input(message: types.Message, user_instance, is_valid_id_func, account_type: str):
+        if is_valid_id_func(message.text):
+            user_instance.set_status(UserStatusType.wait_id_status)
+            user_instance.set_account_number(message.text.upper())
+            user_instance.set_account_type(account_type)
+            await open_menu(message, get_half_vip_markup(user_instance.language),
+                            languageFile[user_instance.language]["wait_id_status"])
+        else:
+            await message.reply(languageFile[user_instance.language]["error_id_text"])
+            user_instance.set_status(UserStatusType.wait_id_input_status)
+            await open_menu(message, get_select_id_type_markup(),
+                            languageFile[user_instance.language]["choose_id_type"])
+
     msg_user = message.from_user
     user_instance = create_user(msg_user.id, msg_user.full_name, msg_user.username)
 
@@ -350,7 +363,8 @@ async def handle_media(message: types.Message):
             if is_user_exists:
                 user_instance.set_do(wait_status_user_id)
                 user_instance.set_status(ManagerStatusType.search_id_manager_status)
-                await open_menu(message, get_accept_reject_markup(user_instance.language), user_instance.get_do_account_number())
+                account_number, user = user_instance.get_do_account_number()
+                await open_menu(message, get_accept_reject_markup(user_instance.language), f"{user.account_type}: {account_number}")
             else:
                 await message.answer(languageFile[user_instance.language]["no_id_requests_text"])
         elif message.text == languageFile[user_instance.language]["search_deposit_request"]:
@@ -358,7 +372,8 @@ async def handle_media(message: types.Message):
             if is_user_exists:
                 user_instance.set_do(wait_deposit_status_user_id)
                 user_instance.set_status(ManagerStatusType.search_deposit_manager_status)
-                await open_menu(message, get_accept_reject_markup(user_instance.language), user_instance.get_do_account_number())
+                account_number, user = user_instance.get_do_account_number()
+                await open_menu(message, get_accept_reject_markup(user_instance.language), f"{user.account_type}: {account_number}")
             else:
                 await message.answer(languageFile[user_instance.language]["no_deposit_requests_text"])
         elif message.text == languageFile[user_instance.language]["stats_button"]:
@@ -406,14 +421,26 @@ async def handle_media(message: types.Message):
         if message.text == languageFile[user_instance.language]["contact_manager"]:
             await message.answer(languageFile[user_instance.language]["contact_manager_text"] + "\n" + config.manager_url)
         elif user_instance.has_status(UserStatusType.wait_id_input_status):
-            # get id
-            if is_valid_id_format(message.text):
-                user_instance.set_status(UserStatusType.wait_id_status)
-                user_instance.set_account_number(message.text.upper())
-                await open_menu(message, get_half_vip_markup(user_instance.language),
-                                languageFile[user_instance.language]["wait_id_status"])
+            if message.text in [binarium_text, pocket_option_text, iq_cent_text]:
+                if message.text == binarium_text:
+                    user_instance.set_status(UserStatusType.wait_id_input_binarium_status)
+                elif message.text == pocket_option_text:
+                    user_instance.set_status(UserStatusType.wait_id_input_po_status)
+                elif message.text == iq_cent_text:
+                    user_instance.set_status(UserStatusType.wait_id_input_iq_cent_status)
+                else:
+                    await message.answer(languageFile[user_instance.language]["wrong_id_type"])
+                    return
+                platform = message.text
+                await open_menu(message, get_empty_markup(), languageFile[user_instance.language]["wait_id_text"] + f"({platform})")
             else:
-                await message.reply(languageFile[user_instance.language]["error_id_text"])
+                await message.answer(languageFile[user_instance.language]["wrong_id_type"])
+        elif user_instance.has_status(UserStatusType.wait_id_input_binarium_status):
+            await handle_id_input(message, user_instance, is_valid_binarium_id, binarium_text)
+        elif user_instance.has_status(UserStatusType.wait_id_input_po_status):
+            await handle_id_input(message, user_instance, is_valid_pocket_option_id, pocket_option_text)
+        elif user_instance.has_status(UserStatusType.wait_id_input_iq_cent_status):
+            await handle_id_input(message, user_instance, is_valid_iq_cent_id, iq_cent_text)
         elif message.text == languageFile[user_instance.language]["vip_status_info"]:
             if user_instance.has_status(UserStatusType.deposit_status):
                 await open_menu(message, get_vip_markup(user_instance.language),
@@ -426,7 +453,7 @@ async def handle_media(message: types.Message):
                                 languageFile[user_instance.language]["you_have_vip_text"])
             else:
                 user_instance.set_status(UserStatusType.wait_id_input_status)
-                await open_menu(message, get_empty_markup(), languageFile[user_instance.language]["wait_id_text"])
+                await open_menu(message, get_select_id_type_markup(), languageFile[user_instance.language]["choose_id_type"])
         elif message.text == languageFile[user_instance.language]["get_signal_button_text"]:
             if not user_instance.is_signal_allowed:
                 user_instance.set_allow_signal(True)

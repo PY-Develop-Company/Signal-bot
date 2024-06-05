@@ -24,10 +24,11 @@ def create_users_table():
         cursor.execute(f"""
                         CREATE TABLE IF NOT EXISTS {user_table} (
                             id INTEGER PRIMARY KEY, name TEXT, tag TEXT, language TEXT, status TEXT, 
-                            account_number INTEGER, had_trial_status INTEGER, trial_end_date REAL, 
+                            account_number INTEGER, account_type TEXT, had_trial_status INTEGER, trial_end_date REAL, 
                             before_trial_status TEXT, time TEXT, get_next_signal INTEGER
                         )
                     """)
+        db_connection.commit()
     except sqlite3.Error as error:
         print(f"Error create_managers_table: ", error)
 
@@ -40,6 +41,7 @@ def create_managers_table():
                             id INTEGER PRIMARY KEY, do TEXT, status TEXT, language TEXT
                         )
                     """)
+        db_connection.commit()
     except sqlite3.Error as error:
         print(f"Error create_managers_table: ", error)
 
@@ -64,3 +66,5 @@ def create_managers_table():
 
 
 db_connection = open_db()
+create_users_table()
+create_managers_table()

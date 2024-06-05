@@ -49,6 +49,7 @@ class User(GenericUser):
 
         self.status = None
         self.account_number = None
+        self.account_type = None
         self.had_trial_status = None
         self.trial_end_date = None
         self.before_trial_status = None
@@ -70,6 +71,7 @@ class User(GenericUser):
         self.language = user_data["language"]
         self.status = user_data["status"]
         self.account_number = user_data["account_number"]
+        self.account_type = user_data["account_type"]
         self.had_trial_status = user_data["had_trial_status"]
         self.trial_end_date = user_data["trial_end_date"]
         self.before_trial_status = user_data["before_trial_status"]
@@ -94,6 +96,7 @@ class User(GenericUser):
                 "language": df["language"][0],
                 "status": df["status"][0],
                 "account_number": df["account_number"][0],
+                "account_type": df["account_type"][0],
                 "had_trial_status": df["had_trial_status"][0],
                 "trial_end_date": df["trial_end_date"][0],
                 "before_trial_status": df["before_trial_status"][0],
@@ -116,16 +119,25 @@ class User(GenericUser):
                 cursor.execute(f'''
                     INSERT INTO {user_table} (
                         id, name, tag, language, status,
-                        account_number, had_trial_status, trial_end_date,
+                        account_number, account_type, had_trial_status, trial_end_date,
                         before_trial_status, time, get_next_signal
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ''', (
                     id, full_name, tag, startLanguage, UserStatusType.none_status.value,
-                    0, False, None, "none", datetime_to_str(now_time()), False
+                    0, None, False, None, "none", datetime_to_str(now_time()), False
                 ))
                 db_connection.commit()
         except sqlite3.Error as error:
             debug_error(error, f"Error add user with {id}")
+
+    def set_account_type(self, account_type):
+        cursor = db_connection.cursor()
+        try:
+            cursor.execute(f"UPDATE {user_table} SET account_type = ? WHERE id = ?", (account_type, self.id))
+            db_connection.commit()
+            self.account_type = account_type
+        except sqlite3.Error as error:
+            debug_error(error, f"Error change account_type {self.id}")
 
     def set_language(self, new_language):
         cursor = db_connection.cursor()

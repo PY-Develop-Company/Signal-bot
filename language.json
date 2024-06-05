@@ -23,7 +23,7 @@
     "check_deposit_text": "CHECK DEPOSIT",
     "check_id_text": "CHECK ID",
     "error_no_user": "❗Error (user with this ID not found)",
-    "error_id_text": "❗Error (ID must begin with ICUP or contain 7 or 8 digits). Try sending again:\n",
+    "error_id_text": "\uD83D\uDED1Error. ID input rules: \n \uD83D\uDD3A PocketOption - 8 digits \n \uD83D\uDD3A IQ Cent - must begin with ICUP  \n \uD83D\uDD3A Binarium - 7 digits",
     "contact_manager": "SUPPORT",
     "contact_manager_text": "Manager's information: ",
     "vip_status_info": "ACCESS TO SIGNALS",
@@ -61,7 +61,9 @@
     "period_yesterday": "yesterday",
     "period_7_days": "7 days",
     "period_1_month": "1 month",
-    "period_1_year": "1 year"
+    "period_1_year": "1 year",
+    "choose_id_type": "Choose a platform:",
+    "wrong_id_type": "This platform does not exist. Select a platform using one of the buttons in the menu:"
   },
   "русский": {
     "language_name": "русский\uD83C\uDDF7\uD83C\uDDFA",
@@ -87,7 +89,7 @@
     "check_deposit_text": "ПРОВЕРИТЬ ДЕПОЗИТ",
     "check_id_text": "ПРОВЕРИТЬ ID",
     "error_no_user": "❗Ошибка (пользователь с данным ID не найден)",
-    "error_id_text": "❗Ошибка (ID должен начинаться с ICUP или содержать 7 или 8 цифр). Попробуйте отправить еще раз:\n",
+    "error_id_text": "\uD83D\uDED1Ошибка. Правила ввода ID: \n \uD83D\uDD3A PocketOption - 8 цифр \n \uD83D\uDD3A IQ Cent - должен начинаться с ICUP  \n \uD83D\uDD3A Binarium - 7 цифр",
     "contact_manager": "ПОДДЕРЖКА",
     "contact_manager_text": "Данные менеджера: ",
     "vip_status_info": "ДОСТУП К СИГНАЛАМ",
@@ -125,7 +127,9 @@
     "period_yesterday": "вчера",
     "period_7_days": "7 дней",
     "period_1_month": "1 месяц",
-    "period_1_year": "1 год"
+    "period_1_year": "1 год",
+    "choose_id_type": "Виберите платформу:",
+    "wrong_id_type": "Эта платформа не существует. Выберите платформу с помощью одной из кнопок в меню:"
   },
   "हिंदी": {
     "language_name": "हिंदी\uD83C\uDDEE\uD83C\uDDF3",
@@ -151,7 +155,7 @@
     "check_deposit_text": "जमा की जाँच करें",
     "check_id_text": "आईडी की जाँच करें",
     "error_no_user": "❗त्रुटि (इस आईडी के साथ उपयोगकर्ता नहीं मिला)",
-    "error_id_text": "❗त्रुटि (आईडी की शुरुआत ICUP से होनी चाहिए या उसमें 7 या 8 अंक होने चाहिए)। पुनः प्रेषण का प्रयास करें:\n",
+    "error_id_text": "\uD83D\uDED1त्रुटि। आईडी इनपुट नियम:\n\uD83D\uDD3A Pocket Option - 8 अंक\n\uD83D\uDD3A IQ Cent - ICUP से शुरू होना चाहिए\n\uD83D\uDD3A Binarium - 7 अंक",
     "contact_manager": "समर्थन",
     "contact_manager_text": "प्रबंधक की जानकारी: ",
     "vip_status_info": "सिग्नल्स तक पहुँच का अधिकार",
@@ -189,6 +193,8 @@
     "period_yesterday": "कल",
     "period_7_days": "7 दिन",
     "period_1_month": "1 महीना",
-    "period_1_year": "1 वर्ष"
+    "period_1_year": "1 वर्ष",
+    "choose_id_type": "एक मंच चुनें:",
+    "wrong_id_type": "यह प्लेटफ़ॉर्म मौजूद नहीं है। मेनू में से किसी एक बटन का उपयोग करके प्लेटफ़ॉर्म चुनें:"
   }
 }

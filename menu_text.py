@@ -18,6 +18,18 @@ select_language_eng = "english"
 select_language_ru = "русский"
 select_language_hin = "हिंदी"
 
+pocket_option_text = "Pocket Option"
+iq_cent_text = "IQ Cent"
+binarium_text = "Binarium"
+
+
+def get_select_id_type_markup():
+    select_id_markup = types.ReplyKeyboardMarkup(resize_keyboard=True, keyboard=[
+        [types.KeyboardButton(pocket_option_text), types.KeyboardButton(iq_cent_text),
+         types.KeyboardButton(binarium_text)]
+    ])
+    return select_id_markup
+
 
 def get_trial_button(language):
     return types.KeyboardButton(languageFile[language]["get_trial_button_text"])
