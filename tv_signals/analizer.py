@@ -31,6 +31,8 @@ def get_deal_time_intervals(intervals):
     deal_time = int(round(deal_time, 0))
     if deal_time < 4:
         deal_time = 4
+    elif deal_time > 30:
+        deal_time = 30
     return deal_time
 
 
