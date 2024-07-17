@@ -82,7 +82,8 @@ class ManagerUser(GenericUser):
 
     def get_do_account_number(self):
         user = User(self.do, None, None)
-        return user.account_number, user
+        account = Account.get_by_id(user.account_id)
+        return account.id, account.type, user
 
     def has_status(self, status: ManagerStatusType):
         return self.status == status.value

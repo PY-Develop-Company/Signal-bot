@@ -6,6 +6,8 @@ from sqlite3 import Error
 
 from my_debuger import debug_error, debug_info
 
+from tv_signals.currencies_model import CurrenciesModel
+
 table_name = "completedSignals"
 
 
@@ -70,15 +72,15 @@ class SignalsTable:
 
 
 def update_signals():
-    from tv_signals.analized_signals_table import table_name as analized_table_name, currencies_table_name
+    from tv_signals.analized_signals_table import table_name as analized_table_name
     cursor = db_connection.cursor()
     try:
         cursor.execute(f"""
                         UPDATE {table_name}
                         SET analized_signal_id = (SELECT {analized_table_name}.id 
                             FROM {analized_table_name} 
-                            LEFT JOIN {currencies_table_name} ON {analized_table_name}.currency = {currencies_table_name}.id
-                            WHERE {analized_table_name}.currency = {currencies_table_name}.id AND {currencies_table_name}.symbol ={table_name}.currency
+                            LEFT JOIN {CurrenciesModel.__tablename__} ON {analized_table_name}.currency = {CurrenciesModel.__tablename__}.id
+                            WHERE {analized_table_name}.currency = {CurrenciesModel.__tablename__}.id AND {CurrenciesModel.__tablename__}.symbol ={table_name}.currency
                             AND {analized_table_name}.interval = {table_name}.interval
                             AND {analized_table_name}.signal_type = {table_name}.signal_type
                             AND {analized_table_name}.open_price = {table_name}.open_price

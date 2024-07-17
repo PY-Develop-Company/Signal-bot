@@ -1,3 +1,5 @@
+from tv_signals.currencies_model import CurrenciesModel
+
 import logging
 import multiprocessing
 import asyncio
@@ -16,19 +18,23 @@ from tv_signals.analized_signals_table import AnalyzedSignalsTable
 from utils import interval_convertor
 from utils.time import *
 
-from aiogram import Bot, Dispatcher
-from aiogram.utils.exceptions import BotBlocked, UserDeactivated
+from aiogram import Dispatcher
 from tv_signals.interval import Interval
 from utils.interval_convertor import my_interval_to_int
-from utils.general import is_valid_id_format, is_valid_pocket_option_id, is_valid_binarium_id, is_valid_iq_cent_id
+from utils.general import is_valid_pocket_option_id, is_valid_binarium_id, is_valid_iq_cent_id
 
 from my_debuger import debug_error, debug_info, debug_temp
 
 from user_status_type import UserStatusType
 
+from po_api.po_callback import flask_main
+
+from utils.bot_utils import (bot, create_user, send_photo_text_message_to_users, send_photo_text_message_to_user,
+                             open_menu, send_message_to_user, send_message_to_users,
+                             accept_registration_po, reject_registration_po, accept_deposit_po, reject_deposit_po)
+
 current_price_updater = FCSForexPriceUpdater(config.FOREX_DATA_TOKEN, 12000)
 logging.basicConfig(level=logging.INFO)
-bot = Bot(token=config.BOT_TOKEN)
 dp = Dispatcher(bot)
 
 last_user_list_message = dict()
@@ -85,81 +91,6 @@ async def remove_last_user_manage_message(user_id):
             pass
 
 
-async def get_chat_id(user_id):
-    try:
-        chat = await bot.get_chat(user_id)
-        return chat.id
-    except Exception as e:
-        return 0
-
-
-async def send_message_to_user(user_id, text, markup=None):
-    if await get_chat_id(user_id) == 0:
-        return
-
-    try:
-        if markup is None:
-            return await bot.send_message(user_id, text, disable_notification=False)
-        else:
-            return await bot.send_message(user_id, text, disable_notification=False, reply_markup=markup)
-    except BotBlocked:
-        pass
-    except UserDeactivated:
-        pass
-    except Exception as e:
-        debug_error(e)
-
-    return None
-
-
-async def send_message_to_users(users_ids: [], text):
-    send_signal_message_tasks = []
-    for user_id in users_ids:
-        t = asyncio.create_task(send_message_to_user(user_id, text))
-        send_signal_message_tasks.append(t)
-
-    await asyncio.gather(*send_signal_message_tasks)
-
-
-async def send_photo_text_message_to_user(user_instance, img_path, text=" ", markup=None, args=[]):
-    if await get_chat_id(user_instance.id) == 0:
-        return
-    if user_instance.language == "none":
-        return
-
-    if len(args) > 0:
-        input_text = args.copy()
-        for i, arg in enumerate(args):
-            input_text[i] = languageFile[user_instance.language][arg]
-        text = text.format(*input_text)
-    try:
-        with open(img_path, "rb") as file:
-            if markup is None:
-                await bot.send_photo(user_instance.id, photo=file, caption=text)
-            else:
-                await bot.send_photo(user_instance.id, photo=file, caption=text, reply_markup=markup)
-    except BotBlocked:
-        pass
-    except UserDeactivated:
-        pass
-    except Exception as e:
-        debug_error(e)
-
-
-async def send_photo_text_message_to_users(users_ids: [], img_path, text=" ", args=[]):
-    send_signal_message_tasks = []
-    for user_id in users_ids:
-        user_instance = create_user(user_id, None, None)
-        t = asyncio.create_task(send_photo_text_message_to_user(user_instance, img_path, text, args=args))
-        send_signal_message_tasks.append(t)
-
-    await asyncio.gather(*send_signal_message_tasks)
-
-
-async def open_menu(message, menu_markup, answer_text="none"):
-    await message.answer(answer_text, reply_markup=menu_markup)
-
-
 async def show_users_list_to_user(user_instance, is_next=True):
     print_str = languageFile[user_instance.language]["users_list_title_text"] + "\n"
 
@@ -175,15 +106,6 @@ async def show_users_list_to_user(user_instance, is_next=True):
     if len(users_to_show) == 0:
         print_str = languageFile[user_instance.language]["no_users_list_title_text"]
     return await send_message_to_user(user_instance.id, print_str, get_users_markup(user_instance.language))
-
-
-def create_user(id, full_name, username):
-    if id in config.managers_ids:
-        user_instance = ManagerUser(id, full_name, username)
-    else:
-        user_instance = User(id, full_name, username)
-
-    return user_instance
 
 
 @dp.message_handler(commands="start")
@@ -257,6 +179,46 @@ async def check_deposit_command(message):
         await message.answer(languageFile[user_instance.language]["wait_deposit_status"])
         user_instance.set_status(UserStatusType.wait_deposit_status)
 
+    account = Account.get_by_id(user_instance.account_id)
+    if account.type == pocket_option_text and not Account.get_by_id(user_instance.account_id).is_deposited:
+        await reject_deposit_po(user_instance)
+    else:
+        if Account.get_by_id(user_instance.account_id).is_deposited:
+            await accept_deposit_po(user_instance)
+
+
+@dp.message_handler(commands="addAccount")
+async def add_account_command(message: types.Message):
+    if not(message.from_user.id in config.managers_ids):
+        return
+
+    id = message.text.split(" ")[-1]
+    account = Account(id, None, True, True)
+    account.create_if_not_exists()
+    users = User.get_users_with_account_id(account.id)
+    for u in users:
+        try:
+            await accept_deposit_po(u)
+        except Exception as e:
+            print(e)
+
+    await message.answer("Account successfully added✅")
+
+
+@dp.message_handler(commands="addUser")
+async def add_user_command(message: types.Message):
+    if not (message.from_user.id in config.managers_ids):
+        return
+
+    id = message.text.split(" ")[-1]
+    user = User(id, None, None)
+    try:
+        await accept_deposit_po(user)
+    except Exception as e:
+        print(e)
+
+    await message.answer("User successfully added✅")
+
 
 @dp.callback_query_handler(text_contains="removeuser_")
 async def remove_user_command(call: types.CallbackQuery):
@@ -272,7 +234,7 @@ async def remove_user_command(call: types.CallbackQuery):
             await bot.send_message(user_instance.id, languageFile[user_instance.language]["cant_remove_trial_user_text"])
         else:
             is_user_removed = user_to_remove.remove()
-            user_string = f"{user_to_remove.full_name} | {user_to_remove.account_number} | {user_to_remove.status}"
+            user_string = f"{user_to_remove.full_name} | {user_to_remove.account_id} | {user_to_remove.status}"
             if is_user_removed:
                 await bot.send_message(user_instance.id, languageFile[user_instance.language][
                     "removed_user_text"] + f"\n " + user_string)
@@ -290,7 +252,7 @@ async def remove_user_command(call: types.CallbackQuery):
     await remove_last_user_manage_message(user_instance.id)
 
 
-@dp.message_handler(commands="trial")
+# @dp.message_handler(commands="trial")
 async def get_trial_command(message):
     user_instance = User(message.from_user.id, message.from_user.full_name, message.from_user.username)
     if user_instance.has_status(UserStatusType.deposit_status) or user_instance.id in config.managers_ids:
@@ -317,13 +279,79 @@ async def users_list_command(message):
         update_last_user_list_message(sent_msg)
 
 
-@dp.message_handler(content_types=["text"])
-async def handle_media(message: types.Message):
+async def manager_handle_media(message: types.Message, user_instance: ManagerUser):
+    if message.text == languageFile[user_instance.language]["user_management_button"]:
+        await users_list_command(message)
+    elif message.text == languageFile[user_instance.language]["search_id_request"]:
+        is_user_exists, wait_status_user_id = User.get_user_with_status_no_po(UserStatusType.wait_id_status)
+        if is_user_exists:
+            user_instance.set_do(wait_status_user_id)
+            user_instance.set_status(ManagerStatusType.search_id_manager_status)
+            account_number, account_type, user = user_instance.get_do_account_number()
+            await open_menu(message, get_accept_reject_markup(user_instance.language),
+                            f"{account_type}: {account_number}")
+        else:
+            await message.answer(languageFile[user_instance.language]["no_id_requests_text"])
+    elif message.text == languageFile[user_instance.language]["search_deposit_request"]:
+        is_user_exists, wait_deposit_status_user_id = User.get_user_with_status_no_po(UserStatusType.wait_deposit_status)
+        if is_user_exists:
+            user_instance.set_do(wait_deposit_status_user_id)
+            user_instance.set_status(ManagerStatusType.search_deposit_manager_status)
+            account_number, account_type, user = user_instance.get_do_account_number()
+            await open_menu(message, get_accept_reject_markup(user_instance.language),
+                            f"{account_type}: {account_number}")
+        else:
+            await message.answer(languageFile[user_instance.language]["no_deposit_requests_text"])
+    elif message.text == languageFile[user_instance.language]["stats_button"]:
+        await open_menu(message, get_statistics_period_markup(user_instance.language),
+                        languageFile[user_instance.language]["selects_stats_period_text"])
+    else:
+        is_accept_button = message.text == languageFile[user_instance.language]["accept_button"]
+        is_reject_button = message.text == languageFile[user_instance.language]["reject_button"]
+        if is_accept_button or is_reject_button:
+            is_search_id_status = user_instance.has_status(ManagerStatusType.search_id_manager_status)
+            is_search_deposit_status = user_instance.has_status(ManagerStatusType.search_deposit_manager_status)
+
+            status = UserStatusType.none_status
+            message_to_user = ""
+
+            user_under_do = User(user_instance.do, None, None)
+            user_under_do.load_user()
+            account = Account.get_by_id(user_under_do.account_id)
+
+            if is_accept_button and is_search_id_status:
+                Account.set_registration(account.id)
+                status = UserStatusType.id_status
+                message_to_user = languageFile[user_under_do.language]["accept_id_message_text"]
+            elif is_reject_button and is_search_id_status:
+                status = UserStatusType.none_status
+                message_to_user = languageFile[user_under_do.language]["reject_id_message_text"]
+            elif is_accept_button and is_search_deposit_status:
+                Account.set_deposit(account.id)
+                status = UserStatusType.deposit_status
+                message_to_user = languageFile[user_under_do.language]["accept_deposit_message_text"]
+            elif is_reject_button and is_search_deposit_status:
+                status = UserStatusType.id_status
+                message_to_user = languageFile[user_under_do.language]["reject_deposit_message_text"]
+
+            user_under_do.set_status(status)
+            markup = get_markup_with_status(user_under_do.id, user_under_do.language, user_under_do.status)
+            await send_message_to_user(user_under_do.id, message_to_user, markup)
+
+            await open_menu(message, get_manager_markup(user_instance.language),
+                            languageFile[user_instance.language]["process_finishing_text"])
+            user_instance.set_do("none")
+            user_instance.set_status(ManagerStatusType.none_manager_status)
+
+
+async def user_handle_media(message: types.Message, user_instance: User):
     async def handle_id_input(message: types.Message, user_instance, is_valid_id_func, account_type: str):
         if is_valid_id_func(message.text):
             user_instance.set_status(UserStatusType.wait_id_status)
-            user_instance.set_account_number(message.text.upper())
-            user_instance.set_account_type(account_type)
+            account = Account(message.text.upper(), account_type)
+            account.create_if_not_exists()
+
+            user_instance.set_account_id(account.id)
             await open_menu(message, get_half_vip_markup(user_instance.language),
                             languageFile[user_instance.language]["wait_id_status"])
         else:
@@ -332,6 +360,61 @@ async def handle_media(message: types.Message):
             await open_menu(message, get_select_id_type_markup(),
                             languageFile[user_instance.language]["choose_id_type"])
 
+    if not user_instance.has_tag():
+        user_instance.set_tag(message.from_user.username)
+
+    if message.text == languageFile[user_instance.language]["contact_manager"]:
+        await message.answer(languageFile[user_instance.language]["contact_manager_text"] + "\n" + config.manager_url)
+    elif user_instance.has_status(UserStatusType.wait_id_input_status):
+        if message.text in [binarium_text, pocket_option_text, iq_cent_text]:
+            if message.text == binarium_text:
+                user_instance.set_status(UserStatusType.wait_id_input_binarium_status)
+            elif message.text == pocket_option_text:
+                user_instance.set_status(UserStatusType.wait_id_input_po_status)
+            elif message.text == iq_cent_text:
+                user_instance.set_status(UserStatusType.wait_id_input_iq_cent_status)
+            else:
+                await message.answer(languageFile[user_instance.language]["wrong_id_type"])
+                return
+            platform = message.text
+            await open_menu(message, get_empty_markup(),
+                            languageFile[user_instance.language]["wait_id_text"] + f"({platform})")
+        else:
+            await message.answer(languageFile[user_instance.language]["wrong_id_type"])
+    elif user_instance.has_status(UserStatusType.wait_id_input_binarium_status):
+        await handle_id_input(message, user_instance, is_valid_binarium_id, binarium_text)
+    elif user_instance.has_status(UserStatusType.wait_id_input_po_status):
+        await handle_id_input(message, user_instance, is_valid_pocket_option_id, pocket_option_text)
+        if Account.get_by_id(user_instance.account_id).is_registered:
+            await accept_registration_po(user_instance)
+        else:
+            await reject_registration_po(user_instance)
+    elif user_instance.has_status(UserStatusType.wait_id_input_iq_cent_status):
+        await handle_id_input(message, user_instance, is_valid_iq_cent_id, iq_cent_text)
+    elif message.text == languageFile[user_instance.language]["vip_status_info"]:
+        if user_instance.has_status(UserStatusType.deposit_status):
+            await open_menu(message, get_vip_markup(user_instance.language),
+                            languageFile[user_instance.language]["you_have_vip_text"])
+        else:
+            await message.answer(languageFile[user_instance.language]["for_vip_text"].format(min_deposit=config.minimal_deposit))
+    elif message.text == languageFile[user_instance.language]["check_id_text"]:
+        if user_instance.has_status(UserStatusType.deposit_status):
+            await open_menu(message, get_vip_markup(user_instance.language),
+                            languageFile[user_instance.language]["you_have_vip_text"])
+        else:
+            user_instance.set_status(UserStatusType.wait_id_input_status)
+            await open_menu(message, get_select_id_type_markup(),
+                            languageFile[user_instance.language]["choose_id_type"])
+    elif message.text == languageFile[user_instance.language]["get_signal_button_text"]:
+        if not user_instance.is_signal_allowed:
+            user_instance.set_allow_signal(True)
+            await message.answer(languageFile[user_instance.language]["start_searching_signal_text"])
+        else:
+            await message.answer(languageFile[user_instance.language]["already_waiting_signal_text"])
+
+
+@dp.message_handler(content_types=["text"])
+async def handle_media(message: types.Message):
     msg_user = message.from_user
     user_instance = create_user(msg_user.id, msg_user.full_name, msg_user.username)
 
@@ -349,117 +432,10 @@ async def handle_media(message: types.Message):
         await start_command(message)
         return
 
-    # TRIAL
-    # if message.text == languageFile[user_instance.language]["get_trial_button_text"]:
-    #     await get_trial_command(message)
-    #     return
-
-    # MANAGER
     if user_instance.id in config.managers_ids:
-        if message.text == languageFile[user_instance.language]["user_management_button"]:
-            await users_list_command(message)
-        elif message.text == languageFile[user_instance.language]["search_id_request"]:
-            is_user_exists, wait_status_user_id = User.get_user_with_status(UserStatusType.wait_id_status)
-            if is_user_exists:
-                user_instance.set_do(wait_status_user_id)
-                user_instance.set_status(ManagerStatusType.search_id_manager_status)
-                account_number, user = user_instance.get_do_account_number()
-                await open_menu(message, get_accept_reject_markup(user_instance.language), f"{user.account_type}: {account_number}")
-            else:
-                await message.answer(languageFile[user_instance.language]["no_id_requests_text"])
-        elif message.text == languageFile[user_instance.language]["search_deposit_request"]:
-            is_user_exists, wait_deposit_status_user_id = User.get_user_with_status(UserStatusType.wait_deposit_status)
-            if is_user_exists:
-                user_instance.set_do(wait_deposit_status_user_id)
-                user_instance.set_status(ManagerStatusType.search_deposit_manager_status)
-                account_number, user = user_instance.get_do_account_number()
-                await open_menu(message, get_accept_reject_markup(user_instance.language), f"{user.account_type}: {account_number}")
-            else:
-                await message.answer(languageFile[user_instance.language]["no_deposit_requests_text"])
-        elif message.text == languageFile[user_instance.language]["stats_button"]:
-            await open_menu(message, get_statistics_period_markup(user_instance.language),
-                            languageFile[user_instance.language]["selects_stats_period_text"])
-        else:
-            is_accept_button = message.text == languageFile[user_instance.language]["accept_button"]
-            is_reject_button = message.text == languageFile[user_instance.language]["reject_button"]
-            if is_accept_button or is_reject_button:
-                is_search_id_status = user_instance.has_status(ManagerStatusType.search_id_manager_status)
-                is_search_deposit_status = user_instance.has_status(ManagerStatusType.search_deposit_manager_status)
-
-                status = UserStatusType.none_status
-                message_to_user = ""
-
-                user_under_do = User(user_instance.do, None, None)
-
-                if is_accept_button and is_search_id_status:
-                    status = UserStatusType.id_status
-                    message_to_user = languageFile[user_under_do.language]["accept_id_message_text"]
-                elif is_reject_button and is_search_id_status:
-                    status = UserStatusType.none_status
-                    message_to_user = languageFile[user_under_do.language]["reject_id_message_text"]
-                elif is_accept_button and is_search_deposit_status:
-                    status = UserStatusType.deposit_status
-                    message_to_user = languageFile[user_under_do.language]["accept_deposit_message_text"]
-                elif is_reject_button and is_search_deposit_status:
-                    status = UserStatusType.id_status
-                    message_to_user = languageFile[user_under_do.language]["reject_deposit_message_text"]
-
-                user_under_do.set_status(status)
-                markup = get_markup_with_status(user_under_do.id, user_under_do.language, user_under_do.status)
-                await send_message_to_user(user_under_do.id, message_to_user, markup)
-
-                await open_menu(message, get_manager_markup(user_instance.language),
-                                languageFile[user_instance.language]["process_finishing_text"])
-                user_instance.set_do("none")
-                user_instance.set_status(ManagerStatusType.none_manager_status)
-    # USER
-    else:  # answer for user
-        # TAG
-        if not user_instance.has_tag():
-            user_instance.set_tag(message.from_user.username)
-
-        if message.text == languageFile[user_instance.language]["contact_manager"]:
-            await message.answer(languageFile[user_instance.language]["contact_manager_text"] + "\n" + config.manager_url)
-        elif user_instance.has_status(UserStatusType.wait_id_input_status):
-            if message.text in [binarium_text, pocket_option_text, iq_cent_text]:
-                if message.text == binarium_text:
-                    user_instance.set_status(UserStatusType.wait_id_input_binarium_status)
-                elif message.text == pocket_option_text:
-                    user_instance.set_status(UserStatusType.wait_id_input_po_status)
-                elif message.text == iq_cent_text:
-                    user_instance.set_status(UserStatusType.wait_id_input_iq_cent_status)
-                else:
-                    await message.answer(languageFile[user_instance.language]["wrong_id_type"])
-                    return
-                platform = message.text
-                await open_menu(message, get_empty_markup(), languageFile[user_instance.language]["wait_id_text"] + f"({platform})")
-            else:
-                await message.answer(languageFile[user_instance.language]["wrong_id_type"])
-        elif user_instance.has_status(UserStatusType.wait_id_input_binarium_status):
-            await handle_id_input(message, user_instance, is_valid_binarium_id, binarium_text)
-        elif user_instance.has_status(UserStatusType.wait_id_input_po_status):
-            await handle_id_input(message, user_instance, is_valid_pocket_option_id, pocket_option_text)
-        elif user_instance.has_status(UserStatusType.wait_id_input_iq_cent_status):
-            await handle_id_input(message, user_instance, is_valid_iq_cent_id, iq_cent_text)
-        elif message.text == languageFile[user_instance.language]["vip_status_info"]:
-            if user_instance.has_status(UserStatusType.deposit_status):
-                await open_menu(message, get_vip_markup(user_instance.language),
-                                languageFile[user_instance.language]["you_have_vip_text"])
-            else:
-                await message.answer(languageFile[user_instance.language]["for_vip_text"])
-        elif message.text == languageFile[user_instance.language]["check_id_text"]:
-            if user_instance.has_status(UserStatusType.deposit_status):
-                await open_menu(message, get_vip_markup(user_instance.language),
-                                languageFile[user_instance.language]["you_have_vip_text"])
-            else:
-                user_instance.set_status(UserStatusType.wait_id_input_status)
-                await open_menu(message, get_select_id_type_markup(), languageFile[user_instance.language]["choose_id_type"])
-        elif message.text == languageFile[user_instance.language]["get_signal_button_text"]:
-            if not user_instance.is_signal_allowed:
-                user_instance.set_allow_signal(True)
-                await message.answer(languageFile[user_instance.language]["start_searching_signal_text"])
-            else:
-                await message.answer(languageFile[user_instance.language]["already_waiting_signal_text"])
+        await manager_handle_media(message, user_instance)
+    else:
+        await user_handle_media(message, user_instance)
 
 
 @dp.callback_query_handler(text="next_users")
@@ -586,7 +562,6 @@ def handle_signal_msg_controller(analyzed_signal_id, signal, msg, pd: PriceData,
 
 async def check_trial_users():
     users_ids = User.get_users_ids_with_status(UserStatusType.trial_status)
-    # try:
     for user_id in users_ids:
         u = User(user_id, None, None)
         if market_info.is_trial_ended(u.trial_end_date):
@@ -595,7 +570,7 @@ async def check_trial_users():
             markup = get_markup_with_status(user_id, u.language, u.status)
             await send_message_to_user(user_id, languageFile[u.language]["ended_trial_text"], markup)
             if u.has_status(UserStatusType.none_status):
-                await send_message_to_user(user_id, languageFile[u.language]["for_vip_text"])
+                await send_message_to_user(user_id, languageFile[u.language]["for_vip_text"].format(min_deposit=config.minimal_deposit))
             elif u.has_status(UserStatusType.id_status):
                 await send_message_to_user(user_id, languageFile[u.language]["accept_id_message_text"])
             elif u.has_status(UserStatusType.deposit_status):
@@ -604,8 +579,6 @@ async def check_trial_users():
                 await send_message_to_user(user_id, languageFile[u.language]["wait_deposit_status"])
             elif u.has_status(UserStatusType.wait_id_status):
                 await send_message_to_user(user_id, languageFile[u.language]["wait_id_status"])
-    # except Exception as e:
-    #     debug_error(e, "check_trial_users_ERROR")
 
 
 def is_stop_send_signals():
@@ -727,7 +700,7 @@ def main():
     multiprocessing.freeze_support()
 
     intervals = [Interval.in_1_minute, Interval.in_5_minute, Interval.in_15_minute, Interval.in_30_minute, Interval.in_1_hour, Interval.in_2_hour]
-    currencies = price_parser.get_currencies()
+    currencies = CurrenciesModel.get_all_in_use()
 
     groups = [IntervalGroup(Interval.in_5_minute, [Interval.in_15_minute, Interval.in_1_hour],
                             additional=[Interval.in_1_minute, Interval.in_5_minute, Interval.in_5_minute]),
@@ -743,18 +716,15 @@ def main():
     periods = ["1m", "5m", "15m", "30m", "1h", "2h"]
     multiprocessing.Process(target=analyze_loop, args=(analyze_pairs, pds, symbols, exchanges, periods)).start()
     multiprocessing.Process(target=signals_message_sender_controller).start()
+    multiprocessing.Process(target=flask_main).start()
 
     executor.start_polling(dp, skip_updates=True)
 
 
 if __name__ == '__main__':
     intervals = [Interval.in_1_minute, Interval.in_5_minute, Interval.in_15_minute, Interval.in_30_minute, Interval.in_1_hour, Interval.in_2_hour]
-    currencies = price_parser.get_currencies()
+    currencies = CurrenciesModel.get_all_in_use()
     symbols = [currency[0] for currency in currencies]
     exchanges = [currency[1] for currency in currencies]
     periods = ["1m", "5m", "15m", "30m", "1h", "2h"]
-    # for period in periods:
-    #     is_ok, res, url = current_price_updater.download_price_data(symbols, period, 1)
-    #     with open(f"data_{period}.json", "w+") as f:
-    #         f.write(url + str(res))
     main()

@@ -15,9 +15,9 @@ from tv_signals.price_updater import TVDatafeedPriceUpdater, FCSForexPriceUpdate
 from my_debuger import debug_error, debug_info
 from utils.interval_convertor import my_interval_to_string
 
-trade_pause_wait_time = 600
+from tv_signals.currencies_model import CurrenciesModel
 
-currencies_table_name = "currencies"
+trade_pause_wait_time = 600
 
 price_updater = TVDatafeedPriceUpdater()
 
@@ -33,7 +33,7 @@ class PriceData:
 
         cursor = db_connection.cursor()
 
-        sql_query = f"""SELECT puncts FROM {currencies_table_name}
+        sql_query = f"""SELECT puncts FROM {CurrenciesModel.__tablename__}
                         WHERE symbol = "{self.symbol}" AND exchange = "{self.exchange}";"""
         cursor.execute(sql_query)
         puncts = cursor.fetchone()
@@ -98,24 +98,6 @@ class PriceData:
         cursor = db_connection.cursor()
         cursor.execute(query)
         db_connection.commit()
-
-
-def get_currencies():
-    currencies = []
-
-    try:
-        sql_query = f"""SELECT * FROM {currencies_table_name};"""
-        df = read_sql_query(sql_query, db_connection)
-
-        for currency in df.index:
-            if df["is_in_use"][currency] == 1:
-                symbol = df['symbol'][currency]
-                exchange = df['exchange'][currency]
-                currencies.append((symbol, exchange))
-    except sqlite3.Error as e:
-        debug_error(e, "Error get_currencies")
-
-    return currencies
 
 
 def update_prices(symbols: [str], exchanges: [str], periods: [str], price_updater: FCSForexPriceUpdater):

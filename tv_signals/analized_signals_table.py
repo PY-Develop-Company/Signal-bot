@@ -1,6 +1,6 @@
 from db_modul import db_connection
 from tv_signals.price_parser import PriceData
-from tv_signals.price_parser import currencies_table_name
+from tv_signals.currencies_model import CurrenciesModel
 
 from pandas import read_sql_query
 from sqlite3 import Error
@@ -54,7 +54,7 @@ class AnalyzedSignalsTable:
             sql_query = f"""SELECT {table_name}.id, has_signal, signal_type, symbol, exchange, interval, open_price, deal_time, 
                 start_analize_time, msg
                 FROM {table_name}
-                LEFT JOIN {currencies_table_name} ON {table_name}.currency = {currencies_table_name}.id
+                LEFT JOIN {CurrenciesModel.__tablename__} ON {table_name}.currency = {CurrenciesModel.__tablename__}.id
                 WHERE is_checked = {False} """
 
             df = read_sql_query(sql_query, db_connection)
@@ -92,9 +92,9 @@ def update_currencies():
     try:
         cursor.execute(f"""
                         UPDATE {table_name}
-                        SET currency = (SELECT {currencies_table_name}.id 
-                            FROM {currencies_table_name}
-                            WHERE {currencies_table_name}.symbol = {table_name}.symbol)
+                        SET currency = (SELECT {CurrenciesModel.__tablename__}.id 
+                            FROM {CurrenciesModel.__tablename__}
+                            WHERE {CurrenciesModel.__tablename__}.symbol = {table_name}.symbol)
                    """)
         db_connection.commit()
     except Error as error:

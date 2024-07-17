@@ -7,10 +7,13 @@ from utils.time import datetime_to_str, now_time, secs_to_date
 import market_info
 from db_modul import *
 from user_status_type import UserStatusType
+from menu_text import pocket_option_text
 
 from pandas import read_sql_query, to_datetime
 
 from my_debuger import debug_error, debug_info
+
+from po_api.auto_register_model import Account
 
 startLanguage = "none"
 
@@ -44,12 +47,13 @@ class GenericUser(ABC):
 
 
 class User(GenericUser):
+    __tablename__ = "users"
+
     def __init__(self, id, full_name, tag):
         super().__init__(id, full_name, tag)
 
         self.status = None
-        self.account_number = None
-        self.account_type = None
+        self.account_id = None
         self.had_trial_status = None
         self.trial_end_date = None
         self.before_trial_status = None
@@ -70,8 +74,7 @@ class User(GenericUser):
         self.tag = user_data["tag"]
         self.language = user_data["language"]
         self.status = user_data["status"]
-        self.account_number = user_data["account_number"]
-        self.account_type = user_data["account_type"]
+        self.account_id = user_data["account_id"]
         self.had_trial_status = user_data["had_trial_status"]
         self.trial_end_date = user_data["trial_end_date"]
         self.before_trial_status = user_data["before_trial_status"]
@@ -80,9 +83,25 @@ class User(GenericUser):
         return True
 
     @staticmethod
+    def create_table():
+        cursor = db_connection.cursor()
+        try:
+            cursor.execute(f"""
+                            CREATE TABLE IF NOT EXISTS {User.__tablename__} (
+                                id INTEGER PRIMARY KEY, name TEXT, tag TEXT, language TEXT, status TEXT, 
+                                account_id TEXT, had_trial_status INTEGER, trial_end_date REAL, 
+                                before_trial_status TEXT, time TEXT, get_next_signal INTEGER,
+                                FOREIGN KEY(account_id) REFERENCES {Account.__tablename__}(id)
+                            )
+                        """)
+            db_connection.commit()
+        except sqlite3.Error as error:
+            print(f"Error create_managers_table: ", error)
+
+    @staticmethod
     def find_user_with_id(id):
         try:
-            sql_query = f"SELECT * FROM {user_table} WHERE id = {id}"
+            sql_query = f"SELECT * FROM {User.__tablename__} WHERE id = {id}"
 
             df = read_sql_query(sql_query, db_connection)
 
@@ -95,8 +114,7 @@ class User(GenericUser):
                 "tag": df["tag"][0],
                 "language": df["language"][0],
                 "status": df["status"][0],
-                "account_number": df["account_number"][0],
-                "account_type": df["account_type"][0],
+                "account_id": df["account_id"][0],
                 "had_trial_status": df["had_trial_status"][0],
                 "trial_end_date": df["trial_end_date"][0],
                 "before_trial_status": df["before_trial_status"][0],
@@ -112,37 +130,28 @@ class User(GenericUser):
         cursor = db_connection.cursor()
 
         try:
-            cursor.execute(f"SELECT * FROM {user_table} WHERE id = ?", (id,))
+            cursor.execute(f"SELECT * FROM {User.__tablename__} WHERE id = ?", (id,))
             user_exists = cursor.fetchone()
 
             if user_exists is None:
                 cursor.execute(f'''
-                    INSERT INTO {user_table} (
+                    INSERT INTO {User.__tablename__} (
                         id, name, tag, language, status,
-                        account_number, account_type, had_trial_status, trial_end_date,
+                        account_id, had_trial_status, trial_end_date,
                         before_trial_status, time, get_next_signal
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ''', (
                     id, full_name, tag, startLanguage, UserStatusType.none_status.value,
-                    0, None, False, None, "none", datetime_to_str(now_time()), False
+                    None, False, None, "none", datetime_to_str(now_time()), False
                 ))
                 db_connection.commit()
         except sqlite3.Error as error:
             debug_error(error, f"Error add user with {id}")
 
-    def set_account_type(self, account_type):
-        cursor = db_connection.cursor()
-        try:
-            cursor.execute(f"UPDATE {user_table} SET account_type = ? WHERE id = ?", (account_type, self.id))
-            db_connection.commit()
-            self.account_type = account_type
-        except sqlite3.Error as error:
-            debug_error(error, f"Error change account_type {self.id}")
-
     def set_language(self, new_language):
         cursor = db_connection.cursor()
         try:
-            cursor.execute(f"UPDATE {user_table} SET language = ? WHERE id = ?", (new_language, self.id))
+            cursor.execute(f"UPDATE {User.__tablename__} SET language = ? WHERE id = ?", (new_language, self.id))
             db_connection.commit()
             self.language = new_language
         except sqlite3.Error as error:
@@ -153,7 +162,7 @@ class User(GenericUser):
 
     def set_status(self, status: UserStatusType):
         cursor = db_connection.cursor()
-        cursor.execute(f"UPDATE {user_table} SET status = ? WHERE id = ?", (status.value, self.id))
+        cursor.execute(f"UPDATE {User.__tablename__} SET status = ? WHERE id = ?", (status.value, self.id))
         db_connection.commit()
         self.status = status.value
 
@@ -161,13 +170,13 @@ class User(GenericUser):
         cursor = db_connection.cursor()
         try:
             cursor.execute(f'''
-                SELECT name, account_number, status FROM {user_table}
+                SELECT name, account_id, status FROM {User.__tablename__}
                 WHERE id = ? AND status = ?
             ''', (self.id, UserStatusType.deposit_status.value))
             user = cursor.fetchone()
 
             if user:
-                cursor.execute(f'''UPDATE {user_table} SET status = ?
+                cursor.execute(f'''UPDATE {User.__tablename__} SET status = ?
                     WHERE id = ? AND status = ?
                 ''', (UserStatusType.none_status.value, self.id, UserStatusType.deposit_status.value))
                 db_connection.commit()
@@ -184,7 +193,7 @@ class User(GenericUser):
         try:
             trial_end_date = market_info.get_trial_end_date()
             cursor.execute(f'''
-                UPDATE {user_table}
+                UPDATE {User.__tablename__}
                 SET had_trial_status = 1, before_trial_status = status, status = ?, trial_end_date = ?
                 WHERE id = ?
             ''', (UserStatusType.trial_status.value, trial_end_date, self.id))
@@ -204,25 +213,25 @@ class User(GenericUser):
     def set_tag(self, tag):
         cursor = db_connection.cursor()
         try:
-            cursor.execute(f"UPDATE {user_table} SET tag = ? WHERE id = ?", (tag, self.id))
+            cursor.execute(f"UPDATE {User.__tablename__} SET tag = ? WHERE id = ?", (tag, self.id))
             db_connection.commit()
             self.tag = tag
         except sqlite3.Error as error:
             debug_error(error, f"Error set tag")
 
-    def set_account_number(self, account_number):
+    def set_account_id(self, account_id):
         try:
             cursor = db_connection.cursor()
-            cursor.execute(f"UPDATE {user_table} SET account_number = ? WHERE id = ?", (account_number, self.id))
+            cursor.execute(f"UPDATE {User.__tablename__} SET account_id = ? WHERE id = ?", (account_id, self.id))
             db_connection.commit()
-            self.account_number = account_number
+            self.account_id = account_id
         except sqlite3.Error as e:
-            debug_error(e, error_name=f"Error update account {self.id}")
+            debug_error(e, error_name=f"Error update account_id {self.id}")
 
     def set_allow_signal(self, flag):
         cursor = db_connection.cursor()
         try:
-            cursor.execute(f"UPDATE {user_table} SET get_next_signal = ? WHERE id = ?", (flag, self.id))
+            cursor.execute(f"UPDATE {User.__tablename__} SET get_next_signal = ? WHERE id = ?", (flag, self.id))
             db_connection.commit()
             self.is_signal_allowed = flag
         except sqlite3.Error as error:
@@ -231,7 +240,7 @@ class User(GenericUser):
     @staticmethod
     def get_users_ids_with_status(status: UserStatusType):
         try:
-            sql_query = f"SELECT * FROM {user_table} WHERE status = '{status.value}'"
+            sql_query = f"SELECT * FROM {User.__tablename__} WHERE status = '{status.value}'"
             users_df = read_sql_query(sql_query, db_connection)
             return users_df["id"].values.tolist()
         except sqlite3.Error as error:
@@ -247,11 +256,27 @@ class User(GenericUser):
 
         return has_users_with_status, result_user
 
+    @staticmethod
+    def get_user_with_status_no_po(status: UserStatusType):
+        try:
+            sql_query = (f"SELECT {User.__tablename__}.id "
+                         f"FROM {User.__tablename__} "
+                         f"INNER JOIN {Account.__tablename__} ON {User.__tablename__}.account_id = {Account.__tablename__}.id "
+                         f"WHERE {User.__tablename__}.status = '{status.value}' AND {Account.__tablename__}.type <> '{pocket_option_text}'")
+            users_df = read_sql_query(sql_query, db_connection)
+            users_ids_with_status = users_df["id"].values.tolist()
+            has_users_with_status = len(users_ids_with_status) > 0
+            result_user = users_ids_with_status[0] if has_users_with_status else None
+            return has_users_with_status, result_user
+        except sqlite3.Error as error:
+            debug_error(error, f"Error get users with status '{status.value}'")
+            return False, None
+
     def remove_trial(self):
         cursor = db_connection.cursor()
         try:
             cursor.execute(f'''
-                UPDATE {user_table}
+                UPDATE {User.__tablename__}
                 SET status = before_trial_status, before_trial_status = ?
                 WHERE id = ?
             ''', (UserStatusType.none_status.value, self.id))
@@ -261,11 +286,23 @@ class User(GenericUser):
         except sqlite3.Error as error:
             debug_error(error, f"Error remove trial {self.id}")
 
+    @staticmethod
+    def get_users_with_account_id(account_id):
+        try:
+            sql_query = f"SELECT * FROM {User.__tablename__} WHERE account_id = '{account_id}'"
+            users_df = read_sql_query(sql_query, db_connection)
+            user_ids = users_df["id"].values.tolist()
+            users = [User(user_id, None, None) for user_id in user_ids]
+            return users
+        except sqlite3.Error as error:
+            debug_error(error, f"Error get users with status '{account_id}'")
+            return []
+
 
 def set_user_time(user_id, new_time):
     cursor = db_connection.cursor()
     try:
-        cursor.execute(f"UPDATE {user_table} SET time = ? WHERE id = ?", (new_time, user_id))
+        cursor.execute(f"UPDATE {User.__tablename__} SET time = ? WHERE id = ?", (new_time, user_id))
         db_connection.commit()
     except sqlite3.Error as error:
         debug_error(error, f"Error set user time {user_id}")
@@ -274,7 +311,7 @@ def set_user_time(user_id, new_time):
 def get_users_groups_ids(groups_count, users_in_group_count, delay_second):
     statuses = [UserStatusType.deposit_status.value, UserStatusType.trial_status.value]
     sql_query = f"""
-        SELECT * FROM {user_table} 
+        SELECT * FROM {User.__tablename__} 
         WHERE (status IN {tuple(statuses)} OR id IN {tuple(config.tester_ids)}) AND get_next_signal = {True} 
         ORDER BY time """
     users_df = read_sql_query(sql_query, db_connection)
@@ -314,8 +351,8 @@ def get_users_strings():
 
     try:
         cursor.execute(f'''
-            SELECT id, name, account_number, tag, status, trial_end_date
-            FROM {user_table}
+            SELECT id, name, account_id, tag, status, trial_end_date
+            FROM {User.__tablename__}
             WHERE status IN (?, ?)
         ''', (UserStatusType.deposit_status.value, UserStatusType.trial_status.value))
 
@@ -323,14 +360,14 @@ def get_users_strings():
         user_number = 1
 
         for row in rows:
-            telegram_id, telegram_name, account_number, tag, status, trial_end_date = row
+            telegram_id, telegram_name, account_id, tag, status, trial_end_date = row
             if status == UserStatusType.deposit_status.value:
-                users_data.append((telegram_id, telegram_name, account_number))
-                users_strings_list.append(f"{user_number}. @{tag} | {telegram_name} | {account_number} | {status}")
+                users_data.append((telegram_id, telegram_name, account_id))
+                users_strings_list.append(f"{user_number}. @{tag} | {telegram_name} | {account_id} | {status}")
             elif status == UserStatusType.trial_status.value:
                 formatted_end_date = secs_to_date(trial_end_date)
-                users_data.append((telegram_id, telegram_name, account_number))
-                users_strings_list.append(f"{user_number}. @{tag} | {telegram_name} | {account_number} | {status} | {formatted_end_date}")
+                users_data.append((telegram_id, telegram_name, account_id))
+                users_strings_list.append(f"{user_number}. @{tag} | {telegram_name} | {account_id} | {status} | {formatted_end_date}")
             user_number += 1
         return users_strings_list, users_data
     except sqlite3.Error as error:
@@ -395,3 +432,6 @@ def next_user_strings(users_for_print_count, manager_id):
 
 def get_current_users_data(manager_id):
     return current_users_data_dict.get(manager_id, [])
+
+
+User.create_table()

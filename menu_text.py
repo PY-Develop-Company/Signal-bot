@@ -31,8 +31,8 @@ def get_select_id_type_markup():
     return select_id_markup
 
 
-# def get_trial_button(language):
-#     return types.KeyboardButton(languageFile[language]["get_trial_button_text"])
+def get_trial_button(language):
+    return types.KeyboardButton(languageFile[language]["get_trial_button_text"])
 
 
 def get_select_language_markup():

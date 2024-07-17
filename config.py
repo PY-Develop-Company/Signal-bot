@@ -22,3 +22,5 @@ manager_username = config["ADMIN"]["ManagerUsername"]
 tester_ids = json.loads(config.get("ADMIN", "TesterIds"))
 managers_ids = json.loads(config.get("ADMIN", "ManagersIds"))
 manager_url = f"https://t.me/{manager_username[1:]}"
+
+minimal_deposit = config["GENERAL"].getint("MinimalDeposit")
