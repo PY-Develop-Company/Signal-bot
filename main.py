@@ -350,9 +350,9 @@ async def handle_media(message: types.Message):
         return
 
     # TRIAL
-    if message.text == languageFile[user_instance.language]["get_trial_button_text"]:
-        await get_trial_command(message)
-        return
+    # if message.text == languageFile[user_instance.language]["get_trial_button_text"]:
+    #     await get_trial_command(message)
+    #     return
 
     # MANAGER
     if user_instance.id in config.managers_ids:

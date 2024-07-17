@@ -31,8 +31,8 @@ def get_select_id_type_markup():
     return select_id_markup
 
 
-def get_trial_button(language):
-    return types.KeyboardButton(languageFile[language]["get_trial_button_text"])
+# def get_trial_button(language):
+#     return types.KeyboardButton(languageFile[language]["get_trial_button_text"])
 
 
 def get_select_language_markup():
@@ -76,7 +76,7 @@ def get_accept_reject_markup(languageCode):
 
 def get_half_vip_markup(languageCode):
     vip_markup = types.ReplyKeyboardMarkup(resize_keyboard=True, keyboard=[
-        [get_trial_button(languageCode)],
+        # [get_trial_button(languageCode)],
         [types.KeyboardButton(languageFile[languageCode]["contact_manager"])]
     ])
     return vip_markup
@@ -93,7 +93,7 @@ def get_vip_markup(languageCode):
 def get_no_vip_markup(languageCode):
     not_vip_markup = types.ReplyKeyboardMarkup(row_width=2, resize_keyboard=True, keyboard=[
         [types.KeyboardButton(languageFile[languageCode]["vip_status_info"]), types.KeyboardButton(languageFile[languageCode]["check_id_text"])],
-        [get_trial_button(languageCode)],
+        # [get_trial_button(languageCode)],
         [types.KeyboardButton(languageFile[languageCode]["contact_manager"])]
     ])
     return not_vip_markup
