@@ -25,8 +25,10 @@ binarium_text = "Binarium"
 
 def get_select_id_type_markup():
     select_id_markup = types.ReplyKeyboardMarkup(resize_keyboard=True, keyboard=[
-        [types.KeyboardButton(pocket_option_text), types.KeyboardButton(iq_cent_text),
-         types.KeyboardButton(binarium_text)]
+        [types.KeyboardButton(pocket_option_text)
+         #    , types.KeyboardButton(iq_cent_text),
+         # types.KeyboardButton(binarium_text)
+         ]
     ])
     return select_id_markup
 
