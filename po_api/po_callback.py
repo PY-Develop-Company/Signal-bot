@@ -28,9 +28,9 @@ async def get_po_data():
         print(f"\t users: {[u.id for u in users]}")
 
         if is_registration:
-            Account.set_registration(trader_id)
             account = Account(trader_id, pocket_option_text)
             account.create_if_not_exists()
+            Account.set_registration(trader_id)
             for u in users:
                 await accept_registration_po(u)
                 print(f"\t\t accept_registration_po: {u.id}")
