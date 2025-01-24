@@ -7,6 +7,7 @@ from utils.time import now_time
 
 from tv_signals.interval import Interval
 from pandas import DataFrame, read_sql_query
+from pandas import to_datetime as pd_to_datetime
 
 import sqlite3
 from db_modul import db_connection
@@ -89,8 +90,13 @@ class PriceData:
         #     continue
 
     def get_saved_chart_data(self, bars_count=5000):
-        df = read_sql_query(f"SELECT * FROM {self.table_name} order by datetime desc limit {bars_count};", db_connection)
-        df["datetime"] = df.apply(lambda row: datetime.strptime(row["datetime_str"], '%Y-%m-%d %H:%M:%S'), axis=1)
+        # Додати індекс
+        cursor = db_connection.cursor()
+        cursor.execute(f"CREATE INDEX IF NOT EXISTS idx_{self.table_name}_datetime ON {self.table_name}(datetime)")
+        sql = f"SELECT * FROM {self.table_name} order by datetime desc limit {bars_count}"
+        df = read_sql_query(sql, db_connection)
+        # df["datetime"] = df.apply(lambda row: datetime.strptime(row["datetime_str"], '%Y-%m-%d %H:%M:%S'), axis=1)
+        df["datetime"] = pd_to_datetime(df["datetime_str"])
         return df
 
     def update_volume(self):

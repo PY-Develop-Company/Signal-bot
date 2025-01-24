@@ -658,7 +658,6 @@ def analyze_loop(analyze_pairs: [AnalyzePair], pds: [PriceData], symbols: [str],
     from threading import Thread, Lock
 
     async def analyze_loop_child():
-        print("init")
         AnalyzedSignalsTable.set_all_checked()
         lock = Lock()
 

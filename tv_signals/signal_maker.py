@@ -16,6 +16,8 @@ import asyncio
 
 from my_debuger import debug_info
 
+import gc
+
 signals_analysis_last_date = {}
 signal_last_update = datetime.now()
 
@@ -42,9 +44,16 @@ def analyze_currency_data_controller(analyze_pair, lock):
         all_pds = analyze_pair.get_all_pds()
 
         lock.acquire()
-        main_price_df = main_pd.get_saved_chart_data(5000)
-        all_dfs = [pd.get_saved_chart_data(5000) for pd in analyze_pair.get_all_pds()]
+        # main_price_df = main_pd.get_saved_chart_data(5000)
+        main_price_df = main_pd.get_saved_chart_data(5000).copy() 
+        # all_dfs = [pd.get_saved_chart_data(5000) for pd in analyze_pair.get_all_pds()]
+        all_dfs = [pd.get_saved_chart_data(5000).copy() for pd in analyze_pair.get_all_pds()]
         lock.release()
+
+        del main_price_df
+        for df in all_dfs:
+            del df
+        gc.collect()
 
         start_analyze_time = now_time()  # main_price_df.iloc[0].loc["download_time"]
 
